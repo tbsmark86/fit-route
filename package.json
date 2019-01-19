@@ -1,0 +1,12 @@
+{
+  "name": "fit-route",
+  "repository": "git@gitlab.com:nwholloway/fit-route.git",
+  "author": "Nick Holloway <nick.holloway@pyrites.org.uk>",
+  "private": true,
+  "scripts": {
+    "start": "browser-sync start -s public -f public --port ${C9_PORT:-8080} --listen ${C9_IP:-127.0.0.1} --no-ui --no-open"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.26.3"
+  }
+}
