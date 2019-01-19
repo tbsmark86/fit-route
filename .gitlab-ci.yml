@@ -1,5 +1,6 @@
 pages:
   stage: deploy
+  when: manual
   script:
     - ':'
   artifacts:
