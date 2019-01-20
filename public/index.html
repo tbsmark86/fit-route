@@ -13,11 +13,22 @@
     <div class="navbar-brand">FIT Route Converter</div>
   </nav>
 
-  <main role="main" class="container-fluid">
+  <main role="main" class="container-fluid" id="main">
     <div class="p-3">
       <p>A browser based application to convert a GPX file into a FIT file.</p>
+      <fit-route></fit-route>
+      <noscript>
+        <p>This application requires a browser with JavaScript enabled, and supporting ES modules.</p>
+      </noscript>
     </div>
   </main>
 </body>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.min.js" integrity="sha384-/akamCRnflySW3CYATb1tG4cZUVrkVT2+s6Q150JJNJ4mv8nhvL/V7rPgmzX8scM" crossorigin="anonymous" defer></script>
+<script nomodule type="text/javascript" src="js/nomodule.js" defer></script>
+
+<script type="text/x-template" id="no-modules-template">
+  <p>This application requires a browser supporting ES modules.</p>
+</script>
 
 </html>
