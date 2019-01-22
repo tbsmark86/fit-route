@@ -1,8 +1,28 @@
 /* global Vue */
-Vue.component('fit-route', {
-  template: '#no-modules-template'
-});
+
+const ErrorMessage = {
+  template: '#error-message-template',
+  props: {
+    message: String
+  },
+  computed: {
+    cssClass: () => ['alert', 'alert-danger']
+  }
+};
+
+const FitRoute = {
+  template: '#empty-template',
+};
 
 new Vue({
-  el: '#main'
+  el: '#main',
+  data: {
+    error: {
+      message: 'This application requires a browser supporting ES modules'
+    }
+  },
+  components: {
+    ErrorMessage,
+    FitRoute
+  }
 });
