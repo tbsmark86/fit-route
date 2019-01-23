@@ -58,7 +58,12 @@
 </script>
 
 <script type="text/x-template" id="fit-route-template">
-  <file-upload v-if="!gpxFile" @submit="onFileUpload"></file-upload>
+  <div>
+    <file-upload v-if="!gpxFile" @submit="onFileUpload"></file-upload>
+    <p v-if="route">
+      Route "{{ route.name }}" has {{ route.points.length }} points.
+    </p>
+  </div>
 </script>
 
 </html>

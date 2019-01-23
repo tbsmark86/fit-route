@@ -1,14 +1,21 @@
+import { parseGpx } from '../gpx.js';
 import FileUpload from './file-upload.js';
 
-function onFileUpload(gpxFile) {
-  this.gpxFile = gpxFile;
-  this.$emit('success', `Selected file ${gpxFile.name} (${gpxFile.size} bytes)`);
+async function onFileUpload(gpxFile) {
+  try {
+    this.gpxFile = gpxFile;
+    this.route = await parseGpx(gpxFile);
+  }
+  catch (error) {
+    this.$emit('error', `Unable to process "${gpxFile.name}"`);
+  }
 }
 
 const FitRoute = {
   template: '#fit-route-template',
   data: () => ({
-    gpxFile: null
+    gpxFile: null,
+    route: null
   }),
   methods: {
     onFileUpload
