@@ -10,8 +10,12 @@ function mounted() {
   }).addTo(this.map);
 
   const latlngs = this.route.points.map(({ lat, lon }) => [lat, lon]);
+
   this.routeLayer = L.polyline(latlngs, { color: 'blue' }).addTo(this.map);
   this.map.fitBounds(this.routeLayer.getBounds());
+
+  L.circleMarker(latlngs[latlngs.length - 1], { radius: 8, weight: 0, color: 'red', fillOpacity: 0.6 }).addTo(this.map);
+  L.circleMarker(latlngs[0], { radius: 8, weight: 0, color: 'green', fillOpacity: 0.6 }).addTo(this.map);
 }
 
 const RouteMap = {
