@@ -29,20 +29,23 @@ async function parseXml(buffer) {
   });
 }
 
+const childNamed = (node, nodeName) =>
+  Array.from(node.children).find(node => node.nodeName === nodeName);
+
+const childrenNamed = (node, nodeName) =>
+  Array.from(node.children).filter(node => node.nodeName === nodeName);
+
 function points(trkseg) {
-  return Array.from(trkseg.children)
-    .filter(node => node.nodeName === 'trkpt')
+  return childrenNamed(trkseg, 'trkpt')
     .map(node => {
       const lat = parseFloat(node.getAttribute('lat'));
       const lon = parseFloat(node.getAttribute('lon'));
-      return { lat, lon };
+      const time = childNamed(node, 'time');
+      return { lat, lon, time: time && Date.parse(time.textContent) };
     });
 }
 
 async function parseRoute(doc) {
-  const childNamed = (node, nodeName) =>
-    Array.from(node.children).find(node => node.nodeName === nodeName);
-
   const trk = childNamed(doc.documentElement, 'trk');
   const trkseg = trk && childNamed(trk, 'trkseg');
   const name = trk && childNamed(trk, 'name');
