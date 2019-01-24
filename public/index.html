@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>FIT Route Converter</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin="anonymous">
   <link rel="stylesheet" href="css/fit-route.css">
 </head>
 
@@ -29,6 +30,7 @@
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.min.js" integrity="sha384-/akamCRnflySW3CYATb1tG4cZUVrkVT2+s6Q150JJNJ4mv8nhvL/V7rPgmzX8scM" crossorigin="anonymous" defer></script>
+<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin="anonymous" defer></script>
 <script nomodule type="text/javascript" src="js/nomodule.js" defer></script>
 <script type="module" src="js/app.js" defer></script>
 
@@ -60,10 +62,14 @@
 <script type="text/x-template" id="fit-route-template">
   <div>
     <file-upload v-if="!gpxFile" @submit="onFileUpload"></file-upload>
-    <p v-if="route">
-      Route "{{ route.name }}" has {{ route.points.length }} points.
-    </p>
+    <div v-if="route">
+      <route-map :route="route"></route-map>
+    </div>
   </div>
+</script>
+
+<script type="text/x-template" id="route-map-template">
+  <div id="route-map" class="bg-light"></div>
 </script>
 
 </html>

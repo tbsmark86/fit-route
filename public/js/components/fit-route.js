@@ -1,5 +1,6 @@
 import { parseGpx } from '../gpx.js';
 import FileUpload from './file-upload.js';
+import RouteMap from './route-map.js';
 
 async function onFileUpload(gpxFile) {
   try {
@@ -21,7 +22,8 @@ const FitRoute = {
     onFileUpload
   },
   components: {
-    FileUpload
+    FileUpload,
+    RouteMap
   }
 };
 

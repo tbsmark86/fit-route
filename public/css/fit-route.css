@@ -10,3 +10,7 @@
   opacity: 0;
   cursor: pointer;
 }
+
+#route-map {
+  height: 400px;
+}
