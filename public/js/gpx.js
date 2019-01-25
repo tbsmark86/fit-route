@@ -47,10 +47,13 @@ function points(trkseg) {
 
 async function parseRoute(doc) {
   const trk = childNamed(doc.documentElement, 'trk');
+  const metadata = childNamed(doc.documentElement, 'metadata');
+  const metadataName = metadata && childNamed(metadata, 'name');
   const trkseg = trk && childNamed(trk, 'trkseg');
-  const name = trk && childNamed(trk, 'name');
-  return trkseg && {
-    name: name && name.textContent || 'Unnamed',
-    points: trkseg && points(trkseg)
-  };
+  const trkName = trk && childNamed(trk, 'name');
+
+  const name = (metadataName && metadataName.textContent) ||
+    (trkName && trkName.textContent) || 'Unnamed';
+
+  return trkseg && { name, points: points(trkseg) };
 }
