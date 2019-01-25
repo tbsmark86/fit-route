@@ -2,6 +2,12 @@ import { parseGpx } from '../gpx.js';
 import FileUpload from './file-upload.js';
 import RouteMap from './route-map.js';
 
+function distance() {
+  const points = this.route.points;
+  const km = points[points.length - 1].distance / 1000;
+  return km < 1000 ? km.toPrecision(3) : Math.round(km);
+}
+
 async function onFileUpload(gpxFile) {
   try {
     this.gpxFile = gpxFile;
@@ -19,6 +25,9 @@ const FitRoute = {
     gpxFile: null,
     route: null
   }),
+  computed: {
+    distance
+  },
   methods: {
     onFileUpload
   },

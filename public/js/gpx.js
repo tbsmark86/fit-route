@@ -32,17 +32,47 @@ async function parseXml(buffer) {
 const childNamed = (node, nodeName) =>
   Array.from(node.children).find(node => node.nodeName === nodeName);
 
-const childrenNamed = (node, nodeName) =>
-  Array.from(node.children).filter(node => node.nodeName === nodeName);
+function haversine({ lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }) {
+  const R = 6371e3;
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lon2 - lon1) * Math.PI / 180;
 
-function points(trkseg) {
-  return childrenNamed(trkseg, 'trkpt')
-    .map(node => {
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) *
+    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c;
+
+  return d;
+}
+
+function* trackPoints(trkseg) {
+  let lastPoint;
+  let distance = 0;
+
+  for (const node of trkseg.children) {
+    if (node.nodeName === 'trkpt') {
       const lat = parseFloat(node.getAttribute('lat'));
       const lon = parseFloat(node.getAttribute('lon'));
       const time = childNamed(node, 'time');
-      return { lat, lon, time: time && Date.parse(time.textContent) };
-    });
+
+      if (lastPoint) {
+        distance += haversine(lastPoint, { lat, lon });
+      }
+
+      const point = {
+        lat,
+        lon,
+        distance,
+        time: time && Date.parse(time.textContent)
+      };
+
+      lastPoint = point;
+      yield point;
+    }
+  }
 }
 
 async function parseRoute(doc) {
@@ -54,6 +84,7 @@ async function parseRoute(doc) {
 
   const name = (metadataName && metadataName.textContent) ||
     (trkName && trkName.textContent) || 'Unnamed';
+  const points = trkseg && Array.from(trackPoints(trkseg));
 
-  return trkseg && { name, points: points(trkseg) };
+  return points && { name, points };
 }
