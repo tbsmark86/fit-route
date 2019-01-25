@@ -8,6 +8,7 @@ async function onFileUpload(gpxFile) {
     this.route = await parseGpx(gpxFile);
   }
   catch (error) {
+    console.error(error);
     this.$emit('error', `Unable to process "${gpxFile.name}"`);
   }
 }

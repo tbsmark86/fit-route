@@ -16,8 +16,8 @@
     <div class="navbar-brand">FIT Route Converter</div>
   </nav>
 
-  <main role="main" class="container-fluid" id="main">
-    <div class="p-3">
+  <main role="main" id="main">
+    <div class="container-fluid p-3">
       <p>A browser based application to convert a GPX file into a FIT file.</p>
       <noscript>
         <div class="alert alert-danger">
@@ -25,8 +25,8 @@
         </div>
       </noscript>
       <error-message v-bind="error"></error-message>
-      <fit-route @success="onSuccess" @warning="onWarning" @error="onError"></fit-route>
     </div>
+    <fit-route @success="onSuccess" @warning="onWarning" @error="onError"></fit-route>
   </main>
 </body>
 
@@ -62,11 +62,23 @@
 </script>
 
 <script type="text/x-template" id="fit-route-template">
-  <div>
-    <file-upload v-if="!gpxFile" @submit="onFileUpload"></file-upload>
-    <div v-if="route">
-      <route-map :route="route"></route-map>
-    </div>
+  <div class="container-fluid p-3">
+    <template v-if="!gpxFile">
+        <file-upload @submit="onFileUpload"></file-upload>
+    </template>
+    <template v-if="route">
+      <div class="row">
+        <div class="col-auto bg-light">
+          <div class="d-flex flex-column">
+            <div>Name:</div>
+            <div class="text-info">{{ route.name }}</div>
+          </div>
+        </div>
+        <div class="col p-0">
+          <route-map :route="route"></route-map>
+        </div>
+      </div>
+    </template>
   </div>
 </script>
 
