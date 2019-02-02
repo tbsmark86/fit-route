@@ -1,6 +1,8 @@
+/* global URL */
 import { parseGpx } from '../gpx.js';
 import FileUpload from './file-upload.js';
 import RouteMap from './route-map.js';
+import { FITEncoder } from '../fit/encoder.js';
 
 function distance() {
   const points = this.route.points;
@@ -44,6 +46,27 @@ async function onFileUpload(gpxFile) {
   }
 }
 
+function onFitDownload() {
+  try {
+    const encoder = new FITEncoder();
+    encoder.writeFileId({ type: 'course', time_created: Date.now() });
+    for (const { lat, lon } of this.route.points) {
+      encoder.writeRecord({ position_lat: lat, position_long: lon });
+    }
+
+    const url = URL.createObjectURL(encoder.blob);
+    const anchorElement = this.$refs.downloadAnchor;
+    anchorElement.download = `${this.route.name}.fit`;
+    anchorElement.href = url;
+    anchorElement.click();
+    URL.revokeObjectURL(url);
+  }
+  catch (error) {
+    console.error(error);
+    this.$emit('error', `Unable to create FIT`);
+  }
+}
+
 const FitRoute = {
   template: '#fit-route-template',
   data: () => ({
@@ -57,7 +80,8 @@ const FitRoute = {
     goalTime
   },
   methods: {
-    onFileUpload
+    onFileUpload,
+    onFitDownload
   },
   components: {
     FileUpload,

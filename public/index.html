@@ -78,6 +78,10 @@
             <div class="text-info">{{ goalTime }}</div>
             <div>Avg Speed:</div>
             <div class="text-info">{{ avgSpeed }} km/h</div>
+            <div>
+              <button class="btn btn-primary" @click="onFitDownload">Download as FIT</button>
+              <a ref="downloadAnchor" class="d-none" download="COURSE.fit" href="#"></a>
+            </div>
           </div>
         </div>
         <div class="col p-0">
