@@ -41,6 +41,13 @@ const uint32 = {
   setValue: DataView.prototype.setUint32
 };
 
+const string = {
+  size: 0,
+  baseType: 7,
+  mapValue: (value) => Array.from(encodedStr(value)),
+  setValue: dvSetUint8Array
+};
+
 const date_time = {
   ...uint32,
   mapValue: (value) => value - 631065600 // "1989-12-31T00:00"
@@ -58,6 +65,56 @@ export const types = {
   uint8,
   sint32,
   uint32,
+  string,
   semicircles,
   date_time
 };
+
+export function encodedStrlen(str) {
+  return Array.from(encodedStr(str)).length;
+}
+
+// Null terminated string encoded in UTF-8 format
+function* encodedStr(s) {
+  for (const codePoint of codePoints(s)) {
+    if (codePoint < 0x80) {
+      yield codePoint;
+    }
+    else {
+      const bytes = [codePoint & 0x3f, (codePoint >> 6) & 0x3f, (codePoint >> 12) & 0x3f, codePoint >> 18];
+      if (codePoint < 0x800) {
+        yield 0xc0 | bytes[1];
+        yield 0x80 | bytes[0];
+      }
+      else if (codePoint < 0x10000) {
+        yield 0xe0 | bytes[2];
+        yield 0x80 | bytes[1];
+        yield 0x80 | bytes[0];
+      }
+      else {
+        yield 0xf0 | bytes[3];
+        yield 0x80 | bytes[2];
+        yield 0x80 | bytes[1];
+        yield 0x80 | bytes[0];
+      }
+    }
+  }
+  yield 0;
+}
+
+function* codePoints(s) {
+  for (let i = 0; i < s.length; i++) {
+    const codePoint = s.codePointAt(i);
+    if (codePoint > 0xFFFF) {
+      i++; // skip 2nd surrogate pair
+    }
+    yield codePoint;
+  }
+}
+
+function dvSetUint8Array(offset, values) {
+  const dv = this;
+  for (const value of values) {
+    dv.setUint8(offset++, value);
+  }
+}

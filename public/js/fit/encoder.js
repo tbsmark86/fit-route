@@ -22,6 +22,10 @@ export class FITEncoder {
     this.writeMesg('record', { position_lat, position_long });
   }
 
+  writeCourse({ name }) {
+    this.writeMesg('course', { name });
+  }
+
   writeMesg(mesgName, values) {
     let localNum = this.localNum[mesgName];
     if (localNum === undefined) {

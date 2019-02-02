@@ -1,4 +1,4 @@
-import { types } from './types.js';
+import { types, encodedStrlen } from './types.js';
 
 const mesgDefns = {
   file_id: {
@@ -13,6 +13,12 @@ const mesgDefns = {
     fieldDefns: [
       { name: 'position_lat', number: 0, type: 'semicircles' },
       { name: 'position_long', number: 1, type: 'semicircles' }
+    ]
+  },
+  course: {
+    mesgNum: 31,
+    fieldDefns: [
+      { name: 'name', number: 5, type: 'string' }
     ]
   }
 };
@@ -32,8 +38,11 @@ export class Mesg {
   }
 
   get mesgDefn() {
-    const fieldDefns = this.fields.map(({ number, type }) => {
+    const fieldDefns = this.fields.map(({ number, type, value }) => {
       const { size, baseType } = types[type];
+      if (type === 'string') {
+        return { number, size: encodedStrlen(value), baseType };
+      }
       return { number, size, baseType };
     });
     return {
