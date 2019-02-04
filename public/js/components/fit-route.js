@@ -51,8 +51,8 @@ function onFitDownload() {
     const encoder = new FITEncoder();
     encoder.writeFileId({ type: 'course', time_created: Date.now() });
     encoder.writeCourse({ name: this.route.name });
-    for (const { lat, lon } of this.route.points) {
-      encoder.writeRecord({ position_lat: lat, position_long: lon });
+    for (const { lat, lon, time } of this.route.points) {
+      encoder.writeRecord({ timestamp: time, position_lat: lat, position_long: lon });
     }
 
     const url = URL.createObjectURL(encoder.blob);

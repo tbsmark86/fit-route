@@ -11,6 +11,7 @@ const mesgDefns = {
   record: {
     mesgNum: 20,
     fieldDefns: [
+      { name: 'timestamp', number: 253, type: 'date_time' },
       { name: 'position_lat', number: 0, type: 'semicircles' },
       { name: 'position_long', number: 1, type: 'semicircles' }
     ]

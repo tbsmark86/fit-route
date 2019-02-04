@@ -50,7 +50,7 @@ const string = {
 
 const date_time = {
   ...uint32,
-  mapValue: (value) => value - 631065600 // "1989-12-31T00:00"
+  mapValue: (value) => Math.round(value / 1000) - 631065600 // "1989-12-31T00:00"
 };
 
 const semicircles = {

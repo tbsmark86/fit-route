@@ -18,8 +18,8 @@ export class FITEncoder {
     this.writeMesg('file_id', { type, time_created });
   }
 
-  writeRecord({ position_lat, position_long }) {
-    this.writeMesg('record', { position_lat, position_long });
+  writeRecord({ timestamp, position_lat, position_long }) {
+    this.writeMesg('record', { timestamp, position_lat, position_long });
   }
 
   writeCourse({ name }) {
