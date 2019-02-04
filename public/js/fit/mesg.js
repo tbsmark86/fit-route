@@ -31,8 +31,23 @@ const fields = (fieldDefns, fieldValues) => {
 };
 
 export class Mesg {
+  static check(mesgName, mesgNum, fieldDefns, values) {
+    if (mesgNum === undefined) {
+      throw new Error(`Message '${mesgName}' not known`);
+    }
+    if (fieldDefns === undefined) {
+      throw new Error(`Message '${mesgName}' has no field definitions`);
+    }
+    const fieldNames = fieldDefns.map((fieldDefn) => fieldDefn.name);
+    const unknownFields = Object.keys(values).filter((fieldName) => !fieldNames.includes(fieldName));
+    if (unknownFields.length) {
+      throw new Error(`Message '${mesgName}' has no field definitions named '${unknownFields}'`);
+    }
+  }
+
   constructor(localNum, mesgName, values) {
     const { mesgNum, fieldDefns } = mesgDefns[mesgName];
+    Mesg.check(mesgName, mesgNum, fieldDefns, values);
     this.localNum = localNum;
     this.mesgNum = mesgNum;
     this.fields = fields(fieldDefns, values);

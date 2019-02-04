@@ -14,16 +14,16 @@ export class FITEncoder {
     this.messages = [];
   }
 
-  writeFileId({ type, time_created }) {
-    this.writeMesg('file_id', { type, time_created });
+  writeFileId(values) {
+    this.writeMesg('file_id', values);
   }
 
-  writeRecord({ timestamp, position_lat, position_long }) {
-    this.writeMesg('record', { timestamp, position_lat, position_long });
+  writeRecord(values) {
+    this.writeMesg('record', values);
   }
 
-  writeCourse({ name }) {
-    this.writeMesg('course', { name });
+  writeCourse(values) {
+    this.writeMesg('course', values);
   }
 
   writeMesg(mesgName, values) {
