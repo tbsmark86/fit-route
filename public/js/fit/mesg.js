@@ -8,6 +8,18 @@ const mesgDefns = {
       { name: 'time_created', number: 4, type: 'date_time' }
     ]
   },
+  lap: {
+    mesgNum: 19,
+    fieldDefns: [
+      { name: 'timestamp', number: 253, type: 'date_time' },
+      { name: 'start_time', number: 2, type: 'date_time' },
+      { name: 'start_position_lat', number: 3, type: 'semicircles' },
+      { name: 'start_position_long', number: 4, type: 'semicircles' },
+      { name: 'end_position_lat', number: 5, type: 'semicircles' },
+      { name: 'end_position_long', number: 6, type: 'semicircles' },
+      { name: 'total_elapsed_time', number: 7, type: 'seconds' }
+    ]
+  },
   record: {
     mesgNum: 20,
     fieldDefns: [

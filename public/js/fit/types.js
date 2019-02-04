@@ -48,6 +48,11 @@ const string = {
   setValue: dvSetUint8Array
 };
 
+const seconds = {
+  ...uint32,
+  mapValue: (value) => Math.round(value * 1000)
+};
+
 const date_time = {
   ...uint32,
   mapValue: (value) => Math.round(value / 1000) - 631065600 // "1989-12-31T00:00"
@@ -66,6 +71,7 @@ export const types = {
   sint32,
   uint32,
   string,
+  seconds,
   semicircles,
   date_time
 };

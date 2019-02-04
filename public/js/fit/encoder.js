@@ -18,6 +18,10 @@ export class FITEncoder {
     this.writeMesg('file_id', values);
   }
 
+  writeLap(values) {
+    this.writeMesg('lap', values);
+  }
+
   writeRecord(values) {
     this.writeMesg('record', values);
   }

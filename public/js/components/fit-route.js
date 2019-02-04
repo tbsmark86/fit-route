@@ -48,9 +48,21 @@ async function onFileUpload(gpxFile) {
 
 function onFitDownload() {
   try {
+    const start = this.route.points[0];
+    const finish = this.route.points[this.route.points.length - 1];
+
     const encoder = new FITEncoder();
     encoder.writeFileId({ type: 'course', time_created: Date.now() });
     encoder.writeCourse({ name: this.route.name });
+    encoder.writeLap({
+      timestamp: start.time,
+      total_elapsed_time: (finish.time - start.time) / 1000,
+      start_time: start.time,
+      start_position_lat: start.lat,
+      start_position_long: start.lon,
+      end_position_lat: start.lat,
+      end_position_long: finish.lon
+    });
     for (const { lat, lon, time } of this.route.points) {
       encoder.writeRecord({ timestamp: time, position_lat: lat, position_long: lon });
     }
