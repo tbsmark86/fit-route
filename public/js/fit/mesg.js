@@ -17,7 +17,8 @@ const mesgDefns = {
       { name: 'start_position_long', number: 4, type: 'semicircles' },
       { name: 'end_position_lat', number: 5, type: 'semicircles' },
       { name: 'end_position_long', number: 6, type: 'semicircles' },
-      { name: 'total_elapsed_time', number: 7, type: 'seconds' }
+      { name: 'total_elapsed_time', number: 7, type: 'seconds' },
+      { name: 'total_distance', number: 9, type: 'distance' }
     ]
   },
   record: {

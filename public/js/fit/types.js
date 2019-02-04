@@ -53,6 +53,11 @@ const seconds = {
   mapValue: (value) => Math.round(value * 1000)
 };
 
+const distance = {
+  ...uint32,
+  mapValue: (value) => Math.round(value * 100)
+};
+
 const date_time = {
   ...uint32,
   mapValue: (value) => Math.round(value / 1000) - 631065600 // "1989-12-31T00:00"
@@ -72,6 +77,7 @@ export const types = {
   uint32,
   string,
   seconds,
+  distance,
   semicircles,
   date_time
 };

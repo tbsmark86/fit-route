@@ -61,7 +61,8 @@ function onFitDownload() {
       start_position_lat: start.lat,
       start_position_long: start.lon,
       end_position_lat: start.lat,
-      end_position_long: finish.lon
+      end_position_long: finish.lon,
+      total_distance: finish.distance
     });
     for (const { lat, lon, time } of this.route.points) {
       encoder.writeRecord({ timestamp: time, position_lat: lat, position_long: lon });
