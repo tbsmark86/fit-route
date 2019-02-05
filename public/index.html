@@ -28,45 +28,44 @@
     </div>
     <fit-route @success="onSuccess" @warning="onWarning" @error="onError"></fit-route>
   </main>
-</body>
 
-<script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.min.js" integrity="sha384-/akamCRnflySW3CYATb1tG4cZUVrkVT2+s6Q150JJNJ4mv8nhvL/V7rPgmzX8scM" crossorigin="anonymous" defer></script>
-<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin="anonymous" defer></script>
-<script src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js" integrity="sha384-btJhAWztz7ttA6ibFC5ppM39nkCPK6CWzRVmsaLcDn37mA3x1TzF1DbFwa6tJpTN" crossorigin="anonymous" defer></script>
-<script nomodule type="text/javascript" src="js/nomodule.js" defer></script>
-<script type="module" src="js/app.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.min.js" integrity="sha384-/akamCRnflySW3CYATb1tG4cZUVrkVT2+s6Q150JJNJ4mv8nhvL/V7rPgmzX8scM" crossorigin="anonymous" defer></script>
+  <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin="anonymous" defer></script>
+  <script src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js" integrity="sha384-btJhAWztz7ttA6ibFC5ppM39nkCPK6CWzRVmsaLcDn37mA3x1TzF1DbFwa6tJpTN" crossorigin="anonymous" defer></script>
+  <script nomodule type="text/javascript" src="js/nomodule.js" defer></script>
+  <script type="module" src="js/app.js" defer></script>
 
-<script type="text/x-template" id="error-message-template">
-  <div role="alert" v-if="message" :class="cssClass">{{ message }}</div>
-</script>
+  <script type="text/x-template" id="error-message-template">
+    <div role="alert" v-if="message" :class="cssClass">{{ message }}</div>
+  </script>
 
-<script type="text/x-template" id="empty-template">
-</script>
+  <script type="text/x-template" id="empty-template">
+  </script>
 
-<script type="text/x-template" id="file-upload-template">
-  <form enctype="multipart/form-data" novalidate>
-    <div class="file-upload d-flex justify-content-center align-items-center border bg-light w-75 mx-auto">
-      <input v-if="!file" type="file" title=" " accept=".gpx,application/gpx+xml" @change="onFilesChange($event.target.files)">
-      <div v-if="!file" class="h4 font-weight-normal">
-        Drop GPX here or click to browse
-      </div>
-      <div v-else d-flex justify-content-center align-items-center>
-        <div class="text-center">{{ file.name }}</div>
-        <div class="d-flex justify-content-around">
-          <button type="button" class="btn btn-secondary m-2" @click.prevent="onCancel">Cancel</button>
-          <button type="button" class="btn btn-primary m-2" @click.prevent="onSubmit">Submit</button>
+  <script type="text/x-template" id="file-upload-template">
+    <form enctype="multipart/form-data" novalidate>
+      <div class="file-upload d-flex justify-content-center align-items-center border bg-light w-75 mx-auto">
+        <input v-if="!file" type="file" title=" " accept=".gpx,application/gpx+xml" @change="onFilesChange($event.target.files)">
+        <div v-if="!file" class="h4 font-weight-normal">
+          Drop GPX here or click to browse
+        </div>
+        <div v-else d-flex justify-content-center align-items-center>
+          <div class="text-center">{{ file.name }}</div>
+          <div class="d-flex justify-content-around">
+            <button type="button" class="btn btn-secondary m-2" @click.prevent="onCancel">Cancel</button>
+            <button type="button" class="btn btn-primary m-2" @click.prevent="onSubmit">Submit</button>
+          </div>
         </div>
       </div>
-    </div>
-  </form>
-</script>
+    </form>
+  </script>
 
-<script type="text/x-template" id="fit-route-template">
-  <div class="container-fluid p-3">
-    <template v-if="!gpxFile">
+  <script type="text/x-template" id="fit-route-template">
+    <div class="container-fluid p-3">
+      <template v-if="!gpxFile">
         <file-upload @submit="onFileUpload"></file-upload>
     </template>
-    <template v-if="route">
+      <template v-if="route">
       <div class="row">
         <div class="col-auto bg-light">
           <div class="d-flex flex-column">
@@ -89,11 +88,12 @@
         </div>
       </div>
     </template>
-  </div>
-</script>
+    </div>
+  </script>
 
-<script type="text/x-template" id="route-map-template">
-  <div id="route-map" class="bg-light"></div>
-</script>
+  <script type="text/x-template" id="route-map-template">
+    <div id="route-map" class="bg-light"></div>
+  </script>
+</body>
 
 </html>
