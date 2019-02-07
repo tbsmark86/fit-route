@@ -56,6 +56,7 @@ function* trackPoints(trkseg) {
     if (node.nodeName === 'trkpt') {
       const lat = parseFloat(node.getAttribute('lat'));
       const lon = parseFloat(node.getAttribute('lon'));
+      const ele = childNamed(node, 'ele');
       const time = childNamed(node, 'time');
 
       if (lastPoint) {
@@ -65,6 +66,7 @@ function* trackPoints(trkseg) {
       const point = {
         lat,
         lon,
+        ele: ele && parseFloat(ele.textContent),
         distance,
         time: time && Date.parse(time.textContent)
       };
@@ -73,6 +75,36 @@ function* trackPoints(trkseg) {
       yield point;
     }
   }
+}
+
+function elevationChange(points) {
+  let eleGain = 0;
+  let eleLoss = 0;
+  let lastEle;
+
+  for (const { ele } of points) {
+    if (ele === undefined) {
+      return {};
+    }
+
+    if (lastEle === undefined) {
+      lastEle = ele;
+      continue;
+    }
+
+    const delta = ele - lastEle;
+    if (Math.abs(delta) >= 4) {
+      lastEle = ele;
+      if (delta > 0) {
+        eleGain += delta;
+      }
+      else {
+        eleLoss -= delta;
+      }
+    }
+  }
+
+  return { eleGain, eleLoss };
 }
 
 async function parseRoute(doc) {
@@ -85,6 +117,7 @@ async function parseRoute(doc) {
   const name = (metadataName && metadataName.textContent) ||
     (trkName && trkName.textContent) || 'Unnamed';
   const points = trkseg && Array.from(trackPoints(trkseg));
+  const { eleGain, eleLoss } = points && elevationChange(points) || {};
 
-  return points && { name, points };
+  return points && { name, points, eleGain, eleLoss };
 }

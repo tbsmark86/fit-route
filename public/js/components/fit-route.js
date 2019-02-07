@@ -62,10 +62,12 @@ function onFitDownload() {
       start_position_long: start.lon,
       end_position_lat: start.lat,
       end_position_long: finish.lon,
-      total_distance: finish.distance
+      total_distance: finish.distance,
+      total_ascent: this.route.eleGain,
+      total_descent: this.route.eleLoss
     });
-    for (const { lat, lon, time } of this.route.points) {
-      encoder.writeRecord({ timestamp: time, position_lat: lat, position_long: lon });
+    for (const { lat, lon, ele, time, distance } of this.route.points) {
+      encoder.writeRecord({ timestamp: time, position_lat: lat, position_long: lon, altitude: ele, distance });
     }
 
     const url = URL.createObjectURL(encoder.blob);

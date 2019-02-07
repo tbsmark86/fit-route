@@ -29,6 +29,18 @@ const uint8 = {
   setValue: DataView.prototype.setUint8
 };
 
+const sint16 = {
+  size: 2,
+  baseType: 0x83,
+  setValue: DataView.prototype.setInt16
+};
+
+const uint16 = {
+  size: 2,
+  baseType: 0x84,
+  setValue: DataView.prototype.setUint16
+};
+
 const sint32 = {
   size: 4,
   baseType: 0x85,
@@ -58,6 +70,11 @@ const distance = {
   mapValue: (value) => Math.round(value * 100)
 };
 
+const altitude = {
+  ...uint16,
+  mapValue: (value) => Math.round((value + 500) * 5)
+};
+
 const date_time = {
   ...uint32,
   mapValue: (value) => Math.round(value / 1000) - 631065600 // "1989-12-31T00:00"
@@ -73,12 +90,15 @@ export const types = {
   enum_sport,
   sint8,
   uint8,
+  sint16,
+  uint16,
   sint32,
   uint32,
   string,
   seconds,
   distance,
   semicircles,
+  altitude,
   date_time
 };
 

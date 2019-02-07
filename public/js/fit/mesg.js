@@ -18,7 +18,9 @@ const mesgDefns = {
       { name: 'end_position_lat', number: 5, type: 'semicircles' },
       { name: 'end_position_long', number: 6, type: 'semicircles' },
       { name: 'total_timer_time', number: 8, type: 'seconds' },
-      { name: 'total_distance', number: 9, type: 'distance' }
+      { name: 'total_distance', number: 9, type: 'distance' },
+      { name: 'total_ascent', number: 21, type: 'uint16' },
+      { name: 'total_descent', number: 22, type: 'uint16' }
     ]
   },
   record: {
@@ -26,7 +28,9 @@ const mesgDefns = {
     fieldDefns: [
       { name: 'timestamp', number: 253, type: 'date_time' },
       { name: 'position_lat', number: 0, type: 'semicircles' },
-      { name: 'position_long', number: 1, type: 'semicircles' }
+      { name: 'position_long', number: 1, type: 'semicircles' },
+      { name: 'altitude', number: 2, type: 'altitude' },
+      { name: 'distance', number: 5, type: 'distance' }
     ]
   },
   course: {
