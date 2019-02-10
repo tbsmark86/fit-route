@@ -16,13 +16,13 @@
   <nav class="navbar navbar-expand-md navbar-dark bg-dark">
     <div class="navbar-brand">FIT Route Converter</div>
     <div class="navbar-nav nav-link ml-auto">
-      <a href="https://www.pyrites.org.uk/" target="_new" class="text-light"><i class="fas fa-blog"></i></a>
+      <a href="https://www.pyrites.org.uk/" target="_new" aria-label="Blog" class="text-light"><i class="fas fa-blog"></i></a>
     </div>
     <div class="navbar-nav nav-link">
-      <a href="https://twitter.com/TechWrangler" target="_new" class="text-light"><i class="fab fa-twitter"></i></a>
+      <a href="https://twitter.com/TechWrangler" target="_new" aria-label="Twitter" class="text-light"><i class="fab fa-twitter"></i></a>
     </div>
     <div class="navbar-nav nav-link">
-      <a href="https://gitlab.com/nwholloway/fit-route" target="_new" class="text-light"><i class="fab fa-gitlab"></i></a>
+      <a href="https://gitlab.com/nwholloway/fit-route" target="_new" aria-label="GitLab" class="text-light"><i class="fab fa-gitlab"></i></a>
     </div>
   </nav>
 
@@ -59,7 +59,7 @@
         <span>Your data never leaves your computer as all processing is performed within your browser.</span>
         <span>You do not need to register to use this application.</span>
         <span>There are no adverts, no cookies, no use of local storage, or service workers.</span>
-        <span>The source can be cloned from <a href="https://gitlab.com/nwholloway/fit-route">GitLab</a>.
+        <span>The source can be cloned from <a href="https://gitlab.com/nwholloway/fit-route" class="text-muted">GitLab</a>.
       </p>
       <p>
         <span>The application works with the current versions of Chrome, Firefox and Safari.</span>
@@ -92,7 +92,7 @@
   <script type="text/x-template" id="file-upload-template">
     <form enctype="multipart/form-data" novalidate>
       <div class="file-upload d-flex justify-content-center align-items-center border bg-light w-75 mx-auto">
-        <input v-if="!file" type="file" title=" " accept=".gpx,application/gpx+xml" @change="onFilesChange($event.target.files)">
+        <input v-if="!file" type="file" title=" " aria-label="Select GPX" accept=".gpx,application/gpx+xml" @change="onFilesChange($event.target.files)">
         <div v-if="!file" class="h4 font-weight-normal">
           Drop GPX here or click to browse
         </div>
