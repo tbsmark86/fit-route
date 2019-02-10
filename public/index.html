@@ -24,9 +24,9 @@
           This application requires a browser with JavaScript enabled, and supporting ES modules.
         </div>
       </noscript>
-      <error-message v-bind="error"></error-message>
+      <error-message :message="error"></error-message>
     </div>
-    <fit-route @success="onSuccess" @warning="onWarning" @error="onError" class="flex-grow-1"></fit-route>
+    <fit-route @error="onError" class="flex-grow-1"></fit-route>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.min.js" integrity="sha384-/akamCRnflySW3CYATb1tG4cZUVrkVT2+s6Q150JJNJ4mv8nhvL/V7rPgmzX8scM" crossorigin="anonymous" defer></script>
@@ -36,7 +36,7 @@
   <script type="module" src="js/app.js" defer></script>
 
   <script type="text/x-template" id="error-message-template">
-    <div role="alert" v-if="message" :class="cssClass">{{ message }}</div>
+    <div role="alert" v-if="message" class="alert alert-danger">{{ message }}</div>
   </script>
 
   <script type="text/x-template" id="empty-template">

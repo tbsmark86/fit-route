@@ -5,8 +5,7 @@ function cssClass() {
 const ErrorMessage = {
   template: '#error-message-template',
   props: {
-    message: String,
-    category: String
+    message: String
   },
   computed: {
     cssClass
