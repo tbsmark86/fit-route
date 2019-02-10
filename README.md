@@ -19,3 +19,26 @@ The application will be served up on <http://localhost:8080/>.
 
 If you are using Cloud9 then the application will be available on the
 workspace URL <http://workspace-username.c9users.io> (`$C9_HOST`).
+
+Notes
+-----
+
+This has been written using ES6 modules, and does not need a build step to
+transpile for execution.  All 3rd party libraries are loaded from their CDNs.
+
+Currently only Chrome, Firefox and Safari are supported.  It would be possible
+to transpile & polyfill to support other browsers.
+
+Documentation of the FIT file format is contained in the FIT SDK
+([download](https://www.thisisant.com/resources/fit/)), and this implementation
+does the bare minimum required.
+
+The mapping uses [CARTO](https://github.com/CartoDB/basemap-styles) raster tiles,
+which are free for up to 75,000 mapviews per month for non-commercial use.
+
+Third Party Libraries
+---------------------
+
+* [Vue.js](https://vuejs.org/)
+* [Bootstrap](https://getbootstrap.com/)
+* [Leaflet](https://leafletjs.com/)
