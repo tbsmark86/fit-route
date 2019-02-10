@@ -5,9 +5,10 @@ import RouteMap from './route-map.js';
 import { FITEncoder } from '../fit/encoder.js';
 
 function distance() {
+  const round = (d) => d < 1000 ? d.toPrecision(3) : Math.round(d);
   const points = this.route.points;
   const km = points[points.length - 1].distance / 1000;
-  return km < 1000 ? km.toPrecision(3) : Math.round(km);
+  return this.units === 'miles' ? round(km / 1.609344) : round(km);
 }
 
 function duration() {
@@ -33,6 +34,10 @@ function goalTime() {
 function avgSpeed() {
   const speed = this.distance / (this.duration / 3600000);
   return speed.toFixed(1);
+}
+
+function speedUnits() {
+  return this.units === 'miles' ? 'mph' : `${this.units}/h`;
 }
 
 function onClear() {
@@ -93,10 +98,12 @@ const FitRoute = {
   template: '#fit-route-template',
   data: () => ({
     gpxFile: null,
-    route: null
+    route: null,
+    units: 'km'
   }),
   computed: {
     avgSpeed,
+    speedUnits,
     distance,
     duration,
     goalTime
