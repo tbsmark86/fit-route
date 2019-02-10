@@ -18,7 +18,42 @@
 
   <main role="main" id="main" class="flex-grow-1 d-flex flex-column">
     <div v-if="showInfo" class="container-fluid p-3">
-      <p>A browser based application to convert a GPX file into a FIT file.</p>
+      <p>
+        <span>A browser based application to convert a GPX file into a FIT file.</span>
+        <ul>
+          <li>
+            Select the GPX file to be converted
+          </li>
+          <li>
+            View the route on a map, along with the key statistics
+          </li>
+          <!--
+          <li>
+            Amend the goal time or the average speed to your desired values
+          </li>
+          -->
+          <li>
+            Download will save the course as a FIT file
+          </li>
+          <li>
+            Connect Garmin as USB device, and place the FIT file in <span class="text-monospace">\GARMIN\NEWFILES</span>
+          </li>
+        </ul>
+      </p>
+      <p>
+        <span>I developed this to simplify the task of converting a GPX for an event into a course I could follow on my Garmin Edge 25.</span>
+        <span>Although there are route planning sites that will perform the conversion, I found the results very variable.</span>
+        <span>I also wanted to see if I could generate the binary file format using JavaScript within the browser.</span>
+      </p>
+      <p>
+        <span>Your data never leaves your computer as all processing is performed within your browser.</span>
+        <span>You do not need to register to use this application.</span>
+        <span>There are no adverts, no cookies, no use of local storage, or service workers.</span>
+        <span>The source can be cloned from <a href="https://gitlab.com/nwholloway/fit-route">GitLab</a>.
+      </p>
+      <p>
+        <span>The application works with the current versions of Chrome, Firefox and Safari.</span>
+      </p>
       <noscript>
         <div class="alert alert-danger">
           This application requires a browser with JavaScript enabled, and supporting ES modules.
