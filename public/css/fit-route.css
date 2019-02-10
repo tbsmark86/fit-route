@@ -1,3 +1,7 @@
+body {
+  min-height: 100vh;
+}
+
 .file-upload {
   position: relative;
   min-height: 150px;
@@ -12,5 +16,5 @@
 }
 
 #route-map {
-  height: 400px;
+  min-height: 400px;
 }

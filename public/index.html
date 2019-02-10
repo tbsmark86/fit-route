@@ -11,12 +11,12 @@
   <link rel="stylesheet" href="css/fit-route.css">
 </head>
 
-<body>
+<body class="d-flex flex-column">
   <nav class="navbar navbar-expand-md navbar-dark bg-dark">
     <div class="navbar-brand">FIT Route Converter</div>
   </nav>
 
-  <main role="main" id="main">
+  <main role="main" id="main" class="flex-grow-1 d-flex flex-column">
     <div class="container-fluid p-3">
       <p>A browser based application to convert a GPX file into a FIT file.</p>
       <noscript>
@@ -26,7 +26,7 @@
       </noscript>
       <error-message v-bind="error"></error-message>
     </div>
-    <fit-route @success="onSuccess" @warning="onWarning" @error="onError"></fit-route>
+    <fit-route @success="onSuccess" @warning="onWarning" @error="onError" class="flex-grow-1"></fit-route>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.min.js" integrity="sha384-/akamCRnflySW3CYATb1tG4cZUVrkVT2+s6Q150JJNJ4mv8nhvL/V7rPgmzX8scM" crossorigin="anonymous" defer></script>
@@ -61,12 +61,12 @@
   </script>
 
   <script type="text/x-template" id="fit-route-template">
-    <div class="container-fluid p-3">
+    <div class="container-fluid p-3 d-flex flex-column">
       <template v-if="!gpxFile">
         <file-upload @submit="onFileUpload"></file-upload>
     </template>
       <template v-if="route">
-      <div class="row">
+      <div class="row flex-grow-1">
         <div class="col-auto bg-light">
           <div class="d-flex flex-column">
             <div>Name:</div>
@@ -92,7 +92,7 @@
   </script>
 
   <script type="text/x-template" id="route-map-template">
-    <div id="route-map" class="bg-light"></div>
+    <div id="route-map" class="bg-light h-100"></div>
   </script>
 </body>
 
