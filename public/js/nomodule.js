@@ -14,9 +14,11 @@ const FitRoute = {
 new Vue({
   el: '#main',
   data: {
+    showInfo: true,
     error: 'This application requires a browser supporting ES modules'
   },
   methods: {
+    onShowInfo: () => undefined,
     onError: () => undefined
   },
   components: {

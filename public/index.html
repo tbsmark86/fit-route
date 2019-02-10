@@ -17,16 +17,18 @@
   </nav>
 
   <main role="main" id="main" class="flex-grow-1 d-flex flex-column">
-    <div class="container-fluid p-3">
+    <div v-if="showInfo" class="container-fluid p-3">
       <p>A browser based application to convert a GPX file into a FIT file.</p>
       <noscript>
         <div class="alert alert-danger">
           This application requires a browser with JavaScript enabled, and supporting ES modules.
         </div>
       </noscript>
+    </div>
+    <div v-if="error" class="container">
       <error-message :message="error"></error-message>
     </div>
-    <fit-route @error="onError" class="flex-grow-1"></fit-route>
+    <fit-route @show-info="onShowInfo" @error="onError" class="flex-grow-1"></fit-route>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.22/dist/vue.min.js" integrity="sha384-/akamCRnflySW3CYATb1tG4cZUVrkVT2+s6Q150JJNJ4mv8nhvL/V7rPgmzX8scM" crossorigin="anonymous" defer></script>
@@ -36,7 +38,7 @@
   <script type="module" src="js/app.js" defer></script>
 
   <script type="text/x-template" id="error-message-template">
-    <div role="alert" v-if="message" class="alert alert-danger">{{ message }}</div>
+    <div role="alert" class="alert alert-danger">{{ message }}</div>
   </script>
 
   <script type="text/x-template" id="empty-template">
@@ -61,13 +63,13 @@
   </script>
 
   <script type="text/x-template" id="fit-route-template">
-    <div class="container-fluid p-3 d-flex flex-column">
+    <div class="container-fluid d-flex flex-column">
       <template v-if="!gpxFile">
         <file-upload @submit="onFileUpload"></file-upload>
     </template>
       <template v-if="route">
       <div class="row flex-grow-1">
-        <div class="col-auto bg-light">
+        <div class="col-auto bg-light p-2">
           <div class="d-flex flex-column">
             <div>Name:</div>
             <div class="text-info">{{ route.name }}</div>
@@ -78,7 +80,10 @@
             <div>Avg Speed:</div>
             <div class="text-info">{{ avgSpeed }} km/h</div>
             <div>
-              <button class="btn btn-primary" @click="onFitDownload">Download as FIT</button>
+              <div class="d-flex justify-content-around">
+                <button class="btn btn-secondary m-2" @click="onClear">Clear</button>
+                <button class="btn btn-primary m-2" @click="onFitDownload">Download as FIT</button>
+              </div>
               <a ref="downloadAnchor" class="d-none" download="COURSE.fit" href="#"></a>
             </div>
           </div>

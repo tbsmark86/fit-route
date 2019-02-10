@@ -35,10 +35,16 @@ function avgSpeed() {
   return speed.toFixed(1);
 }
 
+function onClear() {
+  this.gpxFile = this.route = null;
+  this.$emit('show-info', true);
+}
+
 async function onFileUpload(gpxFile) {
   try {
     this.gpxFile = gpxFile;
     this.route = await parseGpx(gpxFile);
+    this.$emit('show-info', false);
   }
   catch (error) {
     console.error(error);
@@ -96,6 +102,7 @@ const FitRoute = {
     goalTime
   },
   methods: {
+    onClear,
     onFileUpload,
     onFitDownload
   },
