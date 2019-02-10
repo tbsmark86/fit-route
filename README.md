@@ -42,3 +42,4 @@ Third Party Libraries
 * [Vue.js](https://vuejs.org/)
 * [Bootstrap](https://getbootstrap.com/)
 * [Leaflet](https://leafletjs.com/)
+* [Font Awesome](https://fontawesome.com/)
