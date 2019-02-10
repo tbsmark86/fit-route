@@ -3,6 +3,7 @@ import { parseGpx } from '../gpx.js';
 import FileUpload from './file-upload.js';
 import RouteMap from './route-map.js';
 import { FITEncoder } from '../fit/encoder.js';
+import { encodedStrlen } from '../fit/types.js';
 
 function distance() {
   const round = (d) => d < 1000 ? d.toPrecision(3) : Math.round(d);
@@ -29,6 +30,10 @@ function goalTime() {
   [days, hours] = divmod(hours, 24);
 
   return `${days ? days + '+' : ''}${hours}:${pad(minutes)}:${pad(seconds)}`;
+}
+
+function nameTooLong() {
+  return encodedStrlen(this.route.name) > 16;
 }
 
 function avgSpeed() {
@@ -102,6 +107,7 @@ const FitRoute = {
     units: 'km'
   }),
   computed: {
+    nameTooLong,
     avgSpeed,
     speedUnits,
     distance,

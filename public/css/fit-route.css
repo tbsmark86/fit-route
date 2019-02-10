@@ -18,3 +18,9 @@ body {
 #route-map {
   min-height: 400px;
 }
+
+.input-feedback {
+  width: 20px;
+  margin: -1.7rem 10px;
+  float: right;
+}
