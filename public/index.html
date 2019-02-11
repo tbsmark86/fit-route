@@ -134,7 +134,7 @@
                 <label for="routeName" class="pt-2">Name:</label>
               </div>
               <div>
-                <input id="routeName" type="text" v-model="route.name" class="form-control text-info bg-light px-1">
+                <input id="routeName" type="text" v-model="route.name" @keydown.enter.prevent class="form-control text-info bg-light px-1">
                 <i v-if="nameTooLong" class="fas fa-exclamation-triangle text-warning input-feedback" title="Name will be truncated on Garmin device" aria-hidden="true"></i>
               </div>
               <div class="pt-2">Goal Time:</div>
