@@ -112,44 +112,18 @@
     <div class="container-fluid d-flex flex-column">
       <template v-if="!gpxFile">
         <file-upload @submit="onFileUpload"></file-upload>
-    </template>
+      </template>
       <template v-if="route">
       <div class="row flex-grow-1">
         <div class="col-auto bg-light p-2">
-          <form novalidate>
-            <div class="d-flex flex-column">
-              <div>
-                <div class="btn-groupx btn-group-toggle d-flex justify-content-center py-3">
-                  <label class="btn btn-info w-25 mx-1" :class="{ active: units == 'km' }">
-                    <input type="radio" value="km" v-model="units"> km
-                  </label>
-                  <label class="btn btn-info w-25 mx-1" :class="{ active: units == 'miles' }">
-                    <input type="radio" value="miles" v-model="units"> miles
-                  </label>
-                </div>
-              </div>
-              <div class="pt-2">Distance:</div>
-              <div class="text-info">{{ distance }} {{ units }}</div>
-              <div>
-                <label for="routeName" class="pt-2">Name:</label>
-              </div>
-              <div>
-                <input id="routeName" type="text" v-model="route.name" @keydown.enter.prevent class="form-control text-info bg-light px-1">
-                <i v-if="nameTooLong" class="fas fa-exclamation-triangle text-warning input-feedback" title="Name will be truncated on Garmin device" aria-hidden="true"></i>
-              </div>
-              <div class="pt-2">Goal Time:</div>
-              <div class="text-info">{{ goalTime }}</div>
-              <div class="pt-2">Avg Speed:</div>
-              <div class="text-info">{{ avgSpeed }} {{ speedUnits }}</div>
-              <div>
-                <div class="d-flex justify-content-around">
-                  <button class="btn btn-secondary m-2" @click="onClear">Clear</button>
-                  <button class="btn btn-primary m-2" @click="onFitDownload">Download as FIT</button>
-                </div>
-                <a ref="downloadAnchor" class="d-none" download="COURSE.fit" href="#"></a>
-              </div>
+          <route-info :route="route" @name="setName"></route-info>
+          <div>
+            <div class="d-flex justify-content-around">
+              <button class="btn btn-secondary m-2" @click="onClear">Clear</button>
+              <button class="btn btn-primary m-2" @click="onFitDownload">Download as FIT</button>
             </div>
-          </form>
+            <a ref="downloadAnchor" class="d-none" download="COURSE.fit" href="#"></a>
+          </div>
         </div>
         <div class="col p-0">
           <route-map :route="route"></route-map>
@@ -157,6 +131,36 @@
       </div>
     </template>
     </div>
+  </script>
+
+  <script type="text/x-template" id="route-info-template">
+    <form novalidate>
+      <div class="d-flex flex-column">
+        <div>
+          <div class="btn-groupx btn-group-toggle d-flex justify-content-center py-3">
+            <label class="btn btn-info w-25 mx-1" :class="{ active: units == 'km' }">
+              <input type="radio" value="km" v-model="units"> km
+            </label>
+            <label class="btn btn-info w-25 mx-1" :class="{ active: units == 'miles' }">
+              <input type="radio" value="miles" v-model="units"> miles
+           </label>
+          </div>
+        </div>
+        <div class="pt-2">Distance:</div>
+        <div class="text-info">{{ distance }} {{ units }}</div>
+        <div>
+          <label for="routeName" class="pt-2">Name:</label>
+        </div>
+        <div>
+          <input id="routeName" type="text" v-model="routeName" @keydown.enter.prevent class="form-control text-info bg-light px-1">
+          <i v-if="routeNameTooLong" class="fas fa-exclamation-triangle text-warning input-feedback" title="Name will be truncated on Garmin device" aria-hidden="true"></i>
+        </div>
+        <div class="pt-2">Goal Time:</div>
+        <div class="text-info">{{ goalTime }}</div>
+        <div class="pt-2">Avg Speed:</div>
+        <div class="text-info">{{ avgSpeed }} {{ speedUnits }}</div>
+      </div>
+    </form>
   </script>
 
   <script type="text/x-template" id="route-map-template">
