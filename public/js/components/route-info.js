@@ -1,8 +1,3 @@
-/* global URL */
-import { parseGpx } from '../gpx.js';
-import FileUpload from './file-upload.js';
-import RouteMap from './route-map.js';
-import { FITEncoder } from '../fit/encoder.js';
 import { encodedStrlen } from '../fit/types.js';
 
 function distance() {
@@ -39,7 +34,7 @@ const routeName = {
   set: function routeName(value) {
     this.$emit('name', value);
   }
-}
+};
 
 function routeNameTooLong() {
   return encodedStrlen(this.routeName) > 16;

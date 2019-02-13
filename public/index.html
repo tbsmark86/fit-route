@@ -115,7 +115,7 @@
       </template>
       <template v-if="route">
       <div class="row flex-grow-1">
-        <div class="col-auto bg-light p-2">
+        <div class="col-auto bg-light">
           <route-info :route="route" @name="setName"></route-info>
           <div>
             <div class="d-flex justify-content-around">
@@ -125,7 +125,7 @@
             <a ref="downloadAnchor" class="d-none" download="COURSE.fit" href="#"></a>
           </div>
         </div>
-        <div class="col p-0">
+        <div class="col p-0 border">
           <route-map :route="route"></route-map>
         </div>
       </div>
@@ -146,19 +146,42 @@
            </label>
           </div>
         </div>
-        <div class="pt-2">Distance:</div>
-        <div class="text-info">{{ distance }} {{ units }}</div>
-        <div>
-          <label for="routeName" class="pt-2">Name:</label>
-        </div>
-        <div>
-          <input id="routeName" type="text" v-model="routeName" @keydown.enter.prevent class="form-control text-info bg-light px-1">
+
+        <div class="form-group">
+          <label for="routeName">Name</label>
+          <input id="routeName" type="text" v-model="routeName" @keydown.enter.prevent class="form-control text-info">
           <i v-if="routeNameTooLong" class="fas fa-exclamation-triangle text-warning input-feedback" title="Name will be truncated on Garmin device" aria-hidden="true"></i>
         </div>
-        <div class="pt-2">Goal Time:</div>
-        <div class="text-info">{{ goalTime }}</div>
-        <div class="pt-2">Avg Speed:</div>
-        <div class="text-info">{{ avgSpeed }} {{ speedUnits }}</div>
+
+        <div class="form-group">
+          <label for="distance">Distance</label>
+          <div class="input-group">
+            <input id="distance" type="text" v-model="distance" readonly class="form-control text-info bg-light">
+            <div class="input-group-append">
+              <span class="input-group-text">{{ units }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="distance">Average Speed</label>
+          <div class="input-group">
+            <input id="distance" type="text" v-model="avgSpeed" readonly class="form-control text-info bg-light">
+            <div class="input-group-append">
+              <span class="input-group-text">{{ speedUnits }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="distance">Goal Time</label>
+          <div class="input-group">
+            <input id="distance" type="text" v-model="goalTime" readonly class="form-control text-info bg-light">
+            <div class="input-group-append">
+              <span class="input-group-text">h:mm:ss</span>
+            </div>
+          </div>
+        </div>
       </div>
     </form>
   </script>

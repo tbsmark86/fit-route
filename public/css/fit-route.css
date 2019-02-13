@@ -19,8 +19,16 @@ body {
   min-height: 400px;
 }
 
+#routeName {
+  padding-right: 30px;
+}
+
 .input-feedback {
   width: 20px;
   margin: -1.7rem 10px;
   float: right;
+}
+
+.input-group-text {
+  width: 5.3rem;
 }
