@@ -9,9 +9,8 @@ function distance() {
 
 function duration() {
   const points = this.route.points;
-  const startTime = points[0].time;
-  const finishTime = points[points.length - 1].time;
-  return startTime && finishTime && finishTime - startTime;
+  const [{ time: startTime }, { time: finishTime }] = [points[0], points[points.length - 1]];
+  return finishTime - startTime;
 }
 
 function goalTime() {
@@ -41,8 +40,7 @@ function routeNameTooLong() {
 }
 
 function avgSpeed() {
-  const speed = this.distance / (this.duration / 3600000);
-  return speed.toFixed(1);
+  return this.distance / (this.duration / 3600000);
 }
 
 function speedUnits() {
@@ -55,7 +53,8 @@ const RouteInfo = {
     route: Object
   },
   data: () => ({
-    units: 'km'
+    units: 'km',
+    avgSpeedField: null
   }),
   computed: {
     routeName,
@@ -65,6 +64,30 @@ const RouteInfo = {
     distance,
     duration,
     goalTime
+  },
+  watch: {
+    avgSpeed: {
+      immediate: true,
+      handler: function avgSpeed(newValue, oldValue) {
+        // Don't set field value if it was due to field value changing
+        if (oldValue === undefined || Math.abs(oldValue - this.avgSpeedField) < 0.05) {
+          this.avgSpeedField = newValue.toFixed(1);
+        }
+      }
+    },
+    avgSpeedField: {
+      handler: function avgSpeedField(newValue, oldValue) {
+        if (!newValue.match(/^\d*\.?\d?$/)) {
+          this.avgSpeedField = oldValue;
+        }
+        else {
+          // Ignore changes due to switching units, or no change in numeric value
+          if (newValue > 0 && Math.abs(newValue - oldValue) >= 0.05 && Math.abs(newValue - this.avgSpeed) >= 0.05) {
+            this.$emit('duration', this.distance * 3600000 / newValue);
+          }
+        }
+      }
+    }
   }
 };
 

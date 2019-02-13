@@ -9,6 +9,14 @@ function setName(name) {
   this.route.name = name;
 }
 
+function setDuration(duration) {
+  const points = this.route.points;
+  const [{ time: startTime = Date.now() }, { distance: totalDistance }] = [points[0], points[points.length - 1]];
+  for (const point of points) {
+    point.time = startTime + Math.round(duration * (point.distance / totalDistance));
+  }
+}
+
 function onClear() {
   this.gpxFile = this.route = null;
   this.$emit('show-info', true);
@@ -73,7 +81,8 @@ const FitRoute = {
     onClear,
     onFileUpload,
     onFitDownload,
-    setName
+    setName,
+    setDuration
   },
   components: {
     FileUpload,
