@@ -147,7 +147,7 @@
 
         <div class="form-group">
           <label for="routeName">Name</label>
-          <input id="routeName" type="text" v-model="routeName" @keydown.enter.prevent class="form-control text-info">
+          <input id="routeName" type="text" v-model="routeName" @keydown.enter.prevent class="form-control text-info" data-lpignore="true">
           <i v-if="routeNameTooLong" class="fas fa-exclamation-triangle text-warning input-feedback" title="Name will be truncated on Garmin device" aria-hidden="true"></i>
         </div>
 
@@ -164,7 +164,7 @@
         <div class="form-group">
           <label for="distance">Average Speed</label>
           <div class="input-group">
-            <input id="distance" type="text" v-model="avgSpeedField" class="form-control text-info">
+            <input id="distance" type="text" v-model="avgSpeedField" class="form-control text-info" data-lpignore="true">
             <div class="input-group-append">
               <span class="input-group-text">{{ speedUnits }}</span>
             </div>
