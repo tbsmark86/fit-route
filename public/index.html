@@ -17,13 +17,13 @@
   <nav class="navbar navbar-expand-md navbar-dark bg-dark">
     <div class="navbar-brand">FIT Route Converter</div>
     <div class="navbar-nav nav-link ml-auto">
-      <a href="https://www.pyrites.org.uk/" target="_new" aria-label="Blog" class="text-light"><i class="fas fa-blog"></i></a>
+      <a href="https://www.pyrites.org.uk/" target="_blank" aria-label="Blog" class="text-light"><i class="fas fa-blog"></i></a>
     </div>
     <div class="navbar-nav nav-link">
-      <a href="https://twitter.com/TechWrangler" target="_new" aria-label="Twitter" class="text-light"><i class="fab fa-twitter"></i></a>
+      <a href="https://twitter.com/TechWrangler" target="_blank" aria-label="Twitter" class="text-light"><i class="fab fa-twitter"></i></a>
     </div>
     <div class="navbar-nav nav-link">
-      <a href="https://gitlab.com/nwholloway/fit-route" target="_new" aria-label="GitLab" class="text-light"><i class="fab fa-gitlab"></i></a>
+      <a href="https://gitlab.com/nwholloway/fit-route" target="_blank" aria-label="GitLab" class="text-light"><i class="fab fa-gitlab"></i></a>
     </div>
   </nav>
 
@@ -31,24 +31,24 @@
     <div v-if="showInfo" class="container-fluid p-3">
       <p>
         <span>A browser based application to convert a GPX file into a FIT file.</span>
-        <ul>
-          <li>
-            Select the GPX file to be converted
-          </li>
-          <li>
-            View the route on a map, along with the key statistics
-          </li>
-          <li>
-            Amend the average speed to your desired value
-          </li>
-          <li>
-            Download will save the course as a FIT file
-          </li>
-          <li>
-            Connect Garmin as USB device, and place the FIT file in <span class="text-monospace">\GARMIN\NEWFILES</span>
-          </li>
-        </ul>
       </p>
+      <ul>
+        <li>
+          Select the GPX file to be converted
+        </li>
+        <li>
+          View the route on a map, along with the key statistics
+        </li>
+        <li>
+          Amend the average speed to your desired value
+        </li>
+        <li>
+          Download will save the course as a FIT file
+        </li>
+        <li>
+          Connect Garmin as USB device, and place the FIT file in <span class="text-monospace">\GARMIN\NEWFILES</span>
+        </li>
+      </ul>
       <p>
         <span>I developed this to simplify the task of converting a GPX for an event into a course I could follow on my Garmin Edge 25.</span>
         <span>Although there are route planning sites that will perform the conversion, I found the results very variable.</span>
@@ -58,7 +58,7 @@
         <span>Your data never leaves your computer as all processing is performed within your browser.</span>
         <span>You do not need to register to use this application.</span>
         <span>There are no adverts, no cookies, no use of local storage, or service workers.</span>
-        <span>The source can be cloned from <a href="https://gitlab.com/nwholloway/fit-route" class="text-muted">GitLab</a>.
+        <span>The source can be cloned from <a href="https://gitlab.com/nwholloway/fit-route" class="text-muted">GitLab</a></span>.
       </p>
       <p>
         <span>The application works with the current versions of Chrome, Firefox and Safari.</span>
@@ -79,7 +79,7 @@
   <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin="anonymous" defer></script>
   <script src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js" integrity="sha384-btJhAWztz7ttA6ibFC5ppM39nkCPK6CWzRVmsaLcDn37mA3x1TzF1DbFwa6tJpTN" crossorigin="anonymous" defer></script>
   <script nomodule type="text/javascript" src="js/nomodule.js" defer></script>
-  <script type="module" src="js/app.js" defer></script>
+  <script type="module" src="js/app.js"></script>
 
   <script type="text/x-template" id="error-message-template">
     <div role="alert" class="alert alert-danger">{{ message }}</div>
