@@ -75,7 +75,8 @@ const FitRoute = {
   template: '#fit-route-template',
   data: () => ({
     gpxFile: null,
-    route: null
+    route: null,
+    units: 'km'
   }),
   methods: {
     onClear,

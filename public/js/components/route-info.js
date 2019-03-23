@@ -58,10 +58,10 @@ const RouteInfo = {
   template: '#route-info-template',
   mounted,
   props: {
-    route: Object
+    route: Object,
+    units: String
   },
   data: () => ({
-    units: 'km',
     avgSpeedField: null
   }),
   computed: {
