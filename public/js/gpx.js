@@ -77,6 +77,33 @@ function* trackPoints(trkseg) {
   }
 }
 
+function* routePoints(rte) {
+  let lastPoint;
+  let distance = 0;
+
+  for (const node of rte.children) {
+    if (node.nodeName === 'rtept') {
+      const lat = parseFloat(node.getAttribute('lat'));
+      const lon = parseFloat(node.getAttribute('lon'));
+      const time = undefined;
+
+      if (lastPoint) {
+        distance += haversine(lastPoint, { lat, lon });
+      }
+
+      const point = {
+        lat,
+        lon,
+        time,
+        distance
+      };
+
+      lastPoint = point;
+      yield point;
+    }
+  }
+}
+
 function elevationChange(points) {
   let eleGain = 0;
   let eleLoss = 0;
@@ -108,15 +135,22 @@ function elevationChange(points) {
 }
 
 async function parseRoute(doc) {
-  const trk = childNamed(doc.documentElement, 'trk');
   const metadata = childNamed(doc.documentElement, 'metadata');
   const metadataName = metadata && childNamed(metadata, 'name');
+
+  const trk = childNamed(doc.documentElement, 'trk');
   const trkseg = trk && childNamed(trk, 'trkseg');
   const trkName = trk && childNamed(trk, 'name');
 
+  const rte = childNamed(doc.documentElement, 'rte');
+  const rteName = rte && childNamed(rte, 'name');
+
   const name = (metadataName && metadataName.textContent) ||
-    (trkName && trkName.textContent) || 'Unnamed';
-  const points = trkseg && Array.from(trackPoints(trkseg));
+    (trkName && trkName.textContent) ||
+    (rteName && rteName.textContent) ||
+    'Unnamed';
+  const points = (trkseg && Array.from(trackPoints(trkseg))) ||
+    (rte && Array.from(routePoints(rte)));
   const { eleGain, eleLoss } = points && elevationChange(points) || {};
 
   return points && { name, points, eleGain, eleLoss };
