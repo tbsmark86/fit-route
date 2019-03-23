@@ -15,7 +15,7 @@ new Vue({
   el: '#main',
   data: {
     showInfo: true,
-    error: 'This application requires a browser supporting ES modules'
+    error: 'This application requires a browser supporting ES modules and object spread properties'
   },
   methods: {
     onShowInfo: () => undefined,
