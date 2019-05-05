@@ -33,6 +33,15 @@ const mesgDefns = {
       { name: 'distance', number: 5, type: 'distance' }
     ]
   },
+  event: {
+    mesgNum: 21,
+    fieldDefns: [
+      { name: 'timestamp', number: 253, type: 'date_time' },
+      { name: 'event', number: 0, type: 'enum_event' },
+      { name: 'event_type', number: 1, type: 'enum_event_type' },
+      { name: 'event_group', number: 4, type: 'uint8' },
+    ]
+  },
   course: {
     mesgNum: 31,
     fieldDefns: [

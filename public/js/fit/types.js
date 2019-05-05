@@ -1,6 +1,8 @@
 const enum_maps = {
   file: { course: 6 },
-  sport: { cycling: 2 }
+  sport: { cycling: 2 },
+  event: { timer: 0 },
+  event_type: { start: 0, stop_disable_all: 9 }
 };
 
 const _enum = (name) => {
@@ -16,6 +18,10 @@ const _enum = (name) => {
 const enum_file = _enum('file');
 
 const enum_sport = _enum('sport');
+
+const enum_event = _enum('event');
+
+const enum_event_type = _enum('event_type');
 
 const sint8 = {
   size: 1,
@@ -88,6 +94,8 @@ const semicircles = {
 export const types = {
   enum_file,
   enum_sport,
+  enum_event,
+  enum_event_type,
   sint8,
   uint8,
   sint16,

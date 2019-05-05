@@ -54,9 +54,21 @@ function onFitDownload() {
       total_ascent: this.route.eleGain,
       total_descent: this.route.eleLoss
     });
+    encoder.writeEvent({
+      timestamp: start.time,
+      event: 'timer',
+      event_type: 'start',
+      event_group: 0
+    });
     for (const { lat, lon, ele, time, distance } of this.route.points) {
       encoder.writeRecord({ timestamp: time, position_lat: lat, position_long: lon, altitude: ele, distance });
     }
+    encoder.writeEvent({
+      timestamp: finish.time,
+      event: 'timer',
+      event_type: 'stop_disable_all',
+      event_group: 0
+    });
 
     const url = URL.createObjectURL(encoder.blob);
     const anchorElement = this.$refs.downloadAnchor;
