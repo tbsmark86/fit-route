@@ -3,7 +3,8 @@ import { encodedStrlen } from '../fit/types.js';
 function mounted() {
   // Set default speed if no timing on route
   if (isNaN(this.duration) || this.duration <= 0) {
-    this.$emit('duration', this.distance * 3600000 / 10);
+    const speed = this.units == 'miles' ? 10 : 16.2;
+    this.$emit('duration', this.distance * 3600000 / speed);
   }
 }
 
