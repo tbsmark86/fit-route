@@ -2,7 +2,7 @@ import { encodedStrlen } from '../fit/types.js';
 
 function mounted() {
   // Set default speed if no timing on route
-  if (!this.route.points[0].time) {
+  if (isNaN(this.duration) || this.duration <= 0) {
     this.$emit('duration', this.distance * 3600000 / 10);
   }
 }
@@ -78,7 +78,7 @@ const RouteInfo = {
       immediate: true,
       handler: function avgSpeed(newValue, oldValue) {
         // Don't set field value if it was due to field value changing
-        if (oldValue === undefined || isNaN(oldValue) || Math.abs(oldValue - this.avgSpeedField) < 0.05) {
+        if (!isFinite(oldValue) || Math.abs(oldValue - this.avgSpeedField) < 0.05) {
           this.avgSpeedField = newValue.toFixed(1);
         }
       }
