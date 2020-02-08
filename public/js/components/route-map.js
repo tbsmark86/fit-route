@@ -18,8 +18,8 @@ function mounted() {
   this.markerLayer = L.layerGroup().addTo(this.map);
 
   const [start, finish] = [points[0], points[points.length - 1]];
-  L.circleMarker(latlng(start), { radius: 8, weight: 0, color: 'red', fillOpacity: 0.6 }).addTo(this.map);
-  L.circleMarker(latlng(finish), { radius: 8, weight: 0, color: 'green', fillOpacity: 0.6 }).addTo(this.map);
+  L.circleMarker(latlng(start), { radius: 8, weight: 0, color: 'greeen', fillOpacity: 0.6 }).addTo(this.map);
+  L.circleMarker(latlng(finish), { radius: 8, weight: 0, color: 'red', fillOpacity: 0.6 }).addTo(this.map);
 
   this.map.on('zoomend', ({target: map }) => {
     this.zoom = map.getZoom();
