@@ -27,8 +27,7 @@ async function onFileUpload(gpxFile) {
     this.gpxFile = gpxFile;
     this.route = await parseGpx(gpxFile);
     this.$emit('show-info', false);
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
     this.$emit('error', `Unable to process "${gpxFile.name}"`);
   }
@@ -76,8 +75,7 @@ function onFitDownload() {
     anchorElement.href = url;
     anchorElement.click();
     URL.revokeObjectURL(url);
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
     this.$emit('error', `Unable to create FIT`);
   }

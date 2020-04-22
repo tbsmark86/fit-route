@@ -88,7 +88,7 @@ const date_time = {
 
 const semicircles = {
   ...sint32,
-  mapValue: (value) => Math.round(value / 180 * 0x80000000)
+  mapValue: (value) => Math.round((value / 180) * 0x80000000)
 };
 
 export const types = {
@@ -119,19 +119,16 @@ function* encodedStr(s) {
   for (const codePoint of codePoints(s)) {
     if (codePoint < 0x80) {
       yield codePoint;
-    }
-    else {
+    } else {
       const bytes = [codePoint & 0x3f, (codePoint >> 6) & 0x3f, (codePoint >> 12) & 0x3f, codePoint >> 18];
       if (codePoint < 0x800) {
         yield 0xc0 | bytes[1];
         yield 0x80 | bytes[0];
-      }
-      else if (codePoint < 0x10000) {
+      } else if (codePoint < 0x10000) {
         yield 0xe0 | bytes[2];
         yield 0x80 | bytes[1];
         yield 0x80 | bytes[0];
-      }
-      else {
+      } else {
         yield 0xf0 | bytes[3];
         yield 0x80 | bytes[2];
         yield 0x80 | bytes[1];
@@ -145,7 +142,7 @@ function* encodedStr(s) {
 function* codePoints(s) {
   for (let i = 0; i < s.length; i++) {
     const codePoint = s.codePointAt(i);
-    if (codePoint > 0xFFFF) {
+    if (codePoint > 0xffff) {
       i++; // skip 2nd surrogate pair
     }
     yield codePoint;

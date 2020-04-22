@@ -4,12 +4,12 @@ function mounted() {
   // Set default speed if no timing on route
   if (isNaN(this.duration) || this.duration <= 0) {
     const speed = this.units == 'miles' ? 10 : 16.2;
-    this.$emit('duration', this.distance * 3600000 / speed);
+    this.$emit('duration', (this.distance * 3600000) / speed);
   }
 }
 
 function distance() {
-  const round = (d) => d < 1000 ? d.toPrecision(3) : Math.round(d);
+  const round = (d) => (d < 1000 ? d.toPrecision(3) : Math.round(d));
   const points = this.route.points;
   const km = points[points.length - 1].distance / 1000;
   return this.units === 'miles' ? round(km / 1.609344) : round(km);
@@ -88,11 +88,10 @@ const RouteInfo = {
       handler: function avgSpeedField(newValue, oldValue) {
         if (!newValue.match(/^\d*\.?\d?$/)) {
           this.avgSpeedField = oldValue;
-        }
-        else {
+        } else {
           // Ignore changes due to switching units, or no change in numeric value
           if (newValue > 0 && Math.abs(newValue - oldValue) >= 0.05 && Math.abs(newValue - this.avgSpeed) >= 0.05) {
-            this.$emit('duration', this.distance * 3600000 / newValue);
+            this.$emit('duration', (this.distance * 3600000) / newValue);
           }
         }
       }

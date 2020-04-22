@@ -1,5 +1,5 @@
 function cssClass() {
-  return ['alert', `alert-${this.category}`]
+  return ['alert', `alert-${this.category}`];
 }
 
 const ErrorMessage = {

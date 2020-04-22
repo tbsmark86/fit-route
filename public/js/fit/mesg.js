@@ -39,14 +39,12 @@ const mesgDefns = {
       { name: 'timestamp', number: 253, type: 'date_time' },
       { name: 'event', number: 0, type: 'enum_event' },
       { name: 'event_type', number: 1, type: 'enum_event_type' },
-      { name: 'event_group', number: 4, type: 'uint8' },
+      { name: 'event_group', number: 4, type: 'uint8' }
     ]
   },
   course: {
     mesgNum: 31,
-    fieldDefns: [
-      { name: 'name', number: 5, type: 'string' }
-    ]
+    fieldDefns: [{ name: 'name', number: 5, type: 'string' }]
   }
 };
 
@@ -96,17 +94,16 @@ export class Mesg {
 
   isSameDefn(mesgDefn) {
     const isSameFieldDefn = (defn1, defn2) =>
-      defn1.number === defn2.number &&
-      defn1.size === defn2.size &&
-      defn1.baseType === defn2.baseType;
+      defn1.number === defn2.number && defn1.size === defn2.size && defn1.baseType === defn2.baseType;
     const areSameFieldDefns = (defns1, defns2) =>
-      defns1.length === defns2.length &&
-      defns1.every((defn1, i) => isSameFieldDefn(defn1, defns2[i]));
+      defns1.length === defns2.length && defns1.every((defn1, i) => isSameFieldDefn(defn1, defns2[i]));
 
     const { localNum, mesgNum, fieldDefns } = this.mesgDefn;
-    return mesgNum === mesgDefn.mesgNum &&
+    return (
+      mesgNum === mesgDefn.mesgNum &&
       localNum === mesgDefn.localNum &&
-      areSameFieldDefns(fieldDefns, mesgDefn.fieldDefns);
+      areSameFieldDefns(fieldDefns, mesgDefn.fieldDefns)
+    );
   }
 
   get defnRecord() {

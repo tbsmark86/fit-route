@@ -4,9 +4,11 @@
   "author": "Nick Holloway <nick.holloway@pyrites.org.uk>",
   "private": true,
   "scripts": {
-    "start": "browser-sync start -s public -f public --port ${C9_PORT:-8080} --listen ${C9_IP:-127.0.0.1} --no-ui --no-open"
+    "start": "browser-sync start -s public -f public --port ${C9_PORT:-8080} --listen ${C9_IP:-127.0.0.1} --no-ui --no-open",
+    "format": "prettier --write 'public/js/*/**.js' --write 'public/css/*/*.css'"
   },
   "devDependencies": {
-    "browser-sync": "^2.26.3"
+    "browser-sync": "^2.26.3",
+    "prettier": "^1.19.1"
   }
 }
