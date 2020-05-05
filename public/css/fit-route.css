@@ -56,6 +56,13 @@ body {
   margin-left: -6px;
 }
 
+.map-label-turn .map-label-content {
+  border-color: green;
+}
+.map-label-turn .map-label-arrow {
+  border-top-color: green;
+}
+
 .input-feedback {
   width: 20px;
   margin: -1.7rem 10px;

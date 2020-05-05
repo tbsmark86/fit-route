@@ -104,6 +104,73 @@ function* routePoints(rte) {
   }
 }
 
+/**
+ * Read gpx exenstion create by brouter-web 'osmand' style:
+ *
+ * Example:
+ *  <rtept lat="52.430425" lon="13.263190">
+ *    <desc>left</desc>
+ *    <extensions>
+ *	<time>182</time>
+ *      <turn>TL</turn>
+ *      <turn-angle>-47</turn-angle>
+ *	<offset>0</offset>
+ *    </extensions>
+ *  </rtept>
+ *
+ * Offset is id of matching trkpt
+ */
+function* routeInstructions(rte) {
+  let first = true;
+
+  for (const node of rte.children) {
+    if (node.nodeName === 'rtept') {
+      const lat = parseFloat(node.getAttribute('lat'));
+      const lon = parseFloat(node.getAttribute('lon'));
+      const extension = childNamed(node, 'extensions');
+      if(!extension) {
+	continue;
+      }
+      const offsetNode = childNamed(extension, 'offset');
+      if(!offsetNode) {
+	continue;
+      }
+      const offset = parseInt(offsetNode.textContent, 10);
+
+      const turnNode = childNamed(extension, 'turn');
+      const turn = (turnNode && turnNode.textContent) || (first ? 'start' : 'end');
+      first = false;
+
+      yield {
+        lat,
+        lon,
+        offset,
+        turn
+      };
+    }
+  }
+}
+
+/**
+ * Enhance point data with instruction information
+ */
+function insertInstructions(points, instructions) {
+  for(const instruction of instructions) {
+    let point = points[instruction.offset];
+    if(!point) {
+      console.warn(`Warning: Instruction offset unknown.`, instruction);
+      continue;
+    } else if(point.lat !== instruction.lat || point.lon !== instruction.lon) {
+      // sanity check
+      console.warn(`Warning: Instruction data not matching point.`, instruction);
+      continue;
+    }
+    point.turn = instruction.turn;
+
+  }
+  return points;
+}
+
 function elevationChange(points) {
   let eleGain = 0;
   let eleLoss = 0;
@@ -149,9 +216,14 @@ async function parseRoute(doc) {
     (trkName && trkName.textContent) ||
     (rteName && rteName.textContent) ||
     'Unnamed';
-  const points = (trkseg && Array.from(trackPoints(trkseg))) ||
+  let points = (trkseg && Array.from(trackPoints(trkseg))) ||
     (rte && Array.from(routePoints(rte)));
   const { eleGain, eleLoss } = points && elevationChange(points) || {};
+
+  const instructions = trkseg && rte && Array.from(routeInstructions(rte));
+  if(instructions) {
+      points = insertInstructions(points, instructions);
+  }
 
   return points && { name, points, eleGain, eleLoss };
 }

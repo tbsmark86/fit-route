@@ -23,6 +23,7 @@ function mounted() {
 
   this.routeLayer = L.polyline(points.map(latlng), { color: 'blue' }).addTo(this.map);
   this.markerLayer = L.layerGroup().addTo(this.map);
+  this.turnLayer = L.layerGroup().addTo(this.map);
 
   const [start, finish] = [points[0], points[points.length - 1]];
   L.circleMarker(latlng(start), { radius: 8, weight: 0, color: 'greeen', fillOpacity: 0.6 }).addTo(this.map);
@@ -33,6 +34,9 @@ function mounted() {
   });
 
   this.map.fitBounds(this.routeLayer.getBounds());
+
+
+  drawTurns.call(this);
 }
 
 const markerInterval = (zoom) => {
@@ -73,6 +77,19 @@ function drawMarkers() {
   for (const { label, latlng } of markerPoints(this.route.points, this.units, this.zoom)) {
     const icon = L.divIcon({ iconSize: null, html: mapLabel(label) });
     L.marker(latlng, { icon }).addTo(this.markerLayer);
+  }
+}
+
+function drawTurns() {
+  this.turnLayer.clearLayers();
+  for (const point of this.route.points) {
+    if (!point.turn) {
+      continue;
+    }
+    const icon = L.divIcon({ iconSize: null,
+      html: `<div class="map-label map-label-turn"><div class="map-label-content">${point.turn}</div><div class="map-label-arrow" /></div></div>`
+    });
+    L.marker(latlng(point), { icon }).addTo(this.turnLayer);
   }
 }
 
