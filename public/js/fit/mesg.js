@@ -33,6 +33,19 @@ const mesgDefns = {
       { name: 'distance', number: 5, type: 'distance' }
     ]
   },
+  course_point: {
+    mesgNum: 32,
+    fieldDefns: [
+      { name: 'message_index', number: 0, type: 'uint16' }, // maybe we need to order the points?
+      { name: 'timestamp', number: 1, type: 'date_time' },
+      { name: 'position_lat', number: 2, type: 'semicircles' },
+      { name: 'position_long', number: 3, type: 'semicircles' },
+      { name: 'distance', number: 4, type: 'distance' },  // not sure if this is required or whats the expected value!
+      { name: 'type', number: 5, type: 'enum_course_point' },
+      { name: 'name', number: 6, type: 'string' },
+      { name: 'favorite', number: 8, type: 'string' }, // no idea what thats for
+    ]
+  },
   event: {
     mesgNum: 21,
     fieldDefns: [

@@ -33,6 +33,37 @@ async function onFileUpload(gpxFile) {
   }
 }
 
+const turn2coursePointMap = {
+  TU: 'u_turn',
+  TRU: 'u_turn',
+  TSHL: 'sharp_left',
+  TL: 'left',
+  TSLL: 'slight_left',
+  KL: 'left_fork', // wild guess
+  C: 'straight',
+  KR: 'right_fork', // wild guess
+  TSLR: 'slight_right',
+  TR: 'right',
+  TSHR: 'sharp_right'
+};
+
+function turn2coursePoint(turn) {
+  let type = turn2coursePointMap[turn];
+  let name = undefined;
+  if(type === undefined) {
+    if(turn.startsWith('RNDB') || turn.startsWith('RNLB')) {
+      // there is no roundabout instruction in fit - make a message
+      type = 'danger';
+      name = 'Roundabout exit ' + turn.slice(4);
+    } else {
+      // unknown - convert to message
+      type = 'generic'
+      name = turn;
+    }
+  }
+  return { type, name }
+}
+
 function onFitDownload() {
   try {
     const start = this.route.points[0];
@@ -59,8 +90,16 @@ function onFitDownload() {
       event_type: 'start',
       event_group: 0
     });
-    for (const { lat, lon, ele, time, distance } of this.route.points) {
+    for (const { lat, lon, ele, time, distance, turn } of this.route.points) {
       encoder.writeRecord({ timestamp: time, position_lat: lat, position_long: lon, altitude: ele, distance });
+
+      if(turn !== undefined && turn !== 'start') {
+	//TODO: Allow custom name for Points?
+	//TODO: mesageIndex and distance required?
+	encoder.writeCoursePoint(
+	  { timestamp: time, position_lat: lat, position_long: lon, ...turn2coursePoint(turn) }
+	);
+      }
     }
     encoder.writeEvent({
       timestamp: finish.time,

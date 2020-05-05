@@ -2,7 +2,35 @@ const enum_maps = {
   file: { course: 6 },
   sport: { cycling: 2 },
   event: { timer: 0 },
-  event_type: { start: 0, stop_disable_all: 9 }
+  event_type: { start: 0, stop_disable_all: 9 },
+  course_point: {
+    generic: 0, // idea: offer those as custom markers!
+    summit: 1,
+    valley: 2,
+    water: 3,
+    food: 4,
+    danger: 5,
+    left: 6,
+    right: 7,
+    straight: 8,
+    //first_aid: 9,
+    //fourth_category: 10,
+    //third_category: 11,
+    //second_category: 12,
+    //first_category: 13,
+    //hors_category: 14,
+    //sprint: 15,
+    left_fork: 16,
+    right_fork: 17,
+    middle_fork: 18,
+    slight_left: 19,
+    sharp_left: 20,
+    slight_right: 21,
+    sharp_right: 22,
+    u_turn: 23,
+    //segment_start: 24,
+    //segment_end: 25,
+  }
 };
 
 const _enum = (name) => {
@@ -22,6 +50,8 @@ const enum_sport = _enum('sport');
 const enum_event = _enum('event');
 
 const enum_event_type = _enum('event_type');
+
+const enum_course_point = _enum('course_point');
 
 const sint8 = {
   size: 1,
@@ -96,6 +126,7 @@ export const types = {
   enum_sport,
   enum_event,
   enum_event_type,
+  enum_course_point,
   sint8,
   uint8,
   sint16,

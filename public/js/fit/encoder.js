@@ -30,9 +30,14 @@ export class FITEncoder {
     this.writeMesg('course', values);
   }
 
+  writeCoursePoint(values) {
+    this.writeMesg('course_point', values);
+  }
+
   writeEvent(values) {
     this.writeMesg('event', values);
   }
+
 
   writeMesg(mesgName, values) {
     let localNum = this.localNum[mesgName];

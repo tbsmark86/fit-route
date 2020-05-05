@@ -119,6 +119,7 @@ function* routePoints(rte) {
  *  </rtept>
  *
  * Offset is id of matching trkpt
+ * turn possible values: https://github.com/abrensch/brouter/blob/a0de73632338004995d152a6aa6180d866e0525c/brouter-core/src/main/java/btools/router/VoiceHint.java
  */
 function* routeInstructions(rte) {
   let first = true;
