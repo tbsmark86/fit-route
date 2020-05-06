@@ -93,11 +93,13 @@ function onFitDownload() {
     for (const { lat, lon, ele, time, distance, turn } of this.route.points) {
       encoder.writeRecord({ timestamp: time, position_lat: lat, position_long: lon, altitude: ele, distance });
 
-      if(turn !== undefined && turn !== 'start') {
+      if(turn !== undefined) {
 	//TODO: Allow custom name for Points?
-	//TODO: mesageIndex and distance required?
+	// There is also the messageIndex - unclear what its for and if it's
+	// required
 	encoder.writeCoursePoint(
-	  { timestamp: time, position_lat: lat, position_long: lon, ...turn2coursePoint(turn) }
+	  { timestamp: time, position_lat: lat, position_long: lon,
+	      ...turn2coursePoint(turn), distance }
 	);
       }
     }

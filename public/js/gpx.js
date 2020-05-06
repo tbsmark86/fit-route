@@ -122,8 +122,6 @@ function* routePoints(rte) {
  * turn possible values: https://github.com/abrensch/brouter/blob/a0de73632338004995d152a6aa6180d866e0525c/brouter-core/src/main/java/btools/router/VoiceHint.java
  */
 function* routeInstructions(rte) {
-  let first = true;
-
   for (const node of rte.children) {
     if (node.nodeName === 'rtept') {
       const lat = parseFloat(node.getAttribute('lat'));
@@ -139,8 +137,11 @@ function* routeInstructions(rte) {
       const offset = parseInt(offsetNode.textContent, 10);
 
       const turnNode = childNamed(extension, 'turn');
-      const turn = (turnNode && turnNode.textContent) || (first ? 'start' : 'end');
-      first = false;
+      if(!turnNode) {
+	// start and end node don't have turn data
+	continue;
+      }
+      const turn = turnNode.textContent;
 
       yield {
         lat,
