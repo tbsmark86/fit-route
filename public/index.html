@@ -206,9 +206,25 @@
               </div>
               <a ref="downloadAnchor" class="d-none" download="COURSE.fit" href="#"></a>
             </div>
+	    <form novalidate style="font-size:0.8em">
+	      Settings
+	      <div class="form-check">
+		<input class="form-check-input" type="checkbox" value="" id="show_marker" v-model="show_marker">
+		<label class="form-check-label" for="show_marker">
+		  Show Distance Markers
+		</label>
+	      </div>
+	      <div class="form-check">
+		<input class="form-check-input" type="checkbox" value="" id="show_turns" v-model="show_turns">
+		<label class="form-check-label" for="show_turns">
+		  Show Turn Instructions Markers
+		</label>
+	      </div>
+            </form>
+
           </div>
           <div class="col p-0 border">
-            <route-map :route="route" :units="units"></route-map>
+            <route-map :route="route" :units="units" :show_turns="show_turns" :show_marker="show_marker"></route-map>
           </div>
         </div>
       </template>

@@ -74,6 +74,9 @@ function drawMarkers() {
     `<div class="map-label"><div class="map-label-content">${label}</div><div class="map-label-arrow" /></div></div>`;
 
   this.markerLayer.clearLayers();
+  if(!this.show_marker) {
+    return;
+  }
   for (const { label, latlng } of markerPoints(this.route.points, this.units, this.zoom)) {
     const icon = L.divIcon({ iconSize: null, html: mapLabel(label) });
     L.marker(latlng, { icon }).addTo(this.markerLayer);
@@ -82,6 +85,9 @@ function drawMarkers() {
 
 function drawTurns() {
   this.turnLayer.clearLayers();
+  if(!this.show_turns) {
+    return;
+  }
   for (const point of this.route.points) {
     if (!point.turn) {
       continue;
@@ -97,7 +103,9 @@ const RouteMap = {
   template: '#route-map-template',
   props: {
     route: Object,
-    units: String
+    units: String,
+    show_marker: Boolean,
+    show_turns: Boolean,
   },
   mounted,
   data: () => ({
@@ -108,7 +116,9 @@ const RouteMap = {
   }),
   watch: {
     units: drawMarkers,
-    zoom: drawMarkers
+    zoom: drawMarkers,
+    show_marker: drawMarkers,
+    show_turns: drawTurns
   }
 };
 

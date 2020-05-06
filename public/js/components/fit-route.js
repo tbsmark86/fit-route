@@ -127,7 +127,9 @@ const FitRoute = {
   data: () => ({
     gpxFile: null,
     route: null,
-    units: 'km'
+    units: 'km',
+    show_marker: true,
+    show_turns: true
   }),
   methods: {
     onClear,
