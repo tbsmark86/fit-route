@@ -5,7 +5,9 @@ const latlng = ({ lat, lon }) => [lat, lon];
 function mounted() {
   this.map = L.map('route-map', {
     zoomControl: false,
-    fullscreenControl: { position: 'topright' }
+    fullscreenControl: { position: 'topright' },
+    almostOnMouseMove: false,
+    almostDistance: 10,
   });
   L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
@@ -21,7 +23,27 @@ function mounted() {
 
   const points = this.route.points;
 
-  this.routeLayer = L.polyline(points.map(latlng), { color: 'blue' }).addTo(this.map);
+  this.routeLayer = L.polyline(points.map(latlng), { color: 'blue' });
+  this.map.addLayer(this.routeLayer);
+
+  // almostOver to allow approximate clicking for;
+  // Note: The layer must be added twice to keep it visible despite of
+  // of example code for almostOver :/
+  this.map.almostOver.addLayer(this.routeLayer);
+  // allow clicking the route to add new instruction
+  this.map.on('almost:click', (event, layer) => {
+      // very stupid way to find the nearest point on the route
+      let max = Number.MAX_SAFE_INTEGER;
+      let found = this.route.points[0];
+      this.route.points.forEach((point) => {
+	  const distance = event.latlng.distanceTo(point);
+	  if(distance < max) {
+	    max = distance;
+	    found = point;
+	  }
+       });
+       this.$emit('select_point', found);
+    });
   this.markerLayer = L.layerGroup().addTo(this.map);
   this.turnLayer = L.layerGroup().addTo(this.map);
 
