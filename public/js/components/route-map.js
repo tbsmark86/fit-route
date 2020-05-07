@@ -95,7 +95,8 @@ function drawTurns() {
     const icon = L.divIcon({ iconSize: null,
       html: `<div class="map-label map-label-turn"><div class="map-label-content">${point.turn}</div><div class="map-label-arrow" /></div></div>`
     });
-    L.marker(latlng(point), { icon }).addTo(this.turnLayer);
+    L.marker(latlng(point), { icon }).addTo(this.turnLayer)
+      .on('click', this.$emit.bind(this, 'select_point', point));
   }
 }
 
@@ -114,6 +115,9 @@ const RouteMap = {
     routeLayer: null,
     zoom: null
   }),
+  methods: {
+    drawTurns
+  },
   watch: {
     units: drawMarkers,
     zoom: drawMarkers,

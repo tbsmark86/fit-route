@@ -72,3 +72,20 @@ body {
 .input-group-text {
   width: 5.3rem;
 }
+
+.course-point-dialog {
+    background-color: rgba(1, 1, 1, 0.5);
+    display: block;
+}
+
+.form-list {
+    display: grid;
+    grid-template-columns: [label] fit-content(80%) [field] 1fr;
+    grid-gap: 0 0.5em;
+}
+.form-list > dt {
+    grid-column: label
+}
+.form-list > dd {
+    grid-column: field
+}

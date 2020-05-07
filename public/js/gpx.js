@@ -122,6 +122,20 @@ function* routePoints(rte) {
  * turn possible values: https://github.com/abrensch/brouter/blob/a0de73632338004995d152a6aa6180d866e0525c/brouter-core/src/main/java/btools/router/VoiceHint.java
  */
 function* routeInstructions(rte) {
+  const map2fit = {
+    TU: 'u_turn',
+    TRU: 'u_turn',
+    TSHL: 'sharp_left',
+    TL: 'left',
+    TSLL: 'slight_left',
+    KL: 'left_fork', // wild guess
+    C: 'straight',
+    KR: 'right_fork', // wild guess
+    TSLR: 'slight_right',
+    TR: 'right',
+    TSHR: 'sharp_right'
+  };
+
   for (const node of rte.children) {
     if (node.nodeName === 'rtept') {
       const lat = parseFloat(node.getAttribute('lat'));
@@ -141,13 +155,29 @@ function* routeInstructions(rte) {
 	// start and end node don't have turn data
 	continue;
       }
-      const turn = turnNode.textContent;
+      const turnOsm = turnNode.textContent;
+
+      // convert OsmAnd-Enum to fit-Enum
+      let turn = map2fit[turnOsm];
+      let name = undefined; // empty hint by default
+      if(turn === undefined) {
+	if(turnOsm.startsWith('RNDB') || turnOsm.startsWith('RNLB')) {
+	  // there is no roundabout instruction in fit - make a message
+	  turn = 'danger';
+	  name = 'Roundabout exit ' + turn.slice(4);
+	} else {
+	  // unknown - convert to message
+	  type = 'generic'
+	  name = turnOsm;
+	}
+      }
 
       yield {
         lat,
         lon,
         offset,
-        turn
+        turn,
+	name
       };
     }
   }

@@ -19,7 +19,7 @@ const enum_maps = {
     //second_category: 12,
     //first_category: 13,
     //hors_category: 14,
-    //sprint: 15,
+    sprint: 15,
     left_fork: 16,
     right_fork: 17,
     middle_fork: 18,
@@ -28,8 +28,8 @@ const enum_maps = {
     slight_right: 21,
     sharp_right: 22,
     u_turn: 23,
-    //segment_start: 24,
-    //segment_end: 25,
+    segment_start: 24,
+    segment_end: 25,
   }
 };
 
