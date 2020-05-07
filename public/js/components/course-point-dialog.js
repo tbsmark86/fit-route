@@ -14,19 +14,66 @@ function edit(point) {
 	return;
       }
       const form = this.$refs.form;
+      const clearKeyboard = listenKeyboard(form, point);
       form.onsubmit = (event) => {
-	const action = event.submitter.value;
-	if(action === 'delete') {
+	if(event.submitter && event.submitter.value === 'delete') {
 	  point.name = undefined;
 	  point.turn = undefined;
 	}
 	this.open = false;
+	clearKeyboard();
 	event.preventDefault();
 	resolve();
       };
       dialog.showModal();
     });
   });
+}
+
+function listenKeyboard(form, point) {
+  const handler = (event) => {
+    if(event.target instanceof HTMLInputElement) {
+      return;
+    }
+    // based on a-w-s-d gaming style navigation
+    switch(event.key) {
+    case 'a':
+      point.turn = 'left';
+      break;
+    case 'q':
+      point.turn = 'slight_left';
+      break;
+    case 'y':
+      point.turn = 'sharp_left';
+      break;
+    case 'd':
+      point.turn = 'right';
+      break;
+    case 'e':
+      point.turn = 'slight_right';
+      break;
+    case 'c':
+      point.turn = 'sharp_right';
+      break;
+      // not sure if keep_left is useful
+    case 's':
+      point.turn = 'u_turn';
+      break;
+    case 'w':
+      point.turn = 'straight';
+      break;
+    case 'x':
+      point.turn = 'generic';
+      break;
+    default:
+      return;
+    };
+    console.log(`intercepted key ${event.key}`);
+    event.preventDefault();
+    form.onsubmit(event);
+  };
+  window.addEventListener('keydown', handler);
+  return window.removeEventListener.bind(window, 'keydown', handler);
 }
 
 const CoursePointDialog = {
