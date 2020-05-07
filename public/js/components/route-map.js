@@ -92,8 +92,9 @@ function drawTurns() {
     if (!point.turn) {
       continue;
     }
+    const text = point.name || '';
     const icon = L.divIcon({ iconSize: null,
-      html: `<div class="map-label map-label-turn"><div class="map-label-content">${point.turn}</div><div class="map-label-arrow" /></div></div>`
+      html: `<div class="map-turn"><div class="map-turn-content map-turn-${point.turn}" data-turn=${point.turn}>${text}</div><div class="map-turn-arrow" /></div></div>`
     });
     L.marker(latlng(point), { icon }).addTo(this.turnLayer)
       .on('click', this.$emit.bind(this, 'select_point', point));

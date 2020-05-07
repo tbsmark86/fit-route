@@ -23,7 +23,7 @@ body {
   padding-right: 30px;
 }
 
-.map-label {
+.map-label, .map-turn {
   position: absolute;
   bottom: 0;
   left: -50%;
@@ -32,7 +32,7 @@ body {
   text-align: center;
 }
 
-.map-label-content {
+.map-label-content, .map-turn-content {
   order: 1;
   position: relative;
   left: -50%;
@@ -44,8 +44,11 @@ body {
   padding: 3px;
   white-space: nowrap;
 }
+.map-turn-content {
+  border-color: blue;
+}
 
-.map-label-arrow {
+.map-label-arrow, .map-turn-arrow {
   order: 2;
   width: 0px;
   height: 0px;
@@ -55,13 +58,44 @@ body {
   border-width: 10px 6px 0 6px;
   margin-left: -6px;
 }
+.map-turn-arrow {
+  border-color: blue transparent transparent transparent;
+  border-width: 10px 3px 0 3px;
+  margin-left: -3px;
+}
 
-.map-label-turn .map-label-content {
-  border-color: green;
+.leaflet-marker-icon:nth-child(odd) .map-turn {
+  top: 0;
+  bottom: initial;
 }
-.map-label-turn .map-label-arrow {
-  border-top-color: green;
+.leaflet-marker-icon:nth-child(odd) .map-turn-content {
+  order: 2;
 }
+.leaflet-marker-icon:nth-child(odd) .map-turn-arrow {
+  order: 1;
+  border-color: transparent transparent blue transparent;
+  border-width: 0 3px 10px 3px;
+}
+
+.map-turn-content:after {
+  content: attr(data-turn);
+  display: block;
+  font-size: bold;
+  position: relative;
+}
+
+.map-turn-right:after { content: '➡'; }
+.map-turn-sharp_right:after { content: '⬊'; }
+.map-turn-slight_right:after { content: '⬈'; }
+.map-turn-right_fork:after { content: '⬈'; }
+.map-turn-left:after { content: '⬅'; }
+.map-turn-sharp_left:after { content: '⬋'; }
+.map-turn-slight_left:after { content: '⬉'; }
+.map-turn-left_fork:after { content: '⬉'; }
+.map-turn-straight:after { content: '⬆'; }
+.map-turn-u_turn:after { content: '↶'; }
+.map-turn-danger:after { content: '⚠'; }
+.map-turn-generic:after { content: '⬤'; }
 
 .input-feedback {
   width: 20px;
