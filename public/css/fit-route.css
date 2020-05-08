@@ -46,6 +46,9 @@ body {
 }
 .map-turn-content {
   border-color: blue;
+  font-size: 0.7rem;
+  padding: 1px;
+  border-width: 1px;
 }
 
 .map-label-arrow, .map-turn-arrow {
@@ -80,8 +83,10 @@ body {
 .map-turn-content:after {
   content: attr(data-turn);
   display: block;
-  font-size: bold;
+  font-weight: bold;
+  font-size: 1rem;
   position: relative;
+  line-height: 1;
 }
 
 .map-turn-right:after { content: '➡'; }

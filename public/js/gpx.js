@@ -163,8 +163,8 @@ function* routeInstructions(rte) {
       if(turn === undefined) {
 	if(turnOsm.startsWith('RNDB') || turnOsm.startsWith('RNLB')) {
 	  // there is no roundabout instruction in fit - make a message
+	  name = 'Exit ' + turnOsm.slice(4);
 	  turn = 'danger';
-	  name = 'Roundabout exit ' + turn.slice(4);
 	} else {
 	  // unknown - convert to message
 	  type = 'generic'
@@ -198,6 +198,7 @@ function insertInstructions(points, instructions) {
       continue;
     }
     point.turn = instruction.turn;
+    point.name = instruction.name;
 
   }
   return points;

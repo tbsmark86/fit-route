@@ -65,6 +65,15 @@ function listenKeyboard(form, point) {
     case 'x':
       point.turn = 'generic';
       break;
+    case 'Delete':
+    case 'r':
+      // remove
+      event.submitter = {value: 'delete'}
+      break;
+    case 'Enter':
+    case 'Escape':
+      // just close
+      break;
     default:
       return;
     };
