@@ -1,5 +1,10 @@
+import { getBool, setBoolWatchFunc } from '../localStorage.js';
+
 function onFilesChange(files) {
   this.file = files[0];
+  if(this.auto_submit) {
+    this.onSubmit();
+  }
 }
 
 function onCancel() {
@@ -13,12 +18,16 @@ function onSubmit() {
 const FileUpload = {
   template: '#file-upload-template',
   data: () => ({
-    file: null
+    file: null,
+    auto_submit: getBool('auto-submit', false),
   }),
   methods: {
     onFilesChange,
     onCancel,
     onSubmit
+  },
+  watch: {
+    auto_submit: setBoolWatchFunc('auto-submit')
   }
 };
 

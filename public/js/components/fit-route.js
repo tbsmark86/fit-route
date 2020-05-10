@@ -5,6 +5,9 @@ import RouteInfo from './route-info.js';
 import RouteMap from './route-map.js';
 import CoursePointDialog from './course-point-dialog.js';
 import { FITEncoder } from '../fit/encoder.js';
+import { getBool, setBoolWatchFunc } from '../localStorage.js';
+
+let unsaved = false;
 
 function setName(name) {
   this.route.name = name;
@@ -21,6 +24,7 @@ function setDuration(duration) {
 function onClear() {
   this.gpxFile = this.route = null;
   this.$emit('show-info', true);
+  unsaved = false;
 }
 
 async function onFileUpload(gpxFile) {
@@ -28,6 +32,7 @@ async function onFileUpload(gpxFile) {
     this.gpxFile = gpxFile;
     this.route = await parseGpx(gpxFile);
     this.$emit('show-info', false);
+    unsaved = true;
   } catch (error) {
     console.error(error);
     this.$emit('error', `Unable to process "${gpxFile.name}"`);
@@ -83,6 +88,7 @@ function onFitDownload() {
     anchorElement.href = url;
     anchorElement.click();
     URL.revokeObjectURL(url);
+    unsaved = false;
   } catch (error) {
     console.error(error);
     this.$emit('error', `Unable to create FIT`);
@@ -92,7 +98,16 @@ function onFitDownload() {
 async function onSelectPoint(point) {
     await this.$refs.dialog.edit(point);
     this.$refs.map.drawTurns();
+    unsaved = true;
 }
+
+// simple 'forgot to save' question
+window.addEventListener('beforeunload', function (e) {
+  if(unsaved) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
 
 const FitRoute = {
   template: '#fit-route-template',
@@ -100,8 +115,8 @@ const FitRoute = {
     gpxFile: null,
     route: null,
     units: 'km',
-    show_marker: true,
-    show_turns: true
+    show_marker: getBool('show-marker', true),
+    show_turns: getBool('show-turns', true),
   }),
   methods: {
     onClear,
@@ -116,7 +131,14 @@ const FitRoute = {
     RouteInfo,
     RouteMap,
     CoursePointDialog
+  },
+  watch: {
+    show_marker: setBoolWatchFunc('show-marker'),
+    show_turns: setBoolWatchFunc('show-turns'),
   }
 };
 
 export default FitRoute;
+
+
+

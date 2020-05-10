@@ -89,6 +89,9 @@
             Connect Garmin as USB device, and place the FIT file in
             <span class="text-monospace">\GARMIN\NEWFILES</span>
           </li>
+	  <li>
+	    For use with Wahoo Element <a href="https://trainerday.com/load-workouts-onto-your-wahoo-elemnt-on-a-mac/">read this</a>
+	  </li>
         </ul>
         <p>
           <span>
@@ -110,7 +113,6 @@
             The source can be cloned from
             <a href="https://gitlab.com/nwholloway/fit-route" class="text-muted">GitLab</a>
           </span>
-          .
         </p>
         <p>
           <span>
@@ -129,6 +131,22 @@
         <error-message :message="error"></error-message>
       </div>
       <fit-route @show-info="onShowInfo" @error="onError" class="flex-grow-1"></fit-route>
+      <div v-if="showInfo" class="container-fluid p-3">
+        <p>
+          <span>Turn-by-Turn instructions</span>
+        </p>
+        <ul>
+          <li>
+	    If GPX file contains "OsmAnd" Style instructions they are auto imported
+	  </li>
+          <li>
+	    You can add/edit your own instructions by click on the appropriate point of the route
+          </li>
+          <li>
+	    You can speed up editing of instructions by using the keyboard shortcuts listed in the drop down. Also 'r' delete and 'enter' or 'esc' close the dialog
+          </li>
+        </ul>
+      </div>
     </main>
 
     <script
@@ -186,6 +204,10 @@
             </div>
           </div>
         </div>
+	<div class="text-center">
+	  <input class="form-check-input" type="checkbox" value="" id="auto_submit" v-model="auto_submit">
+	  <label class="form-check-label" for="auto_submit">automatic submit</label>
+	</div>
       </form>
     </script>
 
