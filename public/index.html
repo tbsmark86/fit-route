@@ -254,11 +254,19 @@
 		  Show Turn Instructions Markers
 		</label>
 	      </div>
+
+	      <div class="form-group">
+		<label for="map_url">Custom map</label>
+		<div class="form-group d-flex">
+		  <input type="checkbox" value="" v-model="map_url_active">
+		  <input id="map_url" type="text" v-model="map_url" class="form-control text-info bg-light">
+		</div>
+	      </div>
             </form>
 
           </div>
           <div class="col p-0 border">
-            <route-map ref="map" :route="route" :units="units" :show_turns="show_turns" :show_marker="show_marker" @select_point="onSelectPoint"></route-map>
+            <route-map ref="map" :layer="layer" :route="route" :units="units" :show_turns="show_turns" :show_marker="show_marker" @select_point="onSelectPoint"></route-map>
           </div>
 	  <course-point-dialog ref="dialog"></course-point-dialog>
         </div>

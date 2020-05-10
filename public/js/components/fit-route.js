@@ -5,7 +5,7 @@ import RouteInfo from './route-info.js';
 import RouteMap from './route-map.js';
 import CoursePointDialog from './course-point-dialog.js';
 import { FITEncoder } from '../fit/encoder.js';
-import { getBool, setBoolWatchFunc } from '../localStorage.js';
+import { getBool, setBoolWatchFunc, setBool, getString, setString } from '../localStorage.js';
 
 let unsaved = false;
 
@@ -117,6 +117,9 @@ const FitRoute = {
     units: 'km',
     show_marker: getBool('show-marker', true),
     show_turns: getBool('show-turns', true),
+    map_url: getString('map-url', ''),
+    map_url_active: getBool('map-url-active', true),
+    layer: getBool('map-url-active', true) && getString('map-url', '')
   }),
   methods: {
     onClear,
@@ -135,6 +138,16 @@ const FitRoute = {
   watch: {
     show_marker: setBoolWatchFunc('show-marker'),
     show_turns: setBoolWatchFunc('show-turns'),
+    map_url: function(val) {
+      setString('map-url', val);
+      if(this.map_url_active) {
+	this.layer = this.map_url;
+      }
+    },
+    map_url_active: function(val) {
+      setBool('map-url-active', val);
+      this.layer = val ? this.map_url : '';
+    }
   }
 };
 

@@ -1,7 +1,10 @@
 
+function finalKey(key) {
+  return 'fit-route-' + key;
+}
 
 export function getBool(key, def) {
-  key = 'fit-route-' + key;
+  key = finalKey(key);
   const val = localStorage[key];
   if(val !== null) {
     try {
@@ -9,15 +12,28 @@ export function getBool(key, def) {
     } catch(e) {
     }
   }
-  console.log('get ', key, 'default');
   return def;
 }
 
 export function setBool(key, val) {
-  key = 'fit-route-' + key;
+  key = finalKey(key);
   localStorage[key] = JSON.stringify(val);
 }
 
 export function setBoolWatchFunc(key, val) {
   return setBool.bind(null, key);
+}
+
+export function getString(key, def) {
+  key = finalKey(key);
+  return localStorage[key] || def;
+}
+
+export function setString(key, val) {
+  key = finalKey(key);
+  localStorage[key] = val;
+}
+
+export function setStringWatchFunc(key, val) {
+  return setString.bind(null, key);
 }

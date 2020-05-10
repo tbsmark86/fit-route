@@ -2,6 +2,10 @@
 
 const latlng = ({ lat, lon }) => [lat, lon];
 
+function getLayerUrl() {
+  return this.layer || 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+}
+
 function mounted() {
   this.map = L.map('route-map', {
     zoomControl: false,
@@ -15,7 +19,7 @@ function mounted() {
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     '&copy; <a href="https://carto.com/attributions">CARTO</a>'
   ];
-  this.tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  this.tileLayer = L.tileLayer(this.getLayerUrl(), {
     attribution: attributions.join(' | '),
     subdomains: 'abcd',
     maxZoom: 19
@@ -130,6 +134,7 @@ const RouteMap = {
     units: String,
     show_marker: Boolean,
     show_turns: Boolean,
+    layer: String,
   },
   mounted,
   data: () => ({
@@ -139,13 +144,17 @@ const RouteMap = {
     zoom: null
   }),
   methods: {
-    drawTurns
+    drawTurns,
+    getLayerUrl
   },
   watch: {
     units: drawMarkers,
     zoom: drawMarkers,
     show_marker: drawMarkers,
-    show_turns: drawTurns
+    show_turns: drawTurns,
+    layer: function() {
+      this.tileLayer.setUrl(this.getLayerUrl());
+    }
   }
 };
 
