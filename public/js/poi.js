@@ -60,7 +60,7 @@ function intersect(A,B,C,D) {
  */
 function removeLoops(points, distance) {
     const distanceLimit = (4 * distance) * 1000; // meters
-    for(let pos = 0; pos < points.length; pos++) {
+    for(let pos = 0; pos < points.length - 2; pos++) {
 	// select a segment
 	let start = points[pos];
 	let startLatLng = L.latLng(start.lat, start.lon);
@@ -74,11 +74,44 @@ function removeLoops(points, distance) {
 		break;
 	    }
 	    if(intersect(start, next, current, previous)) {
-		// remove all elements involved in the loop
+		// remove all points involved in the loop
 		points.splice(pos + 1, cnt + 1);
+		// restart this search for nested loops
+		pos--;
 		break;
 	    }
 	    previous = current;
+	}
+    }
+    return points;
+}
+
+/**
+ * Search for strange spikes in the route; Reason are like the loop
+ * problem but less extrem.
+ *
+ */
+function removeSpikes(points, distance) {
+    const distanceLimit = (4 * distance) * 1000; // meters
+    for(let pos = 0; pos < points.length - 2; pos++) {
+	// select two points
+	let start = points[pos];
+	let startLatLng = L.latLng(start.lat, start.lon);
+	let next = points[pos+1];
+	let startDistance = startLatLng.distanceTo([next.lat, next.lon]);
+	// now search for a point that is nearer then next
+	for(let i = pos + 2, cnt = 0; i < points.length; i++, cnt++) {
+	    let current = points[i];
+	    // stop loop once we far away from starting point
+	    // or many edges because spike are 95% only 3 points
+	    if(cnt > 4 || startLatLng.distanceTo([current.lat, current.lon]) > distanceLimit) {
+		break;
+	    }
+	    if(startLatLng.distanceTo([current.lat, current.lon]) < startDistance) {
+		// remove all points involved in this spike
+		points.splice(pos + 1, cnt + 1);
+		break;
+	    }
 	}
     }
     return points;
@@ -128,12 +161,15 @@ export function getBoundingBox(points, distance) {
 	    lastP2 = p2;
 	}
     }
-    list1 = removeLoops(list1, distance);
-    list2 = removeLoops(list2, distance);
+    list1 = removeSpikes(removeLoops(list1, distance), distance);
+    list2 = removeSpikes(removeLoops(list2, distance), distance);
     // the last point has no bearing add it 'solo'
     list1.push({lat: points[points.length-1].lat, lon: points[points.length-1].lon});
     // add lower line to close loop
     list1.push.apply(list1, list2.reverse());
+
+    // the merge might create a final loop
+    list1 = removeLoops(list1, distance);
 
     return list1;
 }
