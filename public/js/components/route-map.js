@@ -1,4 +1,8 @@
 /* global L */
+/* jshint esversion: 6 */
+
+import { getBoundingBox } from '../poi.js';
+import * as Overpass from '../overpass.js';
 
 const latlng = ({ lat, lon }) => [lat, lon];
 
@@ -50,10 +54,12 @@ function mounted() {
     });
   this.markerLayer = L.layerGroup().addTo(this.map);
   this.turnLayer = L.layerGroup().addTo(this.map);
+  this.waterLayer = L.layerGroup().addTo(this.map);
 
   const [start, finish] = [points[0], points[points.length - 1]];
   L.circleMarker(latlng(start), { radius: 8, weight: 0, color: 'greeen', fillOpacity: 0.6 }).addTo(this.map);
   L.circleMarker(latlng(finish), { radius: 8, weight: 0, color: 'red', fillOpacity: 0.6 }).addTo(this.map);
+
 
   this.map.on('zoomend', ({ target: map }) => {
     this.zoom = map.getZoom();
@@ -61,8 +67,8 @@ function mounted() {
 
   this.map.fitBounds(this.routeLayer.getBounds());
 
-
   drawTurns.call(this);
+  drawWater.call(this);
 }
 
 const markerInterval = (zoom) => {
@@ -134,6 +140,7 @@ const RouteMap = {
     units: String,
     show_marker: Boolean,
     show_turns: Boolean,
+    show_water: Boolean,
     layer: String,
   },
   mounted,
@@ -145,6 +152,7 @@ const RouteMap = {
   }),
   methods: {
     drawTurns,
+    drawWater,
     getLayerUrl
   },
   watch: {
@@ -152,10 +160,29 @@ const RouteMap = {
     zoom: drawMarkers,
     show_marker: drawMarkers,
     show_turns: drawTurns,
+    show_water: drawWater,
     layer: function() {
       this.tileLayer.setUrl(this.getLayerUrl());
     }
   }
 };
+
+async function drawWater() {
+    this.waterLayer.clearLayers();
+    if(!this.show_water) {
+	return;
+    }
+
+    let box = getBoundingBox(this.route.points, 3);
+    let water = await Overpass.findWater(box);
+
+    const mapLabel = (label) =>
+	`<div class="map-label"><div class="map-label-content">${label}</div><div class="map-label-arrow" /></div></div>`;
+    for(const i of water) {
+	console.log('add icon');
+	const icon = L.divIcon({ iconSize: null, html: mapLabel(i.name) });
+	L.marker([i.lat, i.lon], { icon, title: i.text }).addTo(this.waterLayer);
+    }
+}
 
 export default RouteMap;

@@ -254,6 +254,12 @@
 		  Show Turn Instructions Markers
 		</label>
 	      </div>
+	      <div class="form-check">
+		<input class="form-check-input" type="checkbox" value="" id="show_water" v-model="show_water">
+		<label class="form-check-label" for="show_water">
+		  Search for Water
+		</label>
+	      </div>
 
 	      <div class="form-group">
 		<label for="map_url">Custom map</label>
@@ -266,7 +272,7 @@
 
           </div>
           <div class="col p-0 border">
-            <route-map ref="map" :layer="layer" :route="route" :units="units" :show_turns="show_turns" :show_marker="show_marker" @select_point="onSelectPoint"></route-map>
+            <route-map ref="map" :layer="layer" :route="route" :units="units" :show_turns="show_turns" :show_marker="show_marker" :show_water="show_water" @select_point="onSelectPoint"></route-map>
           </div>
 	  <course-point-dialog ref="dialog"></course-point-dialog>
         </div>

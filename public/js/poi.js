@@ -1,4 +1,7 @@
 /* jshint esversion: 6 */
+
+import * as Overpass from './overpass.js';
+
 Number.prototype.toRad = function() {
    return this * Math.PI / 180;
 };
