@@ -179,7 +179,6 @@ async function drawWater() {
     const mapLabel = (label) =>
 	`<div class="map-label"><div class="map-label-content">${label}</div><div class="map-label-arrow" /></div></div>`;
     for(const i of water) {
-	console.log('add icon');
 	const icon = L.divIcon({ iconSize: null, html: mapLabel(i.name) });
 	L.marker([i.lat, i.lon], { icon, title: i.text }).addTo(this.waterLayer);
     }

@@ -38,7 +38,6 @@ function tags2str(tags) {
  * Box is a list of points that forms a polygon
  */
 export function findWater(box) {
-
     const query = `
 	[out:json];
 	node[amenity=drinking_water]${box2poly(box)};
@@ -54,13 +53,22 @@ export function findWater(box) {
 	    // not useful
 	    delete ele.tags.amenity;
 	    delete ele.tags.wheelchair;
+	    delete ele.tags.drinking_water;
 	    res.push({
 		lat: ele.lat,
 		lon: ele.lon,
 		name: 'Wasser',
 		text: tags2str(ele.tags),
+
+		// GPX Symbol see as example
+		// https://www.gpsbabel.org/htmldoc-development/GarminIcons.html
+		// sadly there is no standard
+		sym: 'Drinking Water',
 	    });
 	}
+
 	return res;
     });
 }
+
+

@@ -1,3 +1,4 @@
+/* jshint esversion: 6 */
 /* global URL */
 import { parseGpx } from '../gpx.js';
 import FileUpload from './file-upload.js';
@@ -6,6 +7,8 @@ import RouteMap from './route-map.js';
 import CoursePointDialog from './course-point-dialog.js';
 import { FITEncoder } from '../fit/encoder.js';
 import { getBool, setBoolWatchFunc, setBool, getString, setString } from '../localStorage.js';
+
+import { getPoiAsGPX } from '../poi.js';
 
 let unsaved = false;
 
@@ -95,6 +98,37 @@ function onFitDownload() {
   }
 }
 
+function onPoiDownload() {
+
+    const downloadGPX = (content, type) => {
+	const filename = `${this.route.name}-${type}.gpx`;
+	const url = URL.createObjectURL(new File([content], filename, {type: 'application/gpx+xml'}));
+	const anchorElement = this.$refs.downloadAnchor;
+	anchorElement.download = filename;
+	anchorElement.href = url;
+	anchorElement.click();
+	URL.revokeObjectURL(url);
+    };
+
+	console.debug('loading start');
+    this.poi_loading = true;
+    const enqueJob = (type, distance) => {
+	return getPoiAsGPX(this.route.points, type, distance).then((gpx) => {
+	    console.info(`${type} loaded start download`, gpx);
+	    downloadGPX(gpx, type);
+	}).catch((err) => {
+	    console.error(err);
+	    this.$emit('error', `Unable to create ${type} GPX`);
+	});
+    };
+    Promise.all([
+	enqueJob('water', 3)
+    ]).finally(() => {
+	console.debug('loading done');
+	this.poi_loading = false;
+    });
+}
+
 async function onSelectPoint(point) {
     await this.$refs.dialog.edit(point);
     this.$refs.map.drawTurns();
@@ -104,8 +138,10 @@ async function onSelectPoint(point) {
 // simple 'forgot to save' question
 window.addEventListener('beforeunload', function (e) {
   if(unsaved) {
+      /* XXX
     e.preventDefault();
     e.returnValue = '';
+    */
   }
 });
 
@@ -120,12 +156,14 @@ const FitRoute = {
     show_water: false,
     map_url: getString('map-url', ''),
     map_url_active: getBool('map-url-active', true),
-    layer: getBool('map-url-active', true) && getString('map-url', '')
+    layer: getBool('map-url-active', true) && getString('map-url', ''),
+    poi_loading: false,
   }),
   methods: {
     onClear,
     onFileUpload,
     onFitDownload,
+    onPoiDownload,
     setName,
     setDuration,
     onSelectPoint

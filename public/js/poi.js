@@ -177,3 +177,59 @@ export function getBoundingBox(points, distance) {
     return list1;
 }
 
+function createGPXField(parent, name, value) {
+    const field = parent.ownerDocument.createElement(name);
+    field.appendChild(parent.ownerDocument.createTextNode(value));
+    parent.appendChild(field);
+}
+
+// make reading create doc easier
+function createBreak(parent) {
+    parent.appendChild(parent.ownerDocument.createTextNode('\n'));
+}
+
+/**
+ * Export a list of pois (as found by overpass.js) to a gpx string
+ */
+function toGPX(pois, name) {
+    const xmlDoc = document.implementation.createDocument('http://www.topografix.com/GPX/1/1', 'gpx');
+    const root = xmlDoc.childNodes[0];
+    root.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+    root.setAttribute('xsi:schemaLocation', 'http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd');
+    root.setAttribute('version', '1.1');
+    createBreak(root);
+
+    const metadata = xmlDoc.createElement('metadata');
+    createGPXField(metadata, 'name', name);
+    root.appendChild(metadata);
+
+    for(const poi of pois) {
+	const wpt = xmlDoc.createElement('wpt');
+	wpt.setAttribute('lat', poi.lat);
+	wpt.setAttribute('lon', poi.lon);
+	createGPXField(wpt, 'name', poi.name || 'Unnamed');
+	createGPXField(wpt, 'desc', poi.text || '');
+	if(poi.sym) {
+	    createGPXField(wpt, 'sym', poi.sym);
+	}
+	root.appendChild(wpt);
+	createBreak(root);
+    }
+    return new XMLSerializer().serializeToString(xmlDoc);
+}
+
+/**
+ * Create a GPX File with specified POI-Type with distance in km
+ * around the route
+ */
+export async function getPoiAsGPX(routePoints, type, distance)
+{
+    let data;
+    let box = getBoundingBox(routePoints, distance);
+    if(type === 'water') {
+	data = await Overpass.findWater(box);
+    } else {
+	throw new Error('Unknown type');
+    }
+    return toGPX(data, type);
+}
