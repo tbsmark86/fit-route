@@ -228,6 +228,14 @@ export async function getPoiAsGPX(routePoints, type, distance)
     let box = getBoundingBox(routePoints, distance);
     if(type === 'water') {
 	data = await Overpass.findWater(box);
+    } else if(type === 'tanke') {
+	data = await Overpass.findTanke(box);
+    } else if(type === 'toilets') {
+	data = await Overpass.findToilets(box);
+    } else if(type === 'shelter') {
+	data = await Overpass.findShelter(box);
+    } else if(type === 'cemetery') {
+	data = await Overpass.findCemetery(box);
     } else {
 	throw new Error('Unknown type');
     }

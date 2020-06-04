@@ -98,7 +98,7 @@ function onFitDownload() {
   }
 }
 
-function onPoiDownload() {
+async function onPoiDownload() {
 
     const downloadGPX = (content, type) => {
 	const filename = `${this.route.name}-${type}.gpx`;
@@ -110,23 +110,24 @@ function onPoiDownload() {
 	URL.revokeObjectURL(url);
     };
 
-	console.debug('loading start');
     this.poi_loading = true;
     const enqueJob = (type, distance) => {
 	return getPoiAsGPX(this.route.points, type, distance).then((gpx) => {
-	    console.info(`${type} loaded start download`, gpx);
+	    console.info(`${type} loaded start download`);
 	    downloadGPX(gpx, type);
 	}).catch((err) => {
 	    console.error(err);
 	    this.$emit('error', `Unable to create ${type} GPX`);
 	});
     };
-    Promise.all([
-	enqueJob('water', 3)
-    ]).finally(() => {
-	console.debug('loading done');
-	this.poi_loading = false;
-    });
+    // request sequentiel to avoid rate limit
+    await enqueJob('water', 3);
+    await enqueJob('tanke', 5);
+    await enqueJob('toilets', 3);
+    await enqueJob('shelter', 2);
+    await enqueJob('cemetery', 2);
+
+    this.poi_loading = false;
 }
 
 async function onSelectPoint(point) {
