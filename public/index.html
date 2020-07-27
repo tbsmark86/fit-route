@@ -162,7 +162,7 @@
     <script type="text/x-template" id="file-upload-template">
       <form enctype="multipart/form-data" novalidate>
         <div class="file-upload d-flex justify-content-center align-items-center border bg-light w-75 mx-auto">
-          <input v-if="!file" type="file" title=" " aria-label="Select GPX" accept=".gpx,application/gpx+xml" @change="onFilesChange($event.target.files)">
+          <input v-if="!file" type="file" title=" " aria-label="Select GPX" accept=".gpx,application/gpx+xml,application/octet-stream" @change="onFilesChange($event.target.files)">
           <div v-if="!file" class="h4 font-weight-normal">
             Drop GPX here or click to browse
           </div>
