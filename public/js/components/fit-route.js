@@ -74,7 +74,7 @@ function onFitDownload() {
     anchorElement.download = `${this.route.name}.fit`;
     anchorElement.href = url;
     anchorElement.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
   } catch (error) {
     console.error(error);
     this.$emit('error', `Unable to create FIT`);
