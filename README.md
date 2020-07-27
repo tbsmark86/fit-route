@@ -17,8 +17,14 @@ $ yarn start
 
 The application will be served up on <http://localhost:8080/>.
 
-If you are using Cloud9 then the application will be available on the
-workspace URL <http://workspace-username.c9users.io> (`$C9_HOST`).
+BrowserStack
+------------
+
+To use _BrowserStack Live_ with _Local Testing_ launch the _BrowserStack Local_
+application as follows:
+```console
+$ BrowserStackLocal --key "$BROWSERSTACK_KEY" --folder "$PWD/public" 
+```
 
 Notes
 -----
