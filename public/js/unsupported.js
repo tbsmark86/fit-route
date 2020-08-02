@@ -8,7 +8,7 @@ const ErrorMessage = {
 };
 
 const FitRoute = {
-  template: '#empty-template',
+  template: '#empty-template'
 };
 
 new Vue({

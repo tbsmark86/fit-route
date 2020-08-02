@@ -19,29 +19,24 @@ async function parseXml(buffer) {
     if (errors.length) {
       console.error('Parse error:', errors.item(0).innerText);
       reject();
-    }
-    else if (doc.documentElement.nodeName !== 'gpx') {
+    } else if (doc.documentElement.nodeName !== 'gpx') {
       reject();
-    }
-    else {
+    } else {
       resolve(doc);
     }
   });
 }
 
-const childNamed = (node, nodeName) =>
-  Array.from(node.children).find(node => node.nodeName === nodeName);
+const childNamed = (node, nodeName) => Array.from(node.children).find((node) => node.nodeName === nodeName);
 
 function haversine({ lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }) {
   const R = 6371e3;
-  const φ1 = lat1 * Math.PI / 180;
-  const φ2 = lat2 * Math.PI / 180;
-  const Δφ = (lat2 - lat1) * Math.PI / 180;
-  const Δλ = (lon2 - lon1) * Math.PI / 180;
+  const φ1 = (lat1 * Math.PI) / 180;
+  const φ2 = (lat2 * Math.PI) / 180;
+  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
 
-  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-    Math.cos(φ1) * Math.cos(φ2) *
-    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const d = R * c;
 
@@ -124,8 +119,7 @@ function elevationChange(points) {
       lastEle = ele;
       if (delta > 0) {
         eleGain += delta;
-      }
-      else {
+      } else {
         eleLoss -= delta;
       }
     }
@@ -145,13 +139,13 @@ async function parseRoute(doc) {
   const rte = childNamed(doc.documentElement, 'rte');
   const rteName = rte && childNamed(rte, 'name');
 
-  const name = (metadataName && metadataName.textContent) ||
+  const name =
+    (metadataName && metadataName.textContent) ||
     (trkName && trkName.textContent) ||
     (rteName && rteName.textContent) ||
     'Unnamed';
-  const points = (trkseg && Array.from(trackPoints(trkseg))) ||
-    (rte && Array.from(routePoints(rte)));
-  const { eleGain, eleLoss } = points && elevationChange(points) || {};
+  const points = (trkseg && Array.from(trackPoints(trkseg))) || (rte && Array.from(routePoints(rte)));
+  const { eleGain, eleLoss } = (points && elevationChange(points)) || {};
 
   return points && { name, points, eleGain, eleLoss };
 }
