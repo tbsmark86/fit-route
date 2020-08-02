@@ -7,7 +7,7 @@ function mounted() {
     zoomControl: false,
     fullscreenControl: { position: 'topright' }
   });
-  L.control.zoom({ position: 'bottomright' }).addTo(this.map);
+  L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
 
   const attributions = [
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -22,7 +22,9 @@ function mounted() {
   const points = this.route.points;
 
   this.routeLayer = L.polyline(points.map(latlng), { color: 'blue' }).addTo(this.map);
-  this.markerLayer = L.layerGroup().addTo(this.map);
+  this.distanceLayer = L.layerGroup().addTo(this.map);
+
+  L.control.layers({}, { Distance: this.distanceLayer }, { position: 'bottomright' }).addTo(this.map);
 
   const [start, finish] = [points[0], points[points.length - 1]];
   L.circleMarker(latlng(start), { radius: 8, weight: 0, color: 'greeen', fillOpacity: 0.6 }).addTo(this.map);
@@ -69,10 +71,10 @@ function drawMarkers() {
   const mapLabel = (label) =>
     `<div class="map-label"><div class="map-label-content">${label}</div><div class="map-label-arrow" /></div></div>`;
 
-  this.markerLayer.clearLayers();
+  this.distanceLayer.clearLayers();
   for (const { label, latlng } of markerPoints(this.route.points, this.units, this.zoom)) {
     const icon = L.divIcon({ iconSize: null, html: mapLabel(label) });
-    L.marker(latlng, { icon }).addTo(this.markerLayer);
+    L.marker(latlng, { icon }).addTo(this.distanceLayer);
   }
 }
 
