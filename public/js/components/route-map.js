@@ -37,6 +37,12 @@ function mounted() {
   this.map.fitBounds(this.routeLayer.getBounds());
 }
 
+function midpoint(fraction, { lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }) {
+  const mid = (a, b) => a + (b - a) * fraction;
+
+  return { lat: mid(lat1, lat2), lon: mid(lon1, lon2) };
+}
+
 const markerInterval = (zoom) => {
   switch (Math.min(zoom, 13)) {
     case 13:
@@ -58,12 +64,15 @@ function* markerPoints(points, units, zoom) {
   const distanceInterval = interval * 1000 * (units === 'miles' ? 1.609344 : 1);
   let distanceNext = distanceInterval;
   let label = interval;
+  let lastPoint;
   for (const point of points) {
-    if (point.distance >= distanceNext) {
-      yield { label, latlng: latlng(point) };
+    while (point.distance >= distanceNext) {
+      const fraction = (distanceNext - lastPoint.distance) / (point.distance - lastPoint.distance);
+      yield { label, latlng: midpoint(fraction, lastPoint, point) };
       label += interval;
       distanceNext += distanceInterval;
     }
+    lastPoint = point;
   }
 }
 
