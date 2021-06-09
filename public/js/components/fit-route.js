@@ -100,6 +100,8 @@ function onFitDownload() {
 
 async function onPoiDownload() {
 
+    console.log('route-name', this.route.name);
+
     const downloadGPX = (content, type) => {
 	const filename = `${this.route.name}-${type}.gpx`;
 	const url = URL.createObjectURL(new File([content], filename, {type: 'application/gpx+xml'}));
@@ -110,8 +112,15 @@ async function onPoiDownload() {
 	URL.revokeObjectURL(url);
     };
 
+    if(this.poi_loading) {
+	console.log('prevent double load');
+	return;
+    }
+    console.log('start poi download');
+
     this.poi_loading = true;
     const enqueJob = (type, distance) => {
+	console.log(`${type} start`);
 	return getPoiAsGPX(this.route.points, type, distance).then((gpx) => {
 	    console.info(`${type} loaded start download`);
 	    downloadGPX(gpx, type);
