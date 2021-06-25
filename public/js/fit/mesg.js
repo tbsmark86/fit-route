@@ -45,6 +45,16 @@ const mesgDefns = {
   course: {
     mesgNum: 31,
     fieldDefns: [{ name: 'name', number: 5, type: 'string' }]
+  },
+  course_point: {
+    mesgNum: 32,
+    fieldDefns: [
+      { name: 'timestamp', number: 1, type: 'date_time' },
+      { name: 'position_lat', number: 2, type: 'semicircles' },
+      { name: 'position_long', number: 3, type: 'semicircles' },
+      { name: 'distance', number: 4, type: 'distance' },
+      { name: 'type', number: 5, type: 'enum_course_point' }
+    ]
   }
 };
 

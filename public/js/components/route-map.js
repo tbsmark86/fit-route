@@ -23,11 +23,13 @@ function mounted() {
 
   this.routeLayer = L.polyline(points.map(latlng), { color: 'blue' }).addTo(this.map);
   this.distanceLayer = L.layerGroup().addTo(this.map);
+  this.turnsLayer = L.layerGroup();
 
-  L.control.layers({}, { Distance: this.distanceLayer }, { position: 'bottomright' }).addTo(this.map);
+  const overlays = { Distance: this.distanceLayer, Turns: this.turnsLayer };
+  L.control.layers({}, overlays, { position: 'bottomright' }).addTo(this.map);
 
   const [start, finish] = [points[0], points[points.length - 1]];
-  L.circleMarker(latlng(start), { radius: 8, weight: 0, color: 'greeen', fillOpacity: 0.6 }).addTo(this.map);
+  L.circleMarker(latlng(start), { radius: 8, weight: 0, color: 'green', fillOpacity: 0.6 }).addTo(this.map);
   L.circleMarker(latlng(finish), { radius: 8, weight: 0, color: 'red', fillOpacity: 0.6 }).addTo(this.map);
 
   this.map.on('zoomend', ({ target: map }) => {
@@ -43,7 +45,7 @@ function midpoint(fraction, { lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }) 
   return { lat: mid(lat1, lat2), lon: mid(lon1, lon2) };
 }
 
-const markerInterval = (zoom) => {
+const distanceMarkerInterval = (zoom) => {
   switch (Math.min(zoom, 13)) {
     case 13:
       return 1;
@@ -59,31 +61,63 @@ const markerInterval = (zoom) => {
   }
 };
 
-function* markerPoints(points, units, zoom) {
-  const interval = markerInterval(zoom);
-  const distanceInterval = interval * 1000 * (units === 'miles' ? 1.609344 : 1);
-  let distanceNext = distanceInterval;
+function* distancePoints(points, units, zoom) {
+  const interval = distanceMarkerInterval(zoom);
+  const intervalDistance = interval * 1000 * (units === 'miles' ? 1.609344 : 1);
+  let nextDistance = intervalDistance;
   let label = interval;
   let lastPoint;
   for (const point of points) {
-    while (point.distance >= distanceNext) {
-      const fraction = (distanceNext - lastPoint.distance) / (point.distance - lastPoint.distance);
+    while (point.distance >= nextDistance) {
+      const fraction = (nextDistance - lastPoint.distance) / (point.distance - lastPoint.distance);
       yield { label, latlng: midpoint(fraction, lastPoint, point) };
       label += interval;
-      distanceNext += distanceInterval;
+      nextDistance += intervalDistance;
     }
     lastPoint = point;
   }
 }
 
-function drawMarkers() {
+function* distanceMarkers(points, units, zoom) {
   const mapLabel = (label) =>
     `<div class="map-label"><div class="map-label-content">${label}</div><div class="map-label-arrow" /></div></div>`;
 
-  this.distanceLayer.clearLayers();
-  for (const { label, latlng } of markerPoints(this.route.points, this.units, this.zoom)) {
+  for (const { label, latlng } of distancePoints(points, units, zoom)) {
     const icon = L.divIcon({ iconSize: null, html: mapLabel(label) });
-    L.marker(latlng, { icon }).addTo(this.distanceLayer);
+    yield L.marker(latlng, { icon });
+  }
+}
+
+const turnIconSize = (zoom) => {
+  switch (Math.min(zoom, 15)) {
+    case 15:
+      return [32, 32];
+    case 14:
+      return [24, 24];
+    case 13:
+      return [16, 16];
+    default:
+      return [8, 8];
+  }
+};
+
+function* turnMarkers(turns, zoom) {
+  const iconSize = turnIconSize(zoom);
+  for (const turn of turns) {
+    const icon = L.icon({ iconUrl: `images/${turn.turn}.svg`, iconSize });
+    yield L.marker(latlng(turn), { icon });
+  }
+}
+
+function drawMarkers() {
+  this.distanceLayer.clearLayers();
+  for (const distanceMarker of distanceMarkers(this.route.points, this.units, this.zoom)) {
+    distanceMarker.addTo(this.distanceLayer);
+  }
+
+  this.turnsLayer.clearLayers();
+  for (const turnMarker of turnMarkers(this.route.turns, this.zoom)) {
+    turnMarker.addTo(this.turnsLayer);
   }
 }
 

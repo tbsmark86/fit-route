@@ -15,6 +15,9 @@ function setDuration(duration) {
   for (const point of points) {
     point.time = startTime + Math.round(duration * (point.distance / totalDistance));
   }
+  for (const turn of this.route.turns) {
+    turn.time = startTime + Math.round(duration * (turn.distance / totalDistance));
+  }
 }
 
 function onClear() {
@@ -59,9 +62,22 @@ function onFitDownload() {
       event_type: 'start',
       event_group: 0
     });
-    for (const { lat, lon, ele, time, distance } of this.route.points) {
-      encoder.writeRecord({ timestamp: time, position_lat: lat, position_long: lon, altitude: ele, distance });
+
+    const points = this.route.points;
+    if (includeTurns) {
+      points.push(...this.route.turns);
+      const tweakedDistance = ({ distance, turn }) => distance - 50 * (turn !== undefined);
+      points.sort((a, b) => tweakedDistance(a) - tweakedDistance(b));
     }
+
+    for (const { lat, lon, distance, time, ele, turn } of points) {
+      if (turn === undefined) {
+        encoder.writeRecord({ timestamp: time, position_lat: lat, position_long: lon, distance, altitude: ele });
+      } else {
+        encoder.writeCoursePoint({ timestamp: time, position_lat: lat, position_long: lon, distance, type: turn });
+      }
+    }
+
     encoder.writeEvent({
       timestamp: finish.time,
       event: 'timer',
@@ -86,7 +102,8 @@ const FitRoute = {
   data: () => ({
     gpxFile: null,
     route: null,
-    units: 'km'
+    units: 'km',
+    includeTurns: false
   }),
   methods: {
     onClear,

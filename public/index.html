@@ -85,7 +85,7 @@
             Select the GPX file to be converted
           </li>
           <li>
-            View the route on a map, along with the key statistics
+            View the route on a map, along with the key statistics, and generated turns
           </li>
           <li>
             Amend the average speed to your desired value
@@ -108,6 +108,16 @@
           </span>
           <span>
             I also wanted to see if I could generate the binary file format using JavaScript within the browser.
+          </span>
+        </p>
+        <p>
+          <span>It is now possible to include basic navigation alerts in the FIT file.</span>
+          <span>
+            The turn information is limited due to being generated solely from the GPX points, and has no knowledge of
+            road junctions.
+          </span>
+          <span>
+            Preview the turns by enabling the layer, and choose to include in the FIT file download.
           </span>
         </p>
         <p>
@@ -194,7 +204,7 @@
           <div class="col-auto bg-light">
             <form novalidate>
               <div>
-                <div class="btn-groupx btn-group-toggle d-flex justify-content-center py-3">
+                <div class="btn-group-toggle d-flex justify-content-center py-3">
                   <label class="btn btn-info w-25 mx-1" :class="{ active: units == 'km' }">
                     <input type="radio" value="km" v-model="units"> km
                   </label>
@@ -206,13 +216,27 @@
             </form>
 
             <route-info :route="route" :units="units" @name="setName" @duration="setDuration"></route-info>
-            <div>
-              <div class="d-flex justify-content-around">
-                <button class="btn btn-secondary m-2" @click="onClear">Clear</button>
-                <button class="btn btn-primary m-2" @click="onFitDownload">Download as FIT</button>
+
+            <form novalidate>
+              <div class="form-group">
+              <label for="time">Navigation</label>
+              <div class="input-group">
+                <div class="ml-2 custom-control custom-checkbox">
+                  <label class="form-check-label">
+                    <input class="form-check-input" type="checkbox" id="includeTurns" v-model="includeTurns">
+                      Include Turn Alerts
+                  </label>
+                </div>
               </div>
-              <a ref="downloadAnchor" class="d-none" download="COURSE.fit" href="#"></a>
-            </div>
+
+              <div class="mt-4 d-flex flex-column">
+                <div class="d-flex justify-content-around">
+                  <button class="btn btn-secondary m-2" @click="onClear">Clear</button>
+                  <button class="btn btn-primary m-2" @click="onFitDownload">Download as FIT</button>
+                </div>
+                <a ref="downloadAnchor" class="d-none" download="COURSE.fit" href="#"></a>
+              </div>
+            </form>
           </div>
           <div class="col p-0 border">
             <route-map :route="route" :units="units"></route-map>

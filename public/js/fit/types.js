@@ -2,7 +2,8 @@ const enum_maps = {
   file: { course: 6 },
   sport: { cycling: 2 },
   event: { timer: 0 },
-  event_type: { start: 0, stop_disable_all: 9 }
+  event_type: { start: 0, stop_disable_all: 9 },
+  course_point: { left: 6, right: 7, slight_left: 19, sharp_left: 20, slight_right: 21, sharp_right: 22, u_turn: 23 }
 };
 
 const _enum = (name) => {
@@ -22,6 +23,8 @@ const enum_sport = _enum('sport');
 const enum_event = _enum('event');
 
 const enum_event_type = _enum('event_type');
+
+const enum_course_point = _enum('course_point');
 
 const sint8 = {
   size: 1,
@@ -96,6 +99,7 @@ export const types = {
   enum_sport,
   enum_event,
   enum_event_type,
+  enum_course_point,
   sint8,
   uint8,
   sint16,
