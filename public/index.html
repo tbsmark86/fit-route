@@ -219,24 +219,24 @@
 
             <form novalidate>
               <div class="form-group">
-              <label for="time">Navigation</label>
-              <div class="input-group">
-                <div class="ml-2 custom-control custom-checkbox">
+                <label for="time">Navigation</label>
+                <div class="input-group">
+                  <div class="ml-2 custom-control custom-checkbox">
                   <label class="form-check-label">
                     <input class="form-check-input" type="checkbox" id="includeTurns" v-model="includeTurns">
                       Include Turn Alerts
                   </label>
                 </div>
               </div>
-
-              <div class="mt-4 d-flex flex-column">
-                <div class="d-flex justify-content-around">
-                  <button class="btn btn-secondary m-2" @click="onClear">Clear</button>
-                  <button class="btn btn-primary m-2" @click="onFitDownload">Download as FIT</button>
-                </div>
-                <a ref="downloadAnchor" class="d-none" download="COURSE.fit" href="#"></a>
-              </div>
             </form>
+
+            <div class="mt-4 d-flex flex-column">
+              <div class="d-flex justify-content-around">
+                <button class="btn btn-secondary m-2" @click="onClear">Clear</button>
+                <button class="btn btn-primary m-2" @click="onFitDownload">Download as FIT</button>
+              </div>
+              <a ref="downloadAnchor" class="d-none" download="COURSE.fit" href="#"></a>
+            </div>
           </div>
           <div class="col p-0 border">
             <route-map :route="route" :units="units"></route-map>
