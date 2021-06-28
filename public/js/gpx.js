@@ -60,17 +60,7 @@ const childNamed = (node, nodeName) => Array.from(node.children).find((node) => 
 function* trackPoints(trkseg) {
   for (const node of trkseg.children) {
     if (node.nodeName === 'trkpt') {
-      const lat = parseFloat(node.getAttribute('lat'));
-      const lon = parseFloat(node.getAttribute('lon'));
-      const ele = childNamed(node, 'ele');
-      const time = childNamed(node, 'time');
-
-      yield {
-        lat,
-        lon,
-        ele: ele && parseFloat(ele.textContent),
-        time: time && Date.parse(time.textContent)
-      };
+      yield waypoint(node);
     }
   }
 }
@@ -78,17 +68,23 @@ function* trackPoints(trkseg) {
 function* routePoints(rte) {
   for (const node of rte.children) {
     if (node.nodeName === 'rtept') {
-      const lat = parseFloat(node.getAttribute('lat'));
-      const lon = parseFloat(node.getAttribute('lon'));
-      const time = undefined;
-
-      yield {
-        lat,
-        lon,
-        time
-      };
+      yield waypoint(node);
     }
   }
+}
+
+function waypoint(node) {
+  const lat = parseFloat(node.getAttribute('lat'));
+  const lon = parseFloat(node.getAttribute('lon'));
+  const ele = childNamed(node, 'ele');
+  const time = childNamed(node, 'time');
+
+  return {
+    lat,
+    lon,
+    ele: ele && parseFloat(ele.textContent),
+    time: time && Date.parse(time.textContent)
+  };
 }
 
 function turnMapping(angle) {
