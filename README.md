@@ -11,11 +11,17 @@ Development
 Start a local server:
 
 ```console
-$ yarn install
-$ yarn start
+$ npm install
+$ npm start
 ```
 
 The application will be served up on <http://localhost:8080/>.
+
+Consistent code formatting is achieved using [Prettier](https://prettier.io/).
+
+```console
+$ npm run format
+```
 
 BrowserStack
 ------------
@@ -23,7 +29,7 @@ BrowserStack
 To use _BrowserStack Live_ with _Local Testing_ launch the _BrowserStack Local_
 application as follows:
 ```console
-$ BrowserStackLocal --key "$BROWSERSTACK_KEY" --folder "$PWD/public" 
+$ BrowserStackLocal --key "$BROWSERSTACK_KEY" --folder "$PWD/public"
 ```
 
 Notes
@@ -32,7 +38,7 @@ Notes
 This has been written using ES6 modules, and does not need a build step to
 transpile for execution.  All 3rd party libraries are loaded from their CDNs.
 
-Currently only Chrome, Firefox and Safari are supported.  It would be possible
+All modern browsers work (Chrome, Firefox, Safari, Edge).  It would be possible
 to transpile & polyfill to support other browsers.
 
 Documentation of the FIT file format is contained in the FIT SDK
