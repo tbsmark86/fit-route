@@ -5,7 +5,10 @@ const latlng = ({ lat, lon }) => [lat, lon];
 function mounted() {
   this.map = L.map('route-map', {
     zoomControl: false,
-    fullscreenControl: { position: 'topright' }
+    fullscreenControl: true,
+    fullscreenControlOptions: {
+      position: 'topright'
+    }
   });
   L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
 
