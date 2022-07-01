@@ -212,10 +212,14 @@
 
             <form novalidate>
               <div class="mb-1">
-                <label class="form-label">Navigation</label>
+                <label class="form-label">Include</label>
+                <div class="form-check form-switch ms-2">
+                  <input class="form-check-input" type="checkbox" id="includeTiming" v-model="includeTiming">
+                  <label class="form-check-label" for="includeTiming">Timing</label>
+                </div>
                 <div class="form-check form-switch ms-2">
                   <input class="form-check-input" type="checkbox" id="includeTurns" v-model="includeTurns">
-                  <label class="form-check-label" for="includeTurns">Include Turn Alerts</label>
+                  <label class="form-check-label" for="includeTurns">Turn Alerts</label>
                 </div>
               </div>
             </form>

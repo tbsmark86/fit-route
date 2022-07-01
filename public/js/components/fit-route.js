@@ -37,6 +37,8 @@ async function onFileUpload(gpxFile) {
 }
 
 function onFitDownload() {
+  const optionalTime = (value) => (this.includeTiming ? value : undefined);
+
   try {
     const start = this.route.points[0];
     const finish = this.route.points[this.route.points.length - 1];
@@ -45,7 +47,7 @@ function onFitDownload() {
     encoder.writeFileId({ type: 'course', time_created: Date.now() });
     encoder.writeCourse({ name: this.route.name });
     encoder.writeLap({
-      timestamp: start.time,
+      timestamp: optionalTime(start.time),
       total_timer_time: (finish.time - start.time) / 1000,
       start_time: start.time,
       start_position_lat: start.lat,
@@ -56,15 +58,18 @@ function onFitDownload() {
       total_ascent: this.route.eleGain,
       total_descent: this.route.eleLoss
     });
-    encoder.writeEvent({
-      timestamp: start.time,
-      event: 'timer',
-      event_type: 'start',
-      event_group: 0
-    });
+
+    if (this.includeTiming) {
+      encoder.writeEvent({
+        timestamp: start.time,
+        event: 'timer',
+        event_type: 'start',
+        event_group: 0
+      });
+    }
 
     const points = this.route.points;
-    if (includeTurns) {
+    if (this.includeTurns) {
       points.push(...this.route.turns);
       const tweakedDistance = ({ distance, turn }) => distance - 50 * (turn !== undefined);
       points.sort((a, b) => tweakedDistance(a) - tweakedDistance(b));
@@ -72,18 +77,20 @@ function onFitDownload() {
 
     for (const { lat, lon, distance, time, ele, turn } of points) {
       if (turn === undefined) {
-        encoder.writeRecord({ timestamp: time, position_lat: lat, position_long: lon, distance, altitude: ele });
+        encoder.writeRecord({ timestamp: optionalTime(time), position_lat: lat, position_long: lon, distance, altitude: ele });
       } else {
-        encoder.writeCoursePoint({ timestamp: time, position_lat: lat, position_long: lon, distance, type: turn });
+        encoder.writeCoursePoint({ timestamp: optionalTime(time), position_lat: lat, position_long: lon, distance, type: turn });
       }
     }
 
-    encoder.writeEvent({
-      timestamp: finish.time,
-      event: 'timer',
-      event_type: 'stop_disable_all',
-      event_group: 0
-    });
+    if (this.includeTiming) {
+      encoder.writeEvent({
+        timestamp: finish.time,
+        event: 'timer',
+        event_type: 'stop_disable_all',
+        event_group: 0
+      });
+    }
 
     const url = URL.createObjectURL(encoder.blob);
     const anchorElement = this.$refs.downloadAnchor;
@@ -103,7 +110,8 @@ const FitRoute = {
     gpxFile: null,
     route: null,
     units: 'km',
-    includeTurns: false
+    includeTiming: true,
+    includeTurns: true
   }),
   methods: {
     onClear,
