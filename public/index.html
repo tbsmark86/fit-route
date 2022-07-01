@@ -14,9 +14,9 @@
     <link rel="icon" href="images/logo-192.png" sizes="192x192" />
     <link rel="icon" href="images/logo-228.png" sizes="228x228" />
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
       crossorigin="anonymous"
     />
     <link
@@ -41,37 +41,43 @@
   </head>
 
   <body class="d-flex flex-column">
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-      <div class="navbar-brand">
-        <img class="rounded mr-1" src="images/logo-32.png" width="24" height="24" alt="" />
-        FIT Route Converter
-      </div>
-      <div class="navbar-nav nav-link ml-auto">
-        <a
-          href="https://www.pyrites.org.uk/post/gpx-to-fit-conversion/"
-          target="_blank"
-          rel="noopener"
-          title="Blog"
-          class="text-light"
-        >
-          <i class="fas fa-blog"></i>
-        </a>
-      </div>
-      <div class="navbar-nav nav-link">
-        <a href="https://twitter.com/TechWrangler" target="_blank" rel="noopener" title="Twitter" class="text-light">
-          <i class="fab fa-twitter"></i>
-        </a>
-      </div>
-      <div class="navbar-nav nav-link">
-        <a
-          href="https://gitlab.com/nwholloway/fit-route"
-          target="_blank"
-          rel="noopener"
-          title="GitLab"
-          class="text-light"
-        >
-          <i class="fab fa-gitlab"></i>
-        </a>
+    <nav class="navbar navbar-expand navbar-dark bg-dark">
+      <div class="container-fluid">
+        <div class="navbar-brand">
+          <img class="rounded mr-1" src="images/logo-32.png" width="24" height="24" alt="" />
+          FIT Route Converter
+        </div>
+        <div class="navbar-expand">
+          <div class="navbar-nav">
+            <a
+              href="https://www.pyrites.org.uk/post/gpx-to-fit-conversion/"
+              target="_blank"
+              rel="noopener"
+              title="Blog"
+              class="nav-link active"
+            >
+              <i class="fas fa-blog"></i>
+            </a>
+            <a
+              href="https://twitter.com/TechWrangler"
+              target="_blank"
+              rel="noopener"
+              title="Twitter"
+              class="nav-link active"
+            >
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a
+              href="https://gitlab.com/nwholloway/fit-route"
+              target="_blank"
+              rel="noopener"
+              title="GitLab"
+              class="nav-link active"
+            >
+              <i class="fab fa-gitlab"></i>
+            </a>
+          </div>
+        </div>
       </div>
     </nav>
 
@@ -194,13 +200,11 @@
           <div class="col-auto bg-light">
             <form novalidate>
               <div>
-                <div class="btn-group-toggle d-flex justify-content-center py-3">
-                  <label class="btn btn-info w-25 mx-1" :class="{ active: units == 'km' }">
-                    <input type="radio" value="km" v-model="units"> km
-                  </label>
-                  <label class="btn btn-info w-25 mx-1" :class="{ active: units == 'miles' }">
-                    <input type="radio" value="miles" v-model="units"> miles
-                 </label>
+                <div class="d-flex justify-content-center py-3">
+                  <input class="btn-check" id="km" data-toggle="button" type="radio" value="km" v-model="units">
+                  <label class="btn btn-outline-secondary w-25 mx-1" :class="{ active: units == 'km' }" for="km">km</label>
+                  <input class="btn-check" id="miles" data-toggle="button" type="radio" value="miles" v-model="units">
+                  <label class="btn btn-outline-secondary w-25 mx-1" :class="{ active: units == 'miles' }" for="miles">miles</label>
                 </div>
               </div>
             </form>
@@ -208,14 +212,11 @@
             <route-info :route="route" :units="units" @name="setName" @duration="setDuration"></route-info>
 
             <form novalidate>
-              <div class="form-group">
-                <label for="time">Navigation</label>
-                <div class="input-group">
-                  <div class="ml-2 custom-control custom-checkbox">
-                  <label class="form-check-label">
-                    <input class="form-check-input" type="checkbox" id="includeTurns" v-model="includeTurns">
-                      Include Turn Alerts
-                  </label>
+              <div class="mb-1">
+                <label class="form-label">Navigation</label>
+                <div class="form-check form-switch ms-2">
+                  <input class="form-check-input" type="checkbox" id="includeTurns" v-model="includeTurns">
+                  <label class="form-check-label" for="includeTurns">Include Turn Alerts</label>
                 </div>
               </div>
             </form>
@@ -239,39 +240,33 @@
     <script type="text/x-template" id="route-info-template">
       <form novalidate>
         <div class="d-flex flex-column">
-          <div class="form-group">
-            <label for="routeName">Name</label>
-            <input id="routeName" type="text" v-model="routeName" @keydown.enter.prevent class="form-control text-info" data-lpignore="true">
+          <div class="mb-3">
+            <label class="form-label" for="routeName">Name</label>
+            <input id="routeName" type="text" v-model="routeName" @keydown.enter.prevent class="form-control text-primary" data-lpignore="true">
             <i v-if="routeNameTooLong" class="fas fa-exclamation-triangle text-warning input-feedback" title="Name will be truncated on Garmin device" aria-hidden="true"></i>
           </div>
 
-          <div class="form-group">
-            <label for="distance">Distance</label>
+          <div class="mb-3">
+            <label class="form-label" for="distance">Distance</label>
             <div class="input-group">
-              <input id="distance" type="text" v-model="distance" readonly class="form-control text-info bg-light">
-              <div class="input-group-append">
-                <span class="input-group-text">{{ units }}</span>
-              </div>
+              <input id="distance" type="text" v-model="distance" readonly class="form-control text-primary bg-light">
+              <div class="input-group-text">{{ units }}</div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="speed">Average Speed</label>
+          <div class="mb-3">
+            <label class="form-label" for="speed">Average Speed</label>
             <div class="input-group">
-              <input id="speed" type="text" v-model="avgSpeedField" class="form-control text-info" data-lpignore="true">
-              <div class="input-group-append">
-                <span class="input-group-text">{{ speedUnits }}</span>
-              </div>
+              <input id="speed" type="text" v-model="avgSpeedField" class="form-control text-primary" data-lpignore="true">
+              <div class="input-group-text">{{ speedUnits }}</div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="time">Goal Time</label>
+          <div class="mb-3">
+            <label class="form-label" for="time">Goal Time</label>
             <div class="input-group">
-              <input id="time" type="text" v-model="goalTime" readonly class="form-control text-info bg-light">
-              <div class="input-group-append">
-                <span class="input-group-text">h:mm:ss</span>
-              </div>
+              <input id="time" type="text" v-model="goalTime" readonly class="form-control text-primary bg-light">
+              <span class="input-group-text">h:mm:ss</span>
             </div>
           </div>
         </div>
