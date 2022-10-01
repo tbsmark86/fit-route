@@ -77,9 +77,21 @@ function onFitDownload() {
 
     for (const { lat, lon, distance, time, ele, turn } of points) {
       if (turn === undefined) {
-        encoder.writeRecord({ timestamp: optionalTime(time), position_lat: lat, position_long: lon, distance, altitude: ele });
+        encoder.writeRecord({
+          timestamp: optionalTime(time),
+          position_lat: lat,
+          position_long: lon,
+          distance,
+          altitude: ele
+        });
       } else {
-        encoder.writeCoursePoint({ timestamp: optionalTime(time), position_lat: lat, position_long: lon, distance, type: turn });
+        encoder.writeCoursePoint({
+          timestamp: optionalTime(time),
+          position_lat: lat,
+          position_long: lon,
+          distance,
+          type: turn
+        });
       }
     }
 

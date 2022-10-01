@@ -132,9 +132,6 @@ const RouteMap = {
   },
   mounted,
   data: () => ({
-    map: null,
-    tileLayer: null,
-    routeLayer: null,
     zoom: null
   }),
   watch: {

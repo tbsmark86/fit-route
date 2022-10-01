@@ -11,12 +11,13 @@ function onError(message) {
   this.error = message;
 }
 
-new Vue({
-  el: '#main',
-  data: {
+const { createApp } = Vue;
+
+const app = createApp({
+  data: () => ({
     showInfo: true,
     error: null
-  },
+  }),
   methods: {
     onShowInfo,
     onError
@@ -26,3 +27,6 @@ new Vue({
     FitRoute
   }
 });
+
+app.config.compilerOptions.whitespace = 'condense';
+app.mount('#main');
