@@ -67,7 +67,11 @@ function makePoi(ele, name, sym) {
 export function findWater(box) {
     const query = `
 	[out:json];
-	node[amenity=drinking_water]${box2poly(box)};
+	node[amenity~"(^drinking_water|water_point$)"]
+	    [access!=private]
+	    [access!=no]
+	    [access!=permissive]
+	    ${box2poly(box)};
 	out;
     `;
     return overpass(query).then((data) => {
