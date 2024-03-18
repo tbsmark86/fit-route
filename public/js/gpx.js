@@ -167,8 +167,9 @@ function* routeInstructions(rte) {
 	  turn = 'danger';
 	} else {
 	  // unknown - convert to message
-	  type = 'generic'
+	  turn = 'generic'
 	  name = turnOsm;
+	    console.log('unknown', turnOsm);
 	}
       }
 
