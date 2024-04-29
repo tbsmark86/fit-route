@@ -7,7 +7,6 @@ import * as Overpass from '../overpass.js';
 const latlng = ({ lat, lon }) => [lat, lon];
 
 function getLayerUrl() {
-  //return this.layer || 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
   return this.layer || 'https://{s}.tile.openstreetmap.de/{z}/{x}/{y}{r}.png'
 }
 
@@ -22,7 +21,6 @@ function mounted() {
 
   const attributions = [
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    '&copy; <a href="https://carto.com/attributions">CARTO</a>'
   ];
   this.tileLayer = L.tileLayer(this.getLayerUrl(), {
     attribution: attributions.join(' | '),
