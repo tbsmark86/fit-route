@@ -8,8 +8,6 @@ import CoursePointDialog from './course-point-dialog.js';
 import { FITEncoder } from '../fit/encoder.js';
 import { getBool, setBoolWatchFunc, setBool, getString, setString } from '../localStorage.js';
 
-import { getPoiAsGPX } from '../poi.js';
-
 let unsaved = false;
 
 function setName(name) {
@@ -125,47 +123,6 @@ function onFitDownload() {
   }
 }
 
-async function onPoiDownload() {
-
-    console.log('route-name', this.route.name);
-
-    const downloadGPX = (content, type) => {
-	const filename = `${this.route.name}-${type}.gpx`;
-	const url = URL.createObjectURL(new File([content], filename, {type: 'application/gpx+xml'}));
-	const anchorElement = this.$refs.downloadAnchor;
-	anchorElement.download = filename;
-	anchorElement.href = url;
-	anchorElement.click();
-	URL.revokeObjectURL(url);
-    };
-
-    if(this.poi_loading) {
-	console.log('prevent double load');
-	return;
-    }
-    console.log('start poi download');
-
-    this.poi_loading = true;
-    const enqueJob = (type, distance) => {
-	console.log(`${type} start`);
-	return getPoiAsGPX(this.route.points, type, distance).then((gpx) => {
-	    console.info(`${type} loaded start download`);
-	    downloadGPX(gpx, type);
-	}).catch((err) => {
-	    console.error(err);
-	    this.$emit('error', `Unable to create ${type} GPX`);
-	});
-    };
-    // request sequentiel to avoid rate limit
-    await enqueJob('water', 3);
-    await enqueJob('tanke', 5);
-    await enqueJob('toilets', 3);
-    await enqueJob('shelter', 2);
-    await enqueJob('cemetery', 2);
-
-    this.poi_loading = false;
-}
-
 async function onSelectPoint(point) {
     await this.$refs.dialog.edit(point);
     this.$refs.map.drawTurns();
@@ -200,7 +157,6 @@ const FitRoute = {
     onClear,
     onFileUpload,
     onFitDownload,
-    onPoiDownload,
     setName,
     setDuration,
     setShortNotes,

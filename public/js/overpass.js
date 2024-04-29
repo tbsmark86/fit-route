@@ -118,7 +118,7 @@ export function findTanke(box) {
 	    delete ele.tags.website;
 	    deleteMatching(ele.tags, /^(addr:|brand|fuel:|payment:)/);
 
-	    res.push(makePoi(ele, name, 'Gas Statiion'));
+	    res.push(makePoi(ele, name, 'Gas Station'));
 	}
 
 	return res;
@@ -142,51 +142,6 @@ export function findToilets(box) {
 	for(let ele of data.elements) {
 	    deleteMatching(ele.tags, /^(addr:|toilets:)/);
 	    res.push(makePoi(ele, 'WC'));
-	}
-
-	return res;
-    });
-}
-
-// https://wiki.openstreetmap.org/wiki/Key:shelter_type
-export function findShelter(box) {
-    const query = `
-	[out:json];
-	node[amenity=shelter]
-	    [shelter_type!=changing_rooms]
-	    [shelter_type!=field_shelter]
-	    [smoking!=dedicated]
-            [bench!=no]
-	    [!fixme]
-	    ${box2poly(box)};
-	out;
-    `;
-
-    return overpass(query).then((data) => {
-	let res = [];
-	for(let ele of data.elements) {
-	    let name = ele.tags.shelter_type || 'shelter';
-	    deleteMatching(ele.tags, /^(addr:)/);
-	    res.push(makePoi(ele, name));
-	}
-
-	return res;
-    });
-}
-
-export function findCemetery(box) {
-    const query = `
-	[out:json];
-	way[landuse=cemetery]
-	    ${box2poly(box)};
-	out center;
-    `;
-
-    return overpass(query).then((data) => {
-	let res = [];
-	for(let ele of data.elements) {
-	    deleteMatching(ele.tags, /^(addr:)/);
-	    res.push(makePoi(ele, 'Friedhof'));
 	}
 
 	return res;
