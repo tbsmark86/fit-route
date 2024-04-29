@@ -43,6 +43,15 @@ const routeName = {
   }
 };
 
+const shortNotes = {
+  get: function shortNotes() {
+    return this.route.shortNotes;
+  },
+  set: function shortNotes(value) {
+    this.$emit('shortNotes', value);
+  }
+};
+
 function routeNameTooLong() {
   return encodedStrlen(this.routeName) > 16;
 }
@@ -60,7 +69,7 @@ const RouteInfo = {
   mounted,
   props: {
     route: Object,
-    units: String
+    units: String,
   },
   data: () => ({
     avgSpeedField: null
@@ -72,7 +81,8 @@ const RouteInfo = {
     speedUnits,
     distance,
     duration,
-    goalTime
+    goalTime,
+    shortNotes
   },
   watch: {
     avgSpeed: {

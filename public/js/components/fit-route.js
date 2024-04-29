@@ -16,6 +16,10 @@ function setName(name) {
   this.route.name = name;
 }
 
+function setShortNotes(shortNotes) {
+  this.route.shortNotes = shortNotes;
+}
+
 function setDuration(duration) {
   const points = this.route.points;
   const [{ time: startTime = Date.now() }, { distance: totalDistance }] = [points[0], points[points.length - 1]];
@@ -34,6 +38,8 @@ async function onFileUpload(gpxFile) {
   try {
     this.gpxFile = gpxFile;
     this.route = await parseGpx(gpxFile);
+    // default save option
+    this.route.shortNotes = true;
     this.$emit('show-info', false);
     unsaved = true;
   } catch (error) {
@@ -68,10 +74,31 @@ function onFitDownload() {
       event_type: 'start',
       event_group: 0
     });
-    for (const { lat, lon, ele, time, distance, turn, name } of this.route.points) {
+    const shortNotes = this.route.shortNotes;
+    const shortMapping = {
+      u_turn: 'U',
+      sharp_left: 'LL',
+      left: 'L',
+      slight_left: 'l',
+      left_fork: 'fork L',
+      straight: '-',
+      right_fork: 'fork R',
+      slight_right: 'r',
+      right: 'R',
+      sharp_right: 'RR',
+    };
+
+    for (let { lat, lon, ele, time, distance, turn, name } of this.route.points) {
       encoder.writeRecord({ timestamp: time, position_lat: lat, position_long: lon, altitude: ele, distance });
 
       if(turn !== undefined) {
+	if(name === undefined && shortNotes && shortMapping[turn]) {
+	  // Store an almost empty Description for the turn.
+	  // The Idea is to override any Default (long word) default Text of
+	  // the device e.g. 'l' instead 'turn slight left' this way manual
+	  // notes can gab more attention.
+	  name = shortMapping[turn]
+	}
 	// There is also the messageIndex - unclear what its for and if it's required
 	encoder.writeCoursePoint(
 	  { timestamp: time, position_lat: lat, position_long: lon, type: turn, name, distance }
@@ -176,6 +203,7 @@ const FitRoute = {
     onPoiDownload,
     setName,
     setDuration,
+    setShortNotes,
     onSelectPoint
   },
   components: {
