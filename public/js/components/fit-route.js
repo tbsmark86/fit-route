@@ -8,8 +8,6 @@ import CoursePointDialog from './course-point-dialog.js';
 import { FITEncoder } from '../fit/encoder.js';
 import { getBool, setBoolWatchFunc, setBool, getString, setString } from '../localStorage.js';
 
-let unsaved = false;
-
 function setName(name) {
   this.route.name = name;
 }
@@ -29,7 +27,7 @@ function setDuration(duration) {
 function onClear() {
   this.gpxFile = this.route = null;
   this.$emit('show-info', true);
-  unsaved = false;
+  this.unsaved = false;
 }
 
 async function onFileUpload(gpxFile) {
@@ -39,7 +37,7 @@ async function onFileUpload(gpxFile) {
     // default save option
     this.route.shortNotes = true;
     this.$emit('show-info', false);
-    unsaved = true;
+    this.unsaved = true;
   } catch (error) {
     console.error(error);
     this.$emit('error', `Unable to process "${gpxFile.name}"`);
@@ -116,28 +114,25 @@ function onFitDownload() {
     anchorElement.href = url;
     anchorElement.click();
     URL.revokeObjectURL(url);
-    unsaved = false;
+    this.unsaved = false;
   } catch (error) {
     console.error(error);
     this.$emit('error', `Unable to create FIT`);
   }
 }
+ 
+function onBeforeUnload(event) {
+    // simple 'forgot to save' question
+    if(this.unsaved) {
+	event.preventDefault();
+    }
+}
 
 async function onSelectPoint(point) {
     await this.$refs.dialog.edit(point);
     this.$refs.map.drawTurns();
-    unsaved = true;
+    this.unsaved = true;
 }
-
-// simple 'forgot to save' question
-window.addEventListener('beforeunload', function (e) {
-  if(unsaved) {
-      /* XXX
-    e.preventDefault();
-    e.returnValue = '';
-    */
-  }
-});
 
 const FitRoute = {
   template: '#fit-route-template',
@@ -153,7 +148,7 @@ const FitRoute = {
     map_url: getString('map-url', ''),
     map_url_active: getBool('map-url-active', true),
     layer: getBool('map-url-active', true) && getString('map-url', ''),
-    poi_loading: false,
+    unsaved: false
   }),
   methods: {
     onClear,
@@ -162,7 +157,8 @@ const FitRoute = {
     setName,
     setDuration,
     setShortNotes,
-    onSelectPoint
+    onSelectPoint,
+    onBeforeUnload
   },
   components: {
     FileUpload,
@@ -183,6 +179,12 @@ const FitRoute = {
       setBool('map-url-active', val);
       this.layer = val ? this.map_url : '';
     }
+  },
+  created: function() {
+    window.addEventListener('beforeunload', this.onBeforeUnload);
+  },
+  destroyed: function() {
+    window.removeEventListener('beforeunload', this.onBeforeUnload);
   }
 };
 
