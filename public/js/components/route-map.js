@@ -175,9 +175,15 @@ const RouteMap = {
 function addPoiLayer(data, layer) {
     const mapLabel = (label) =>
 	`<div class="map-label"><div class="map-label-content">${label}</div><div class="map-label-arrow" /></div></div>`;
+    const infoFunc = function() {
+	alert(`OSM Attributes:\n\n${this.options.title}`);
+    };
     for(const i of data) {
 	const icon = L.divIcon({ iconSize: null, html: mapLabel(i.name) });
-	L.marker([i.lat, i.lon], { icon, title: i.text }).addTo(layer);
+	console.log(data);
+	L.marker([i.lat, i.lon], { icon, title: i.text })
+	    .addTo(layer)
+	    .on('click', infoFunc);
     }
 }
 
