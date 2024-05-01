@@ -148,6 +148,8 @@ const FitRoute = {
     show_marker: getBool('show-marker', true),
     show_turns: getBool('show-turns', true),
     show_water: false,
+    show_toilet: false,
+    show_gas: false,
     map_url: getString('map-url', ''),
     map_url_active: getBool('map-url-active', true),
     layer: getBool('map-url-active', true) && getString('map-url', ''),

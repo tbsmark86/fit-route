@@ -54,6 +54,8 @@ function mounted() {
   this.markerLayer = L.layerGroup().addTo(this.map);
   this.turnLayer = L.layerGroup().addTo(this.map);
   this.waterLayer = L.layerGroup().addTo(this.map);
+  this.toiletLayer = L.layerGroup().addTo(this.map);
+  this.gasLayer = L.layerGroup().addTo(this.map);
 
   const [start, finish] = [points[0], points[points.length - 1]];
   L.circleMarker(latlng(start), { radius: 8, weight: 0, color: 'greeen', fillOpacity: 0.6 }).addTo(this.map);
@@ -140,6 +142,8 @@ const RouteMap = {
     show_marker: Boolean,
     show_turns: Boolean,
     show_water: Boolean,
+    show_toilet: Boolean,
+    show_gas: Boolean,
     layer: String,
   },
   mounted,
@@ -160,27 +164,51 @@ const RouteMap = {
     show_marker: drawMarkers,
     show_turns: drawTurns,
     show_water: drawWater,
+    show_toilet: drawToilet,
+    show_gas: drawGas,
     layer: function() {
       this.tileLayer.setUrl(this.getLayerUrl());
     }
   }
 };
 
+function addPoiLayer(data, layer) {
+    const mapLabel = (label) =>
+	`<div class="map-label"><div class="map-label-content">${label}</div><div class="map-label-arrow" /></div></div>`;
+    for(const i of data) {
+	const icon = L.divIcon({ iconSize: null, html: mapLabel(i.name) });
+	L.marker([i.lat, i.lon], { icon, title: i.text }).addTo(layer);
+    }
+}
+
 async function drawWater() {
     this.waterLayer.clearLayers();
     if(!this.show_water) {
 	return;
     }
+    addPoiLayer(
+      await Overpass.findWater(getBoundingBox(this.route.points, 1.5)),
+      this.waterLayer)
+}
 
-    let box = getBoundingBox(this.route.points, 3);
-    let water = await Overpass.findWater(box);
-
-    const mapLabel = (label) =>
-	`<div class="map-label"><div class="map-label-content">${label}</div><div class="map-label-arrow" /></div></div>`;
-    for(const i of water) {
-	const icon = L.divIcon({ iconSize: null, html: mapLabel(i.name) });
-	L.marker([i.lat, i.lon], { icon, title: i.text }).addTo(this.waterLayer);
+async function drawToilet() {
+    this.toiletLayer.clearLayers();
+    if(!this.show_toilet) {
+	return;
     }
+    addPoiLayer(
+      await Overpass.findToilet(getBoundingBox(this.route.points, 1.5)),
+      this.toiletLayer)
+}
+
+async function drawGas() {
+    this.gasLayer.clearLayers();
+    if(!this.show_gas) {
+	return;
+    }
+    addPoiLayer(
+      await Overpass.findGas(getBoundingBox(this.route.points, 1.5)),
+      this.gasLayer)
 }
 
 export default RouteMap;
