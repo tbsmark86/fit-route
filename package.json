@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "start": "browser-sync start -s public -f public --port ${C9_PORT:-8080} --listen ${C9_IP:-127.0.0.1} --no-ui --no-open",
-    "format": "prettier --write 'public/js/**/*.js' --write 'public/index.html' --write 'public/css/**/*.css'"
+    "format": "prettier --write 'public/js/**/*.js' --write 'public/css/**/*.css'"
   },
   "devDependencies": {
     "browser-sync": "^2.27.10",

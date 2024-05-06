@@ -82,24 +82,29 @@ function onFitDownload() {
       right_fork: 'fork R',
       slight_right: 'r',
       right: 'R',
-      sharp_right: 'RR',
+      sharp_right: 'RR'
     };
 
     for (let { lat, lon, ele, time, distance, turn, name } of this.route.points) {
       encoder.writeRecord({ timestamp: time, position_lat: lat, position_long: lon, altitude: ele, distance });
 
-      if(turn !== undefined) {
-	if(name === undefined && shortNotes && shortMapping[turn]) {
-	  // Store an almost empty Description for the turn.
-	  // The Idea is to override any Default (long word) default Text of
-	  // the device e.g. 'l' instead 'turn slight left' this way manual
-	  // notes can gab more attention.
-	  name = shortMapping[turn]
-	}
-	// There is also the messageIndex - unclear what its for and if it's required
-	encoder.writeCoursePoint(
-	  { timestamp: time, position_lat: lat, position_long: lon, type: turn, name, distance }
-	);
+      if (turn !== undefined) {
+        if (name === undefined && shortNotes && shortMapping[turn]) {
+          // Store an almost empty Description for the turn.
+          // The Idea is to override any Default (long word) default Text of
+          // the device e.g. 'l' instead 'turn slight left' this way manual
+          // notes can gab more attention.
+          name = shortMapping[turn];
+        }
+        // There is also the messageIndex - unclear what its for and if it's required
+        encoder.writeCoursePoint({
+          timestamp: time,
+          position_lat: lat,
+          position_long: lon,
+          type: turn,
+          name,
+          distance
+        });
       }
     }
 
@@ -122,18 +127,18 @@ function onFitDownload() {
     this.$emit('error', `Unable to create FIT`);
   }
 }
- 
+
 function onBeforeUnload(event) {
-    // simple 'forgot to save' question
-    if(this.unsaved) {
-	event.preventDefault();
-    }
+  // simple 'forgot to save' question
+  if (this.unsaved) {
+    event.preventDefault();
+  }
 }
 
 async function onSelectPoint(point) {
-    await this.$refs.dialog.edit(point);
-    this.$refs.map.drawTurns();
-    this.unsaved = true;
+  await this.$refs.dialog.edit(point);
+  this.$refs.map.drawTurns();
+  this.unsaved = true;
 }
 
 const FitRoute = {
@@ -171,26 +176,23 @@ const FitRoute = {
   watch: {
     show_marker: setBoolWatchFunc('show-marker'),
     show_turns: setBoolWatchFunc('show-turns'),
-    map_url: function(val) {
+    map_url: function (val) {
       setString('map-url', val);
-      if(this.map_url_active) {
-	this.layer = this.map_url;
+      if (this.map_url_active) {
+        this.layer = this.map_url;
       }
     },
-    map_url_active: function(val) {
+    map_url_active: function (val) {
       setBool('map-url-active', val);
       this.layer = val ? this.map_url : '';
     }
   },
-  created: function() {
+  created: function () {
     window.addEventListener('beforeunload', this.onBeforeUnload);
   },
-  destroyed: function() {
+  destroyed: function () {
     window.removeEventListener('beforeunload', this.onBeforeUnload);
   }
 };
 
 export default FitRoute;
-
-
-

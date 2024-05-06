@@ -69,7 +69,7 @@ const RouteInfo = {
   mounted,
   props: {
     route: Object,
-    units: String,
+    units: String
   },
   data: () => ({
     avgSpeedField: null

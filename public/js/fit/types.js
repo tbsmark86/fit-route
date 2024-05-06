@@ -29,7 +29,7 @@ const enum_maps = {
     sharp_right: 22,
     u_turn: 23,
     segment_start: 24,
-    segment_end: 25,
+    segment_end: 25
   }
 };
 

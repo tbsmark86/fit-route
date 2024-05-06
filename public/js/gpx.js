@@ -137,36 +137,36 @@ function* routeInstructions(rte) {
       const lat = parseFloat(node.getAttribute('lat'));
       const lon = parseFloat(node.getAttribute('lon'));
       const extension = childNamed(node, 'extensions');
-      if(!extension) {
-	continue;
+      if (!extension) {
+        continue;
       }
       const offsetNode = childNamed(extension, 'offset');
-      if(!offsetNode) {
-	continue;
+      if (!offsetNode) {
+        continue;
       }
       const offset = parseInt(offsetNode.textContent, 10);
 
       const turnNode = childNamed(extension, 'turn');
-      if(!turnNode) {
-	// start and end node don't have turn data
-	continue;
+      if (!turnNode) {
+        // start and end node don't have turn data
+        continue;
       }
       const turnOsm = turnNode.textContent;
 
       // convert OsmAnd-Enum to fit-Enum
       let turn = map2fit[turnOsm];
       let name = undefined; // empty hint by default
-      if(turn === undefined) {
-	if(turnOsm.startsWith('RNDB') || turnOsm.startsWith('RNLB')) {
-	  // there is no roundabout instruction in fit - make a message
-	  name = 'Exit ' + turnOsm.slice(4);
-	  turn = 'danger';
-	} else {
-	  // unknown - convert to message
-	  turn = 'generic'
-	  name = turnOsm;
-	    console.log('unknown', turnOsm);
-	}
+      if (turn === undefined) {
+        if (turnOsm.startsWith('RNDB') || turnOsm.startsWith('RNLB')) {
+          // there is no roundabout instruction in fit - make a message
+          name = 'Exit ' + turnOsm.slice(4);
+          turn = 'danger';
+        } else {
+          // unknown - convert to message
+          turn = 'generic';
+          name = turnOsm;
+          console.log('unknown', turnOsm);
+        }
       }
 
       yield {
@@ -174,7 +174,7 @@ function* routeInstructions(rte) {
         lon,
         offset,
         turn,
-	name
+        name
       };
     }
   }
@@ -184,19 +184,18 @@ function* routeInstructions(rte) {
  * Enhance point data with instruction information
  */
 function insertInstructions(points, instructions) {
-  for(const instruction of instructions) {
+  for (const instruction of instructions) {
     let point = points[instruction.offset];
-    if(!point) {
+    if (!point) {
       console.warn(`Warning: Instruction offset unknown.`, instruction);
       continue;
-    } else if(point.lat !== instruction.lat || point.lon !== instruction.lon) {
+    } else if (point.lat !== instruction.lat || point.lon !== instruction.lon) {
       // sanity check
       console.warn(`Warning: Instruction data not matching point.`, instruction);
       continue;
     }
     point.turn = instruction.turn;
     point.name = instruction.name;
-
   }
   return points;
 }
@@ -247,11 +246,11 @@ async function parseRoute(doc) {
     (rteName && rteName.textContent) ||
     'Unnamed';
   let points = Array.from(setDistance(trkseg && trackPoints(trkseg)) || (rte && routePoints(rte)));
-  const { eleGain, eleLoss } = points && elevationChange(points) || {};
+  const { eleGain, eleLoss } = (points && elevationChange(points)) || {};
 
   const instructions = trkseg && rte && Array.from(routeInstructions(rte));
-  if(instructions) {
-      points = insertInstructions(points, instructions);
+  if (instructions) {
+    points = insertInstructions(points, instructions);
   }
 
   return points && { name, points, eleGain, eleLoss };

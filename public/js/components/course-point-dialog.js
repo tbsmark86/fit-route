@@ -8,22 +8,22 @@ function edit(point) {
     this.point = point;
     this.$nextTick(() => {
       const dialog = this.$refs.dialog;
-      if(!dialog) {
-	// Dialog is very new
-	alert('Sry no browser support!');
-	return;
+      if (!dialog) {
+        // Dialog is very new
+        alert('Sry no browser support!');
+        return;
       }
       const form = this.$refs.form;
       const clearKeyboard = listenKeyboard(form, point);
       form.onsubmit = (event) => {
-	if(event.submitter && event.submitter.value === 'delete') {
-	  point.name = undefined;
-	  point.turn = undefined;
-	}
-	this.open = false;
-	clearKeyboard();
-	event.preventDefault();
-	resolve();
+        if (event.submitter && event.submitter.value === 'delete') {
+          point.name = undefined;
+          point.turn = undefined;
+        }
+        this.open = false;
+        clearKeyboard();
+        event.preventDefault();
+        resolve();
       };
       dialog.showModal();
     });
@@ -32,51 +32,51 @@ function edit(point) {
 
 function listenKeyboard(form, point) {
   const handler = (event) => {
-    if(event.target instanceof HTMLInputElement) {
+    if (event.target instanceof HTMLInputElement) {
       return;
     }
     // based on a-w-s-d gaming style navigation
-    switch(event.key) {
-    case 'a':
-      point.turn = 'left';
-      break;
-    case 'q':
-      point.turn = 'slight_left';
-      break;
-    case 'y':
-      point.turn = 'sharp_left';
-      break;
-    case 'd':
-      point.turn = 'right';
-      break;
-    case 'e':
-      point.turn = 'slight_right';
-      break;
-    case 'c':
-      point.turn = 'sharp_right';
-      break;
+    switch (event.key) {
+      case 'a':
+        point.turn = 'left';
+        break;
+      case 'q':
+        point.turn = 'slight_left';
+        break;
+      case 'y':
+        point.turn = 'sharp_left';
+        break;
+      case 'd':
+        point.turn = 'right';
+        break;
+      case 'e':
+        point.turn = 'slight_right';
+        break;
+      case 'c':
+        point.turn = 'sharp_right';
+        break;
       // not sure if keep_left is useful
-    case 's':
-      point.turn = 'u_turn';
-      break;
-    case 'w':
-      point.turn = 'straight';
-      break;
-    case 'x':
-      point.turn = 'generic';
-      break;
-    case 'Delete':
-    case 'r':
-      // remove
-      event.submitter = {value: 'delete'}
-      break;
-    case 'Enter':
-    case 'Escape':
-      // just close
-      break;
-    default:
-      return;
-    };
+      case 's':
+        point.turn = 'u_turn';
+        break;
+      case 'w':
+        point.turn = 'straight';
+        break;
+      case 'x':
+        point.turn = 'generic';
+        break;
+      case 'Delete':
+      case 'r':
+        // remove
+        event.submitter = { value: 'delete' };
+        break;
+      case 'Enter':
+      case 'Escape':
+        // just close
+        break;
+      default:
+        return;
+    }
     console.log(`intercepted key ${event.key}`);
     event.preventDefault();
     form.onsubmit(event);
@@ -93,10 +93,10 @@ const CoursePointDialog = {
   },
   data: () => ({
     open: false,
-    point: {},
+    point: {}
   }),
   methods: {
-    edit,
+    edit
   }
 };
 

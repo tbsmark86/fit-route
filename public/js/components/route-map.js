@@ -7,7 +7,7 @@ import * as Overpass from '../overpass.js';
 const latlng = ({ lat, lon }) => [lat, lon];
 
 function getLayerUrl() {
-  return this.layer || 'https://{s}.tile.openstreetmap.de/{z}/{x}/{y}{r}.png'
+  return this.layer || 'https://{s}.tile.openstreetmap.de/{z}/{x}/{y}{r}.png';
 }
 
 function mounted() {
@@ -15,13 +15,11 @@ function mounted() {
     zoomControl: false,
     fullscreenControl: { position: 'topright' },
     almostOnMouseMove: false,
-    almostDistance: 10,
+    almostDistance: 10
   });
   L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
 
-  const attributions = [
-    '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  ];
+  const attributions = ['&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'];
   this.tileLayer = L.tileLayer(this.getLayerUrl(), {
     attribution: attributions.join(' | '),
     subdomains: 'abcd',
@@ -39,18 +37,18 @@ function mounted() {
   this.map.almostOver.addLayer(this.routeLayer);
   // allow clicking the route to add new instruction
   this.map.on('almost:click', (event, layer) => {
-      // very stupid way to find the nearest point on the route
-      let max = Number.MAX_SAFE_INTEGER;
-      let found = this.route.points[0];
-      this.route.points.forEach((point) => {
-	  const distance = event.latlng.distanceTo(point);
-	  if(distance < max) {
-	    max = distance;
-	    found = point;
-	  }
-       });
-       this.$emit('select_point', found);
+    // very stupid way to find the nearest point on the route
+    let max = Number.MAX_SAFE_INTEGER;
+    let found = this.route.points[0];
+    this.route.points.forEach((point) => {
+      const distance = event.latlng.distanceTo(point);
+      if (distance < max) {
+        max = distance;
+        found = point;
+      }
     });
+    this.$emit('select_point', found);
+  });
   this.markerLayer = L.layerGroup().addTo(this.map);
   this.turnLayer = L.layerGroup().addTo(this.map);
   this.waterLayer = L.layerGroup().addTo(this.map);
@@ -129,7 +127,7 @@ function drawMarkers() {
 
 function drawTurns() {
   this.turnLayer.clearLayers();
-  if(!this.show_turns) {
+  if (!this.show_turns) {
     return;
   }
   for (const point of this.route.points) {
@@ -137,11 +135,11 @@ function drawTurns() {
       continue;
     }
     const text = point.name || '';
-    const icon = L.divIcon({ iconSize: null,
+    const icon = L.divIcon({
+      iconSize: null,
       html: `<div class="map-turn"><div class="map-turn-content map-turn-${point.turn}" data-turn=${point.turn}>${text}</div><div class="map-turn-arrow" /></div></div>`
     });
-    L.marker(latlng(point), { icon }).addTo(this.turnLayer)
-      .on('click', this.$emit.bind(this, 'select_point', point));
+    L.marker(latlng(point), { icon }).addTo(this.turnLayer).on('click', this.$emit.bind(this, 'select_point', point));
   }
 }
 
@@ -155,7 +153,7 @@ const RouteMap = {
     show_water: Boolean,
     show_toilet: Boolean,
     show_gas: Boolean,
-    layer: String,
+    layer: String
   },
   mounted,
   data: () => ({
@@ -174,54 +172,46 @@ const RouteMap = {
     show_water: drawWater,
     show_toilet: drawToilet,
     show_gas: drawGas,
-    layer: function() {
+    layer: function () {
       this.tileLayer.setUrl(this.getLayerUrl());
     }
   }
 };
 
 function addPoiLayer(data, layer) {
-    const mapLabel = (label) =>
-	`<div class="map-label"><div class="map-label-content">${label}</div><div class="map-label-arrow" /></div></div>`;
-    const infoFunc = function() {
-	alert(`OSM Attributes:\n\n${this.options.title}`);
-    };
-    for(const i of data) {
-	const icon = L.divIcon({ iconSize: null, html: mapLabel(i.name) });
-	L.marker([i.lat, i.lon], { icon, title: i.text })
-	    .addTo(layer)
-	    .on('click', infoFunc);
-    }
+  const mapLabel = (label) =>
+    `<div class="map-label"><div class="map-label-content">${label}</div><div class="map-label-arrow" /></div></div>`;
+  const infoFunc = function () {
+    alert(`OSM Attributes:\n\n${this.options.title}`);
+  };
+  for (const i of data) {
+    const icon = L.divIcon({ iconSize: null, html: mapLabel(i.name) });
+    L.marker([i.lat, i.lon], { icon, title: i.text }).addTo(layer).on('click', infoFunc);
+  }
 }
 
 async function drawWater() {
-    this.waterLayer.clearLayers();
-    if(!this.show_water) {
-	return;
-    }
-    addPoiLayer(
-      await Overpass.findWater(getBoundingBox(this.route.points, 1.5)),
-      this.waterLayer)
+  this.waterLayer.clearLayers();
+  if (!this.show_water) {
+    return;
+  }
+  addPoiLayer(await Overpass.findWater(getBoundingBox(this.route.points, 1.5)), this.waterLayer);
 }
 
 async function drawToilet() {
-    this.toiletLayer.clearLayers();
-    if(!this.show_toilet) {
-	return;
-    }
-    addPoiLayer(
-      await Overpass.findToilet(getBoundingBox(this.route.points, 1.5)),
-      this.toiletLayer)
+  this.toiletLayer.clearLayers();
+  if (!this.show_toilet) {
+    return;
+  }
+  addPoiLayer(await Overpass.findToilet(getBoundingBox(this.route.points, 1.5)), this.toiletLayer);
 }
 
 async function drawGas() {
-    this.gasLayer.clearLayers();
-    if(!this.show_gas) {
-	return;
-    }
-    addPoiLayer(
-      await Overpass.findGas(getBoundingBox(this.route.points, 1.5)),
-      this.gasLayer)
+  this.gasLayer.clearLayers();
+  if (!this.show_gas) {
+    return;
+  }
+  addPoiLayer(await Overpass.findGas(getBoundingBox(this.route.points, 1.5)), this.gasLayer);
 }
 
 export default RouteMap;

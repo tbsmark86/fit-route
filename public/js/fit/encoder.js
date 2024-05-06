@@ -38,7 +38,6 @@ export class FITEncoder {
     this.writeMesg('event', values);
   }
 
-
   writeMesg(mesgName, values) {
     let localNum = this.localNum[mesgName];
     if (localNum === undefined) {

@@ -1,4 +1,3 @@
-
 function finalKey(key) {
   return 'fit-route-' + key;
 }
@@ -6,11 +5,10 @@ function finalKey(key) {
 export function getBool(key, def) {
   key = finalKey(key);
   const val = localStorage[key];
-  if(val !== null) {
+  if (val !== null) {
     try {
       return JSON.parse(val);
-    } catch(e) {
-    }
+    } catch (e) {}
   }
   return def;
 }
