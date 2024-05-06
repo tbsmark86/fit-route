@@ -1,6 +1,5 @@
 {
   "name": "fit-route",
-  "repository": "git@gitlab.com:nwholloway/fit-route.git",
   "author": "Nick Holloway <nick.holloway@pyrites.org.uk>",
   "private": true,
   "scripts": {

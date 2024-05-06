@@ -7,7 +7,7 @@ import * as Overpass from '../overpass.js';
 const latlng = ({ lat, lon }) => [lat, lon];
 
 function getLayerUrl() {
-  return this.layer || 'https://{s}.tile.openstreetmap.de/{z}/{x}/{y}{r}.png';
+  return this.layer || 'https://tile.openstreetmap.org/{z}/{x}/{y}{r}.png';
 }
 
 function mounted() {

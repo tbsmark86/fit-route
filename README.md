@@ -1,9 +1,12 @@
+This a fork of https://gitlab.com/nwholloway/fit-route with custom extension.
+Mainly manual adding of turn instructions - this part is in conflict with the original code.
+
 FIT Route Converter
 ===================
 
 This is a serverless solution to the problem of converting a GPX file for
 an event into a FIT file that can be used directly by a Garmin Edge cycle
-computer.
+computer or compatible devices.
 
 Development
 -----------
@@ -23,15 +26,6 @@ Consistent code formatting is achieved using [Prettier](https://prettier.io/).
 $ npm run format
 ```
 
-BrowserStack
-------------
-
-To use _BrowserStack Live_ with _Local Testing_ launch the _BrowserStack Local_
-application as follows:
-```console
-$ BrowserStackLocal --key "$BROWSERSTACK_KEY" --folder "$PWD/public"
-```
-
 Notes
 -----
 
@@ -44,9 +38,6 @@ to transpile & polyfill to support other browsers.
 Documentation of the FIT file format is contained in the FIT SDK
 ([download](https://www.thisisant.com/resources/fit/)), and this implementation
 does the bare minimum required.
-
-The mapping uses [CARTO](https://github.com/CartoDB/basemap-styles) raster tiles,
-which are free for up to 75,000 mapviews per month for non-commercial use.
 
 Third Party Libraries
 ---------------------
