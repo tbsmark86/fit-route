@@ -140,8 +140,17 @@ body {
 }
 
 .course-point-dialog {
+  width: max-content;
+  max-width: 90vw;
+  margin: auto auto;
+  padding: 0;
+  border: none;
+}
+.course-point-dialog::backdrop {
   background-color: rgba(1, 1, 1, 0.5);
-  display: block;
+}
+.course-point-dialog > .modal-dialog {
+  margin: 0;
 }
 
 .form-list {

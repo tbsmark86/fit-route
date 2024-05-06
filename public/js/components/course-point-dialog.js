@@ -9,7 +9,6 @@ function edit(point) {
     this.$nextTick(() => {
       const dialog = this.$refs.dialog;
       if (!dialog) {
-        // Dialog is very new
         alert('Sry no browser support!');
         return;
       }
