@@ -58,7 +58,7 @@ const mesgDefns = {
   course: {
     mesgNum: 31,
     fieldDefns: [{ name: 'name', number: 5, type: 'string' }]
-  }
+  },
 };
 
 const fields = (fieldDefns, fieldValues) => {

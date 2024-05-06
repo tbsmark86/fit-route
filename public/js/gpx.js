@@ -19,93 +19,89 @@ async function parseXml(buffer) {
     if (errors.length) {
       console.error('Parse error:', errors.item(0).innerText);
       reject();
-    }
-    else if (doc.documentElement.nodeName !== 'gpx') {
+    } else if (doc.documentElement.nodeName !== 'gpx') {
       reject();
-    }
-    else {
+    } else {
       resolve(doc);
     }
   });
 }
 
-const childNamed = (node, nodeName) =>
-  Array.from(node.children).find(node => node.nodeName === nodeName);
+const toDegrees = (radians) => ((radians * 180) / Math.PI + 360) % 360;
+const toRadians = (degrees) => (degrees * Math.PI) / 180;
 
 function haversine({ lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }) {
   const R = 6371e3;
-  const φ1 = lat1 * Math.PI / 180;
-  const φ2 = lat2 * Math.PI / 180;
-  const Δφ = (lat2 - lat1) * Math.PI / 180;
-  const Δλ = (lon2 - lon1) * Math.PI / 180;
+  const φ1 = toRadians(lat1);
+  const φ2 = toRadians(lat2);
+  const Δφ = toRadians(lat2 - lat1);
+  const Δλ = toRadians(lon2 - lon1);
 
-  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-    Math.cos(φ1) * Math.cos(φ2) *
-    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const d = R * c;
 
   return d;
 }
 
-function* trackPoints(trkseg) {
-  let lastPoint;
-  let distance = 0;
+function azimuth({ lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }) {
+  const φ1 = (lat1 * Math.PI) / 180;
+  const φ2 = (lat2 * Math.PI) / 180;
+  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+  const y = Math.sin(Δλ) * Math.cos(φ2);
+  const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+  const θ = Math.atan2(y, x);
 
+  return toDegrees(θ);
+}
+
+const childNamed = (node, nodeName) => Array.from(node.children).find((node) => node.nodeName === nodeName);
+
+function* trackPoints(trkseg) {
   for (const node of trkseg.children) {
     if (node.nodeName === 'trkpt') {
-      const lat = parseFloat(node.getAttribute('lat'));
-      const lon = parseFloat(node.getAttribute('lon'));
-      const ele = childNamed(node, 'ele');
-      const time = childNamed(node, 'time');
-
-      if (lastPoint) {
-        distance += haversine(lastPoint, { lat, lon });
-      }
-
-      const point = {
-        lat,
-        lon,
-        ele: ele && parseFloat(ele.textContent),
-        distance,
-        time: time && Date.parse(time.textContent)
-      };
-
-      lastPoint = point;
-      yield point;
+      yield waypoint(node);
     }
   }
 }
 
 function* routePoints(rte) {
-  let lastPoint;
-  let distance = 0;
-
   for (const node of rte.children) {
     if (node.nodeName === 'rtept') {
-      const lat = parseFloat(node.getAttribute('lat'));
-      const lon = parseFloat(node.getAttribute('lon'));
-      const time = undefined;
-
-      if (lastPoint) {
-        distance += haversine(lastPoint, { lat, lon });
-      }
-
-      const point = {
-        lat,
-        lon,
-        time,
-        distance
-      };
-
-      lastPoint = point;
-      yield point;
+      yield waypoint(node);
     }
   }
 }
 
+function waypoint(node) {
+  const lat = parseFloat(node.getAttribute('lat'));
+  const lon = parseFloat(node.getAttribute('lon'));
+  const ele = childNamed(node, 'ele');
+  const time = childNamed(node, 'time');
+
+  return {
+    lat,
+    lon,
+    ele: ele && parseFloat(ele.textContent),
+    time: time && Date.parse(time.textContent)
+  };
+}
+
+function* setDistance(points) {
+  let distance = 0;
+  let prevPoint = 0;
+
+  for (const point of points) {
+    if (prevPoint) {
+      distance += haversine(prevPoint, point);
+    }
+    yield { ...point, distance };
+    prevPoint = point;
+  }
+}
+
 /**
- * Read gpx exenstion create by brouter-web 'osmand' style:
+ * Read gpx exenstion created by brouter-web 'osmand' style:
  *
  * Example:
  *  <rtept lat="52.430425" lon="13.263190">
@@ -225,8 +221,7 @@ function elevationChange(points) {
       lastEle = ele;
       if (delta > 0) {
         eleGain += delta;
-      }
-      else {
+      } else {
         eleLoss -= delta;
       }
     }
@@ -246,12 +241,12 @@ async function parseRoute(doc) {
   const rte = childNamed(doc.documentElement, 'rte');
   const rteName = rte && childNamed(rte, 'name');
 
-  const name = (metadataName && metadataName.textContent) ||
+  const name =
+    (metadataName && metadataName.textContent) ||
     (trkName && trkName.textContent) ||
     (rteName && rteName.textContent) ||
     'Unnamed';
-  let points = (trkseg && Array.from(trackPoints(trkseg))) ||
-    (rte && Array.from(routePoints(rte)));
+  let points = Array.from(setDistance(trkseg && trackPoints(trkseg)) || (rte && routePoints(rte)));
   const { eleGain, eleLoss } = points && elevationChange(points) || {};
 
   const instructions = trkseg && rte && Array.from(routeInstructions(rte));

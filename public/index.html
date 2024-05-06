@@ -8,62 +8,75 @@
       content="Browser based application to convert a GPX route into a FIT course for Garmin Edge"
     />
     <title>FIT Route Converter</title>
+    <link rel="icon" href="images/logo-32.png" sizes="32x32" />
+    <link rel="icon" href="images/logo-96.png" sizes="96x96" />
+    <link rel="icon" href="images/logo-128.png" sizes="128x128" />
+    <link rel="icon" href="images/logo-192.png" sizes="192x192" />
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
       crossorigin="anonymous"
     />
     <link
       rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
-      integrity="sha384-eS4bw6aEvhCSXWGP85ANR/N8isWKzT7P36NvcuTJGkrj6wsbxLVpXslrNXYHyseD"
+      href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css"
+      integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14="
       crossorigin="anonymous"
     />
     <link
       rel="stylesheet"
-      href="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css"
-      integrity="sha384-t17w2haSDwLp3KSAOHF7+VI9q2maRMLDhnIyU/JasjeWyxcN3YOcrD7T95CiJSWE"
+      href="https://unpkg.com/leaflet.fullscreen@2.4.0/Control.FullScreen.css"
+      integrity="sha384-73+xhNp0ojkCt/iDWKlGxfuMbKCt8OcstZj1N30Eo3XQTMu13XLkURBo8SrsLqS4"
       crossorigin="anonymous"
     />
     <link
       rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
-      integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
+      href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
+      integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm"
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="css/fit-route.css" />
   </head>
 
   <body class="d-flex flex-column">
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-      <div class="navbar-brand">FIT Route Converter</div>
-      <div class="navbar-nav nav-link ml-auto">
-        <a
-          href="https://www.pyrites.org.uk/post/gpx-to-fit-conversion/"
-          target="_blank"
-          rel="noopener"
-          title="Blog"
-          class="text-light"
-        >
-          <i class="fas fa-blog"></i>
-        </a>
-      </div>
-      <div class="navbar-nav nav-link">
-        <a href="https://twitter.com/TechWrangler" target="_blank" rel="noopener" title="Twitter" class="text-light">
-          <i class="fab fa-twitter"></i>
-        </a>
-      </div>
-      <div class="navbar-nav nav-link">
-        <a
-          href="https://gitlab.com/nwholloway/fit-route"
-          target="_blank"
-          rel="noopener"
-          title="GitLab"
-          class="text-light"
-        >
-          <i class="fab fa-gitlab"></i>
-        </a>
+    <nav class="navbar navbar-expand navbar-dark bg-dark">
+      <div class="container-fluid">
+        <div class="navbar-brand">
+          <img class="rounded mr-1" src="images/logo-32.png" width="24" height="24" alt="" />
+          FIT Route Converter
+        </div>
+        <div class="navbar-expand">
+          <div class="navbar-nav">
+            <a
+              href="https://www.pyrites.org.uk/post/gpx-to-fit-conversion/"
+              target="_blank"
+              rel="noopener"
+              title="Blog"
+              class="nav-link active"
+            >
+              <i class="fas fa-blog"></i>
+            </a>
+            <a
+              href="https://twitter.com/TechWrangler"
+              target="_blank"
+              rel="noopener"
+              title="Twitter"
+              class="nav-link active"
+            >
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a
+              href="https://gitlab.com/nwholloway/fit-route"
+              target="_blank"
+              rel="noopener"
+              title="GitLab"
+              class="nav-link active"
+            >
+              <i class="fab fa-gitlab"></i>
+            </a>
+          </div>
+        </div>
       </div>
     </nav>
 
@@ -73,18 +86,10 @@
           <span>A browser based application to convert a GPX file into a FIT file.</span>
         </p>
         <ul>
-          <li>
-            Select the GPX file to be converted
-          </li>
-          <li>
-            View the route on a map, along with the key statistics
-          </li>
-          <li>
-            Amend the average speed to your desired value
-          </li>
-          <li>
-            Download will save the course as a FIT file
-          </li>
+          <li>Select the GPX file to be converted</li>
+          <li>View the route on a map, along with the key statistics, and generated turns</li>
+          <li>Amend the average speed to your desired value</li>
+          <li>Download will save the course as a FIT file</li>
           <li>
             Connect Garmin as USB device, and place the FIT file in
             <span class="text-monospace">\GARMIN\NEWFILES</span>
@@ -106,6 +111,14 @@
           </span>
         </p>
         <p>
+          <span>It is now possible to include basic navigation alerts in the FIT file.</span>
+          <span>
+            The turn information is limited due to being generated solely from the GPX points, and has no knowledge of
+            road junctions.
+          </span>
+          <span>Preview the turns by enabling the layer, and choose to include in the FIT file download.</span>
+        </p>
+        <p>
           <span>Your data never leaves your computer as all processing is performed within your browser.</span>
           <span>You do not need to register to use this application.</span>
           <span>There are no adverts, no cookies, no use of local storage, or service workers.</span>
@@ -115,10 +128,7 @@
           </span>
         </p>
         <p>
-          <span>
-            The application works with the current versions of Chrome, Firefox and Safari. Edge started working with
-            version 79.
-          </span>
+          <span>The application works with the current versions of Chrome, Firefox, Safari, Edge and Opera.</span>
         </p>
         <noscript>
           <div class="alert alert-danger">
@@ -150,26 +160,26 @@
     </main>
 
     <script
-      src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"
-      integrity="sha384-8t+aLluUVnn5SPPG/NbeZCH6TWIvaXIm/gDbutRvtEeElzxxWaZN+G/ZIEdI/f+y"
+      src="https://unpkg.com/vue@3.2.40/dist/vue.global.prod.js"
+      integrity="sha384-ELrpD0dhLcTnJv2Snc2EcDMR25eJoUJbHIHHc4q2+/Lm4LFEbR26r3+RlcYvqUU4"
       crossorigin="anonymous"
       defer
     ></script>
     <script
-      src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
-      integrity="sha384-bmPowDlt+owc6Mn3LwOzLPkYiVm6MuKeLMe0qN2pp7Fhmux2xtVJm5e+ekpCVv4x"
+      src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"
+      integrity="sha256-NDI0K41gVbWqfkkaHj15IzU7PtMoelkzyKp8TOaFQ3s="
       crossorigin="anonymous"
       defer
     ></script>
     <script
-      src="https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js"
-      integrity="sha384-btJhAWztz7ttA6ibFC5ppM39nkCPK6CWzRVmsaLcDn37mA3x1TzF1DbFwa6tJpTN"
+      src="https://unpkg.com/leaflet.fullscreen@2.4.0/Control.FullScreen.js"
+      integrity="sha384-TqFtkYBnYsrP2JCfIv/oLQxS9L6xpaIV9xnaI2UGMK25cJsTtQXZIU6WGQ7daT0Z"
       crossorigin="anonymous"
       defer
     ></script>
     <script
-      src="https://unpkg.com/leaflet-geometryutil@0.9.3/src/leaflet.geometryutil.js"
-      integrity="sha384-G70mXD+1sJc5SJH+a0+Xu6x71fJPj917SBijw64O7AXPwI8ogBe8FPqR9iRU5k67"
+      src="https://unpkg.com/leaflet-geometryutil@0.10.3/src/leaflet.geometryutil.js"
+      integrity="sha384-2cc9nXHZOwICBnT6+IPHd05dasat3OvNiB3SqEbSnT6JRMujcWXo7gcoUeI0JFwB"
       crossorigin="anonymous"
       defer
     ></script>
@@ -179,9 +189,11 @@
       crossorigin="anonymous"
       defer
     ></script>
-    <script nomodule type="text/javascript" src="js/unsupported.js" defer></script>
+
     <script type="module" src="js/spreadcheck.js"></script>
     <script type="module" src="js/app.js"></script>
+
+    <script nomodule type="text/javascript" src="js/unsupported.js"></script>
 
     <script type="text/x-template" id="error-message-template">
       <div role="alert" class="alert alert-danger">{{ message }}</div>
@@ -192,7 +204,7 @@
     <script type="text/x-template" id="file-upload-template">
       <form enctype="multipart/form-data" novalidate>
         <div class="file-upload d-flex justify-content-center align-items-center border bg-light w-75 mx-auto">
-          <input v-if="!file" type="file" title=" " aria-label="Select GPX" accept=".gpx,application/gpx+xml" @change="onFilesChange($event.target.files)">
+          <input v-if="!file" type="file" title=" " aria-label="Select GPX" accept=".gpx,application/gpx+xml,application/octet-stream" @change="onFilesChange($event.target.files)">
           <div v-if="!file" class="h4 font-weight-normal">
             Drop GPX here or click to browse
           </div>
@@ -221,19 +233,17 @@
           <div class="col-auto bg-light">
             <form novalidate>
               <div>
-                <div class="btn-groupx btn-group-toggle d-flex justify-content-center py-3">
-                  <label class="btn btn-info w-25 mx-1" :class="{ active: units == 'km' }">
-                    <input type="radio" value="km" v-model="units"> km
-                  </label>
-                  <label class="btn btn-info w-25 mx-1" :class="{ active: units == 'miles' }">
-                    <input type="radio" value="miles" v-model="units"> miles
-                 </label>
+                <div class="d-flex justify-content-center py-3">
+                  <input class="btn-check" id="km" data-toggle="button" type="radio" value="km" v-model="units">
+                  <label class="btn btn-outline-secondary w-25 mx-1" :class="{ active: units == 'km' }" for="km">km</label>
+                  <input class="btn-check" id="miles" data-toggle="button" type="radio" value="miles" v-model="units">
+                  <label class="btn btn-outline-secondary w-25 mx-1" :class="{ active: units == 'miles' }" for="miles">miles</label>
                 </div>
               </div>
             </form>
 
-            <route-info :route="route" :units="units" @name="setName" @duration="setDuration" @shortNotes="setShortNotes"></route-info>
-            <div>
+           <route-info :route="route" :units="units" @name="setName" @duration="setDuration" @shortNotes="setShortNotes"></route-info>
+           <div class="mt-4 d-flex flex-column">
               <div class="d-flex justify-content-around">
                 <button class="btn btn-secondary m-2" @click="onClear">Clear</button>
                 <button class="btn btn-primary m-2" @click="onFitDownload">Download as FIT</button>
@@ -241,7 +251,7 @@
               <a ref="downloadAnchor" class="d-none" download="COURSE.fit" href="#"></a>
             </div>
 	    <form novalidate style="font-size:0.8em">
-	      Settings
+	      <i>View Settings</i>
 	      <div class="form-check">
 		<input class="form-check-input" type="checkbox" value="" id="show_marker" v-model="show_marker">
 		<label class="form-check-label" for="show_marker">
@@ -299,39 +309,33 @@
     <script type="text/x-template" id="route-info-template">
       <form novalidate>
         <div class="d-flex flex-column">
-          <div class="form-group">
-            <label for="routeName">Name</label>
-            <input id="routeName" type="text" v-model="routeName" @keydown.enter.prevent class="form-control text-info" data-lpignore="true">
+          <div class="mb-3">
+            <label class="form-label" for="routeName">Name</label>
+            <input id="routeName" type="text" v-model="routeName" @keydown.enter.prevent class="form-control text-primary" data-lpignore="true">
             <i v-if="routeNameTooLong" class="fas fa-exclamation-triangle text-warning input-feedback" title="Name will be truncated on Garmin device" aria-hidden="true"></i>
           </div>
 
-          <div class="form-group">
-            <label for="distance">Distance</label>
+          <div class="mb-3">
+            <label class="form-label" for="distance">Distance</label>
             <div class="input-group">
-              <input id="distance" type="text" v-model="distance" readonly class="form-control text-info bg-light">
-              <div class="input-group-append">
-                <span class="input-group-text">{{ units }}</span>
-              </div>
+              <input id="distance" type="text" v-model="distance" readonly class="form-control text-primary bg-light">
+              <div class="input-group-text">{{ units }}</div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="speed">Average Speed</label>
+          <div class="mb-3">
+            <label class="form-label" for="speed">Average Speed</label>
             <div class="input-group">
-              <input id="speed" type="text" v-model="avgSpeedField" class="form-control text-info" data-lpignore="true">
-              <div class="input-group-append">
-                <span class="input-group-text">{{ speedUnits }}</span>
-              </div>
+              <input id="speed" type="text" v-model="avgSpeedField" class="form-control text-primary" data-lpignore="true">
+              <div class="input-group-text">{{ speedUnits }}</div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="time">Goal Time</label>
+          <div class="mb-3">
+            <label class="form-label" for="time">Goal Time</label>
             <div class="input-group">
-              <input id="time" type="text" v-model="goalTime" readonly class="form-control text-info bg-light">
-              <div class="input-group-append">
-                <span class="input-group-text">h:mm:ss</span>
-              </div>
+              <input id="time" type="text" v-model="goalTime" readonly class="form-control text-primary bg-light">
+              <span class="input-group-text">h:mm:ss</span>
             </div>
           </div>
 	  <div class="form-check">

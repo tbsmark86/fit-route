@@ -64,6 +64,7 @@ function onFitDownload() {
       total_ascent: this.route.eleGain,
       total_descent: this.route.eleLoss
     });
+
     encoder.writeEvent({
       timestamp: start.time,
       event: 'timer',
@@ -101,6 +102,7 @@ function onFitDownload() {
 	);
       }
     }
+
     encoder.writeEvent({
       timestamp: finish.time,
       event: 'timer',
@@ -113,7 +115,7 @@ function onFitDownload() {
     anchorElement.download = `${this.route.name}.fit`;
     anchorElement.href = url;
     anchorElement.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
     this.unsaved = false;
   } catch (error) {
     console.error(error);

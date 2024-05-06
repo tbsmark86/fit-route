@@ -17,7 +17,7 @@ function mounted() {
     almostOnMouseMove: false,
     almostDistance: 10,
   });
-  L.control.zoom({ position: 'bottomright' }).addTo(this.map);
+  L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
 
   const attributions = [
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -30,8 +30,8 @@ function mounted() {
 
   const points = this.route.points;
 
-  this.routeLayer = L.polyline(points.map(latlng), { color: 'blue' });
-  this.map.addLayer(this.routeLayer);
+  this.routeLayer = L.polyline(points.map(latlng), { color: 'blue' }).addTo(this.map);
+  this.distanceLayer = L.layerGroup().addTo(this.map);
 
   // almostOver to allow approximate clicking for;
   // Note: The layer must be added twice to keep it visible despite of
@@ -58,9 +58,8 @@ function mounted() {
   this.gasLayer = L.layerGroup().addTo(this.map);
 
   const [start, finish] = [points[0], points[points.length - 1]];
-  L.circleMarker(latlng(start), { radius: 8, weight: 0, color: 'greeen', fillOpacity: 0.6 }).addTo(this.map);
+  L.circleMarker(latlng(start), { radius: 8, weight: 0, color: 'green', fillOpacity: 0.6 }).addTo(this.map);
   L.circleMarker(latlng(finish), { radius: 8, weight: 0, color: 'red', fillOpacity: 0.6 }).addTo(this.map);
-
 
   this.map.on('zoomend', ({ target: map }) => {
     this.zoom = map.getZoom();
@@ -72,7 +71,13 @@ function mounted() {
   drawWater.call(this);
 }
 
-const markerInterval = (zoom) => {
+function midpoint(fraction, { lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }) {
+  const mid = (a, b) => a + (b - a) * fraction;
+
+  return { lat: mid(lat1, lat2), lon: mid(lon1, lon2) };
+}
+
+const distanceMarkerInterval = (zoom) => {
   switch (Math.min(zoom, 13)) {
     case 13:
       return 1;
@@ -88,31 +93,37 @@ const markerInterval = (zoom) => {
   }
 };
 
-function* markerPoints(points, units, zoom) {
-  const interval = markerInterval(zoom);
-  const distanceInterval = interval * 1000 * (units === 'miles' ? 1.609344 : 1);
-  let distanceNext = distanceInterval;
+function* distancePoints(points, units, zoom) {
+  const interval = distanceMarkerInterval(zoom);
+  const intervalDistance = interval * 1000 * (units === 'miles' ? 1.609344 : 1);
+  let nextDistance = intervalDistance;
   let label = interval;
+  let lastPoint;
   for (const point of points) {
-    if (point.distance >= distanceNext) {
-      yield { label, latlng: latlng(point) };
+    while (point.distance >= nextDistance) {
+      const fraction = (nextDistance - lastPoint.distance) / (point.distance - lastPoint.distance);
+      yield { label, latlng: midpoint(fraction, lastPoint, point) };
       label += interval;
-      distanceNext += distanceInterval;
+      nextDistance += intervalDistance;
     }
+    lastPoint = point;
+  }
+}
+
+function* distanceMarkers(points, units, zoom) {
+  const mapLabel = (label) =>
+    `<div class="map-label"><div class="map-label-content">${label}</div><div class="map-label-arrow" /></div></div>`;
+
+  for (const { label, latlng } of distancePoints(points, units, zoom)) {
+    const icon = L.divIcon({ iconSize: null, html: mapLabel(label) });
+    yield L.marker(latlng, { icon });
   }
 }
 
 function drawMarkers() {
-  const mapLabel = (label) =>
-    `<div class="map-label"><div class="map-label-content">${label}</div><div class="map-label-arrow" /></div></div>`;
-
-  this.markerLayer.clearLayers();
-  if(!this.show_marker) {
-    return;
-  }
-  for (const { label, latlng } of markerPoints(this.route.points, this.units, this.zoom)) {
-    const icon = L.divIcon({ iconSize: null, html: mapLabel(label) });
-    L.marker(latlng, { icon }).addTo(this.markerLayer);
+  this.distanceLayer.clearLayers();
+  for (const distanceMarker of distanceMarkers(this.route.points, this.units, this.zoom)) {
+    distanceMarker.addTo(this.distanceLayer);
   }
 }
 
@@ -148,9 +159,6 @@ const RouteMap = {
   },
   mounted,
   data: () => ({
-    map: null,
-    tileLayer: null,
-    routeLayer: null,
     zoom: null
   }),
   methods: {
@@ -180,7 +188,6 @@ function addPoiLayer(data, layer) {
     };
     for(const i of data) {
 	const icon = L.divIcon({ iconSize: null, html: mapLabel(i.name) });
-	console.log(data);
 	L.marker([i.lat, i.lon], { icon, title: i.text })
 	    .addTo(layer)
 	    .on('click', infoFunc);
