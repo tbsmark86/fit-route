@@ -24,6 +24,13 @@ function edit(point) {
         event.preventDefault();
         resolve();
       };
+      dialog.onclose = (event) => {
+	// Handle any close of dialog; most important 'esc'
+	// Note: we're always saving - cancel is not supported
+	if(this.open) {
+	  form.onsubmit(event);
+	}
+      };
       dialog.showModal();
     });
   });
@@ -42,6 +49,7 @@ function listenKeyboard(form, point) {
       case 'q':
         point.turn = 'slight_left';
         break;
+      case 'z':
       case 'y':
         point.turn = 'sharp_left';
         break;
