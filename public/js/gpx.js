@@ -56,11 +56,14 @@ function azimuth({ lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }) {
 }
 
 const childNamed = (node, nodeName) => Array.from(node.children).find((node) => node.nodeName === nodeName);
+const childsNamed = (node, nodeName) => Array.from(node.children).filter((node) => node.nodeName === nodeName);
 
-function* trackPoints(trkseg) {
-  for (const node of trkseg.children) {
-    if (node.nodeName === 'trkpt') {
-      yield waypoint(node);
+function* trackPoints(trksegs) {
+  for (const trkseg of trksegs) {
+    for (const node of trkseg.children) {
+      if (node.nodeName === 'trkpt') {
+        yield waypoint(node);
+      }
     }
   }
 }
@@ -234,7 +237,8 @@ async function parseRoute(doc) {
   const metadataName = metadata && childNamed(metadata, 'name');
 
   const trk = childNamed(doc.documentElement, 'trk');
-  const trkseg = trk && childNamed(trk, 'trkseg');
+  // a track sometimes is split into multiple segments
+  const trksegs = trk && childsNamed(trk, 'trkseg');
   const trkName = trk && childNamed(trk, 'name');
 
   const rte = childNamed(doc.documentElement, 'rte');
@@ -245,10 +249,16 @@ async function parseRoute(doc) {
     (trkName && trkName.textContent) ||
     (rteName && rteName.textContent) ||
     'Unnamed';
-  let points = Array.from(setDistance(trkseg && trackPoints(trkseg)) || (rte && routePoints(rte)));
+  let points = Array.from(setDistance(trksegs.length && trackPoints(trksegs)) || (rte && routePoints(rte)));
   const { eleGain, eleLoss } = (points && elevationChange(points)) || {};
 
-  const instructions = trkseg && rte && Array.from(routeInstructions(rte));
+  if(points.length == 0) {
+    throw new Error('Can\'t find a track or route in this GPX.')
+  } else if(childsNamed(doc.documentElement, 'trk').length > 1) {
+    alert('GPX contains multiple tracks!\nPlease split if you want to process all of them.');
+  }
+
+  const instructions = trksegs && rte && Array.from(routeInstructions(rte));
   if (instructions) {
     points = insertInstructions(points, instructions);
   }
