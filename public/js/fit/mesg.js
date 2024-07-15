@@ -155,3 +155,21 @@ export class Mesg {
     return dv.buffer;
   }
 }
+
+// For Reading: Reverse Map of FIT-Global Mesg-Num => for us relevant
+// fields.
+// Non Mapped Mesgs & Fields are simply skipped
+export const mesgMap = (() => {
+    let res = {};
+    for(const [mesgName, mesgDef] of Object.entries(mesgDefns)) {
+	let newFields = {
+	    _mesgName: mesgName
+	};
+	for(const fieldDef of Object.values(mesgDef.fieldDefns)) {
+	    newFields[fieldDef.number] = fieldDef;
+	}
+	res[mesgDef.mesgNum] = newFields;
+    }
+    Object.seal(res);
+    return res;
+})();

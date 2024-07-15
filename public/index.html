@@ -57,7 +57,7 @@
 	  <span>A browser based application to convert a GPX file into a FIT file <i>and</i> insert Turn-by-Turn Instructions.</span>
         </p>
         <ul>
-          <li>Select the GPX file to be converted</li>
+          <li>Select the GPX file to be converted (or existing FIT to edit)</li>
 	  <li>Check the route; click on Points to add Turn Instructions<br>
 	    <details><summary>Shortcuts</summary>
 		After click on a point you can use keys to quickly set the turn.<br>
@@ -106,11 +106,15 @@
         </p>
         <ul>
           <li>
-	    <a href="https://gitlab.com/nwholloway/fit-route">Original Version</a>
-	  </li>
-          <li>
 	    <a href="https://github.com/tbsmark86/fit-route">Code for this Version</a>
           </li>
+	  <li>
+	      You may report Bugs <a href="mailto:kontakt@tobis-page.de">via E-Mail</a> <b>IF</b> you can Include the problematic File.
+          </li>
+
+	  <li>
+	    <a href="https://gitlab.com/nwholloway/fit-route">Original Version</a>
+	  </li>
           <li>
 	    Main Lib: <a href="https://leafletjs.com/">Leaflet</a>
           </li>
@@ -163,9 +167,9 @@
     <script type="text/x-template" id="file-upload-template">
       <form enctype="multipart/form-data" novalidate>
         <div class="file-upload d-flex justify-content-center align-items-center border bg-light w-75 mx-auto">
-          <input v-if="!file" type="file" title=" " aria-label="Select GPX" accept=".gpx,application/gpx+xml,application/octet-stream" @change="onFilesChange($event.target.files)">
+          <input v-if="!file" type="file" title=" " aria-label="Select GPX" accept=".gpx,application/gpx+xml,application/octet-stream,.fit,application/vnd.ant.fit" @change="onFilesChange($event.target.files)">
           <div v-if="!file" class="h4 font-weight-normal">
-            Drop GPX here or click to browse
+            Drop GPX/FIT here or click to browse
           </div>
           <div v-else d-flex justify-content-center align-items-center>
             <div class="text-center">{{ file.name }}</div>

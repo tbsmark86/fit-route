@@ -1,13 +1,28 @@
+
 export async function parseGpx(file) {
-  return await parseRoute(await parseXml(await readFile(file)));
+
+    if(file.name.endsWith('.fit')) {
+	// Very likely a fit file transparently switch to Fit-Reader!
+	console.log('Read as fit file');
+	let lib = await import('./fit/decoder.js');
+	let decoder = new lib.FITDecoder();
+	return decoder.readRoute(await readFile(file, 'binary'));
+    }
+    console.log('Read as gpx file');
+    return parseRoute(await parseXml(await readFile(file, 'text')));
 }
 
-async function readFile(file) {
+async function readFile(file, mode) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = ({ target: { result } }) => resolve(result);
     reader.onerror = (error) => reject(error);
-    reader.readAsText(file, 'UTF-8');
+    if(mode === 'binary') {
+	reader.readAsArrayBuffer(file);
+    } else {
+	reader.readAsText(file, 'UTF-8');
+    }
+
   });
 }
 

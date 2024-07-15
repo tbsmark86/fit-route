@@ -1,11 +1,7 @@
 /* global Blob */
 import { Mesg } from './mesg.js';
 import { crc } from './crc.js';
-
-const HEADER_LEN = 14;
-const PROTOCOL_VERSION = 0x10; // 1.0
-const PROFILE_VERSION = 2078; // 20.78
-const MAGIC = 0x2e464954; // ".FIT"
+import { HEADER_LEN, PROTOCOL_VERSION, PROFILE_VERSION, MAGIC } from './types.js';
 
 export class FITEncoder {
   constructor() {

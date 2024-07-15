@@ -1,3 +1,10 @@
+
+// File-Header
+export const HEADER_LEN = 14;
+export const PROTOCOL_VERSION = 0x10; // 1.0
+export const PROFILE_VERSION = 2078; // 20.78
+export const MAGIC = 0x2e464954; // ".FIT"
+
 const enum_maps = {
   file: { course: 6 },
   sport: { cycling: 2 },
@@ -34,12 +41,18 @@ const enum_maps = {
 };
 
 const _enum = (name) => {
-  const enum_map = enum_maps[name];
+    const enum_map = enum_maps[name];
+    const enum_unmap = [];
+    for(let [name, value] of Object.entries(enum_map)) {
+	enum_unmap[value] = name;
+    }
   return {
     size: 1,
     baseType: 0,
     mapValue: (value) => enum_map[value],
-    setValue: DataView.prototype.setUint8
+    unmapValue: (value) => enum_unmap[value] ?? value,
+    setValue: DataView.prototype.setUint8,
+    getValue: DataView.prototype.getUint8
   };
 };
 
@@ -56,69 +69,82 @@ const enum_course_point = _enum('course_point');
 const sint8 = {
   size: 1,
   baseType: 1,
-  setValue: DataView.prototype.setInt8
+  setValue: DataView.prototype.setInt8,
+  getValue: DataView.prototype.getInt8
 };
 
 const uint8 = {
   size: 1,
   baseType: 2,
-  setValue: DataView.prototype.setUint8
+  setValue: DataView.prototype.setUint8,
+  getValue: DataView.prototype.getUint8
 };
 
 const sint16 = {
   size: 2,
   baseType: 0x83,
-  setValue: DataView.prototype.setInt16
+  setValue: DataView.prototype.setInt16,
+  getValue: DataView.prototype.getInt16
 };
 
 const uint16 = {
   size: 2,
   baseType: 0x84,
-  setValue: DataView.prototype.setUint16
+  setValue: DataView.prototype.setUint16,
+  getValue: DataView.prototype.getUint16
 };
 
 const sint32 = {
   size: 4,
   baseType: 0x85,
-  setValue: DataView.prototype.setInt32
+  setValue: DataView.prototype.setInt32,
+  getValue: DataView.prototype.getInt32
 };
 
 const uint32 = {
   size: 4,
   baseType: 0x86,
-  setValue: DataView.prototype.setUint32
+  setValue: DataView.prototype.setUint32,
+  getValue: DataView.prototype.getUint32
 };
 
 const string = {
   size: 0,
   baseType: 7,
   mapValue: (value) => Array.from(encodedStr(value)),
-  setValue: dvSetUint8Array
+  unmapValue: (value) => decodeStr(value),
+  setValue: dvSetUint8Array,
+  getValue: dvGetUint8Array
 };
 
 const seconds = {
   ...uint32,
-  mapValue: (value) => Math.round(value * 1000)
+  mapValue: (value) => Math.round(value * 1000),
+  unmapValue: (value) => value / 1000
 };
 
 const distance = {
   ...uint32,
-  mapValue: (value) => Math.round(value * 100)
+  mapValue: (value) => Math.round(value * 100),
+  unmapValue: (value) => value / 100
 };
 
 const altitude = {
   ...uint16,
-  mapValue: (value) => Math.round((value + 500) * 5)
+  mapValue: (value) => Math.round((value + 500) * 5),
+  unmapValue: (value) => value / 5 - 500
 };
 
 const date_time = {
   ...uint32,
-  mapValue: (value) => Math.round(value / 1000) - 631065600 // "1989-12-31T00:00"
+  mapValue: (value) => Math.round(value / 1000) - 631065600, // "1989-12-31T00:00"
+  unmapValue: (value) => Math.round((value + 631065600) * 1000)
 };
 
 const semicircles = {
   ...sint32,
-  mapValue: (value) => Math.round((value / 180) * 0x80000000)
+  mapValue: (value) => Math.round((value / 180) * 0x80000000),
+  unmapValue: (value) => (value / 0x80000000) * 180
 };
 
 export const types = {
@@ -180,9 +206,28 @@ function* codePoints(s) {
   }
 }
 
+function decodeStr(bytes) {
+    // cut of NULL byte (maybe more the one)
+    let realLength = bytes.byteLength;
+    for(; realLength > 0; realLength--) {
+	if(bytes[realLength - 1]) {
+	    break;
+	}
+    }
+    bytes = new Uint8Array(bytes.buffer, bytes.byteOffset, realLength);
+
+    const decoder = new TextDecoder('utf-8');
+    return decoder.decode(bytes);
+}
+
 function dvSetUint8Array(offset, values) {
   const dv = this;
   for (const value of values) {
     dv.setUint8(offset++, value);
   }
 }
+
+function dvGetUint8Array(offset, length) {
+    return new Uint8Array(this.buffer, offset, length);
+}
+
