@@ -57,7 +57,7 @@
 	  <span>A browser based application to convert a GPX file into a FIT file <i>and</i> insert Turn-by-Turn Instructions.</span>
         </p>
         <ul>
-          <li>Select the GPX file to be converted (or existing FIT to edit)</li>
+          <li>Select the GPX file to be converted</li>
 	  <li>Check the route; click on Points to add Turn Instructions<br>
 	    <details><summary>Shortcuts</summary>
 		After click on a point you can use keys to quickly set the turn.<br>
@@ -81,8 +81,7 @@
 	  </li>
           <li>Amend the average speed to your desired value</li>
           <li>Download will save the course as a FIT file</li>
-	  <li>Open the FIT on your Phone likely the App of your Navigation Device will allow import</li>
-	  <li>POIs: If you want to download POIs checkout my <a href="https://www.tobis-page.de/pois/">POIs Tool</a></li>
+	  <li>Open the FIT on your Phone to Import with the App of your Navigation Device</li>
         </ul>
         <p>
           <span>Your data never leaves your computer as all processing is performed within your browser.</span>
@@ -101,6 +100,13 @@
       </div>
       <fit-route @show-info="onShowInfo" @error="onError" class="flex-grow-1"></fit-route>
       <div v-if="showInfo" class="container-fluid p-3">
+        <p>
+          <span>More Info</span>
+        </p>
+	<ul>
+          <li>Also can be used to edit FIT routes or convert FIT activity</li>
+	  <li>POIs: If you want to download POIs checkout my <a href="https://www.tobis-page.de/pois/">POIs Tool</a></li>
+	</ul>
         <p>
           <span>Credits</span>
         </p>

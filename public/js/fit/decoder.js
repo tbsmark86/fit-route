@@ -20,6 +20,7 @@ export class FITDecoder {
 	this.turns = [];
 	this.eleGain = 0;
 	this.eleLoss = 0;
+	this.activity = false;
 
 	if (buffer.byteLength < 12) {
 	    throw new Error('File to small to be a FIT file');
@@ -64,6 +65,16 @@ export class FITDecoder {
 
 	console.debug(`Fit Parsed got: ${this.points.length} Points and ${this.turns.length} Turns`);
 	if(this.points.length) {
+	    if(this.activity && !this.turns.length) {
+		this.reduceActivity();
+	    }
+	    if(!this.name) {
+		if(this.activity) {
+		    this.name = 'Track';
+		} else {
+		    this.name = 'Route';
+		}
+	    }
 	    this.mergeTurnsIntoPoints();
 	    return {name: this.name, points: this.points, eleGain: this.eleGain, eleLoss: this.eleLoss};
 	}
@@ -199,9 +210,11 @@ export class FITDecoder {
     processMesg(mesg) {
 	switch(mesg._mesgName) {
 	    case 'file_id':
-		if(mesg.type !== 'course') {
+		if(mesg.type !== 'course' && mesg.type !== 4) {
+		    // 4 - activity file
 		    throw new Error(`Only Fit-Course-File supported (Found: ${mesg.type})`);
 		}
+		this.activity = mesg.type === 4;
 		console.debug('Got correct file type');
 		break;
 	    case 'course':
@@ -217,14 +230,18 @@ export class FITDecoder {
 		// not required
 		break;
 	    case 'record':
-		let point = {
-		    lat: mesg.position_lat,
-		    lon: mesg.position_long,
-		    ele: mesg.altitude,
-		    time: mesg.timestamp,
-		    distance: mesg.distance
-		};
-		this.points.push(point);
+		// records without lat/long might happen on activity files
+		// especially for indoor workouts!
+		if(mesg.position_lat && mesg.position_long) {
+		    let point = {
+			lat: mesg.position_lat,
+			lon: mesg.position_long,
+			ele: mesg.altitude,
+			time: mesg.timestamp,
+			distance: mesg.distance
+		    };
+		    this.points.push(point);
+		}
 		break;
 	    case 'course_point':
 		this.turns.push(mesg);
@@ -252,6 +269,24 @@ export class FITDecoder {
 		turnsMap[`${point.lat};${point.lon}`] = null;
 	    }
 	}
+    }
+
+    reduceActivity() {
+	/* Activity Files typically have way more points then need for navigation.
+	 * Perform a very minor reduction with Douglas-Pecker to keep file size
+	 * in check */
+	let newPoints = this.points;
+	newPoints.forEach((p) => {
+	    p.x = p.lat;
+	    p.y = p.lon;
+	});
+	let reducedPoints = L.LineUtil.simplify(newPoints, 0.000002);
+	reducedPoints.forEach((p) => {
+	    p.lat = p.x;
+	    p.lon = p.y;
+	});
+	this.points = reducedPoints;
+	console.debug(`Compresed to: ${this.points.length} Points`);
     }
 }
 
