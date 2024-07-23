@@ -2,6 +2,7 @@
 /* jshint esversion: 6 */
 
 import { getBoundingBox } from '../poi.js';
+import { findClimbs } from '../climbs.js';
 import * as Overpass from '../overpass.js';
 
 const latlng = ({ lat, lon }) => [lat, lon];
@@ -65,8 +66,12 @@ function mounted() {
 
   this.map.fitBounds(this.routeLayer.getBounds());
 
+    // TODO: just a tech demo - need gui!
+    findClimbs(points);
+
   drawTurns.call(this);
   drawWater.call(this);
+
 }
 
 function midpoint(fraction, { lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }) {
