@@ -50,10 +50,8 @@ class Segment {
 	
 	for(let idx = this.startPoint + 1; idx < this.endPoint; idx++) {
 	    const point = points[idx];
-	    const lastPoint = points[idx - 1];
-
-	    const distance = point.distance - lastPoint.distance;
-	    const eleDelta = point.ele - lastPoint.ele;
+	    const distance = point.deltaDistance;
+	    const eleDelta = point.deltaEle;
 	    if(
 		eleDelta === 0 ||
 		(isClimb && eleDelta < 0) ||
@@ -94,11 +92,11 @@ class Segment {
 	    const point = points[idx];
 	    const lastPoint = points[idx - 1];
 
-	    const eleDelta = point.ele - lastPoint.ele;
-	    const distance = point.distance - lastPoint.distance;
+	    const eleDelta = point.deltaEle;
+	    const distance = point.deltaDistance;
+	    const grade = point.grade;
 
 	    // Ignore opposite direction
-	    const grade = (eleDelta / distance) * 100;
 	    if(
 		(isClimb && grade < 0) ||
 		(!isClimb && grade > 0)
@@ -192,7 +190,6 @@ class ClimbFinder
     constructor(points, config)
     {
 	this.config = config || ClimbFinder.defaultConfig;
-	this.points = points;
     }
 
     hasLeveledOf(cur, curEnd, idx)
@@ -210,7 +207,7 @@ class ClimbFinder
 	    // (aka the higher the climb the more short drop/stop is allowed)
 	    return false;
 	}
-	console.debug('endClimbLeveldOf', idx, curEnd, scaledLimit);
+	//console.debug('endClimbLeveldOf', idx, curEnd, scaledLimit);
 	return true;
     }
 
@@ -231,7 +228,7 @@ class ClimbFinder
 	    // (aka the higher the climb the more short drop/stop is allowed)
 	    return false;
 	}
-	console.debug('endClimbPeak', idx, curEnd, scaledLimit);
+	//console.debug('endClimbPeak', idx, curEnd, scaledLimit);
 	return true;
     }
 
@@ -254,18 +251,13 @@ class ClimbFinder
 	const config = this.config;
 	for(let idx = 1; idx < points.length; idx++) {
 	    const point = points[idx];
-	    const lastPoint = points[idx - 1];
 
-	    const eleDelta = point.ele - lastPoint.ele;
+	    const eleDelta = point.deltaEle;
 	    if(eleDelta === 0 && cur === null) {
 		continue;
 	    }
-
-	    // Not sure if the distance here also includes the climbing
-	    // (triangle and so on) but it should really matte that much to
-	    // we just need to be close enough
-	    const distance = point.distance - lastPoint.distance;
-	    const grade = (eleDelta / distance) * 100; /* get in % */
+	    const distance = point.deltaDistance;
+	    const grade = point.grade
 
 	    if(cur === null) {
 		if(Math.abs(grade) < config.considerAsFlatTill) {
@@ -289,6 +281,17 @@ class ClimbFinder
 		    checkForClimbEnd = true;
 		}
 	    }
+
+	    if(checkForClimbEnd && !curEnd && cur.distance < 50) {
+		// require at least 2 consecutive points of climb/drop
+		// to do any detailed investigation unless this first
+		// point is unusually long
+		//
+		// This should filter out many small bumbs from the cacluation
+		cur = null;
+		continue;
+	    }
+
 	    if(checkForClimbEnd) {
 		if(!curEnd) {
 		    curEnd = new Segment(idx - 1, distance, eleDelta);
@@ -372,22 +375,21 @@ class ClimbFinder
 	}
 
 	if(ignoreClimb) {
-	    console.debug('ignoreClimb', segment, avgGrade, maxGrade);
+	    //console.debug('ignoreClimb', segment, avgGrade, maxGrade);
 	    return;
 	}
 
-	console.debug('useClimb', segment, avgGrade, maxGrade);
+	//console.debug('useClimb', segment, avgGrade, maxGrade);
 	this.insertClimb(segment, avgGrade, maxGrade);
     }
 
-    findFreePoint(start, searchDistance, direction, skipMore)
+    findFreePoint(points, start, searchDistance, direction, skipMore)
     {
-	const points = this.points;
-
 	let sumDistance = 0;
 	let foundPoint = null;
 	if(direction === 'forward') {
-	    for(let idx = start - 1; idx > 0; idx--) {
+	    // forward means earlier in the track
+	    for(let idx = start - 1; idx >= 0; idx--) {
 		const point = points[idx];
 		const prevPoint = points[idx + 1];
 		if(point.turn) {
@@ -399,16 +401,14 @@ class ClimbFinder
 		    sumDistance = 0;
 		    continue;
 		}
-		const distance = prevPoint.distance - point.distance;
-		sumDistance += distance;
+		sumDistance += prevPoint.deltaDistance;
 		if(sumDistance > searchDistance) {
-		    return idx;
+		    return point;
 		}
 	    }
 	} else {
 	    for(let idx = start + 1; idx < points.length; idx++) {
 		const point = points[idx];
-		const lastPoint = points[idx - 1];
 		if(point.turn) {
 		    // damn another nearby hint
 		    if(skipMore <= 0) {
@@ -418,10 +418,9 @@ class ClimbFinder
 		    sumDistance = 0;
 		    continue;
 		}
-		const distance = point.distance - lastPoint.distance;
-		sumDistance += distance;
+		sumDistance += point.deltaDistance;
 		if(sumDistance > searchDistance) {
-		    return idx;
+		    return point;
 		}
 	    }
 
@@ -431,30 +430,29 @@ class ClimbFinder
 
     insertClimb(segment, avgGrade, maxGrade)
     {
-	const points = this.points;
+	const originalPoints = this.originalPoints;
 
-	let targetPoint = points[segment.startPoint];
+	const startPointIndex = this.points[segment.startPoint].origIndex;
+	let targetPoint = originalPoints[startPointIndex];
 	if(targetPoint.turn) {
 	    // There is already something here :/
-	    let tryPoint;
-	    tryPoint = this.findFreePoint(segment.startPoint, 60, 'forward', 0);
-	    if(tryPoint === null) {
-		tryPoint = this.findFreePoint(segment.startPoint, 60, 'backward', 0);
+	    targetPoint = this.findFreePoint(originalPoints, startPointIndex, 60, 'forward', 0);
+	    if(targetPoint === null) {
+		targetPoint = this.findFreePoint(originalPoints, startPointIndex, 60, 'backward', 0);
 	    }
-	    if(tryPoint === null) {
-		tryPoint = this.findFreePoint(segment.startPoint, 50, 'forward', 1);
+	    if(targetPoint === null) {
+		targetPoint = this.findFreePoint(originalPoints, startPointIndex, 50, 'forward', 1);
 	    }
-	    if(tryPoint === null) {
-		tryPoint = this.findFreePoint(segment.startPoint, 50, 'backward', 1);
+	    if(targetPoint === null) {
+		targetPoint = this.findFreePoint(originalPoints, startPointIndex, 50, 'backward', 1);
 	    }
-	    if(tryPoint === null) {
-		tryPoint = this.findFreePoint(segment.startPoint, 40, 'forward', 2);
+	    if(targetPoint === null) {
+		targetPoint = this.findFreePoint(originalPoints, startPointIndex, 40, 'forward', 2);
 	    }
-	    if(tryPoint === null) {
+	    if(targetPoint === null) {
 		console.warn('cant find free pont to insert climb info', segment);
 		return;
 	    }
-	    targetPoint = points[tryPoint];
 	}
 
 	let meterFormat = new Intl.NumberFormat(undefined, { style: 'unit', unit: 'meter', maximumFractionDigits: 0, unitDisplay: 'narrow' });
@@ -480,7 +478,7 @@ class ClimbFinder
 	} else {
 	    targetPoint.turn = 'danger';
 	}
-	targetPoint.name = `${meterFormat.format(segment.relevantHeight)}/${kmFormat.format(segment.distance / 1000)} ⌀:${percentFormat.format(avgGrade/100)} Max:${percentFormat.format(maxGrade/100)}`
+	targetPoint.name = `${meterFormat.format(segment.relevantHeight)}/${kmFormat.format(segment.distance / 1000)} ⌀:${percentFormat.format(avgGrade/100)} Max:${percentFormat.format(maxGrade/100)}`;
 	console.warn(targetPoint.turn, targetPoint.name);
 
 	if(segment.distance < 2000) {
@@ -488,32 +486,166 @@ class ClimbFinder
 	    return;
 	}
 
-	targetPoint = points[segment.endPoint];
+	const endPointIndex = this.points[segment.endPoint].origIndex;
+	targetPoint = originalPoints[endPointIndex];
 	if(targetPoint.turn) {
 	    // There is already something here :/
-	    let tryPoint;
-	    tryPoint = this.findFreePoint(segment.startPoint, 60, 'forward', 0);
-	    if(tryPoint === null) {
-		tryPoint = this.findFreePoint(segment.startPoint, 60, 'backward', 0);
+	    targetPoint = this.findFreePoint(originalPoints, endPointIndex, 60, 'forward', 0);
+	    if(targetPoint === null) {
+		targetPoint = this.findFreePoint(originalPoints, endPointIndex, 60, 'backward', 0);
 	    }
 	    // don't search so much for final point the user should probably get it himself :)
-	    if(tryPoint === null) {
+	    if(targetPoint === null) {
 		console.warn('cant find free pont to insert climb-finish info', segment);
 		return;
 	    }
-	    targetPoint = points[tryPoint];
 	}
 	targetPoint.turn = 'summit';
 	targetPoint.name = 'Done!';
+    }
+
+    loadPointsBasic(inputPoints)
+    {
+	this.originalPoints = inputPoints;
+
+	this.points = [];
+
+	// Just pass input points through ensuring every point can be used
+	// in calculations
+	let lastEle = NaN;
+	let lastDistance = 0;
+	inputPoints.forEach((point, idx) => {
+	    if(lastDistance == point.distance) {
+		// ignore duplicate points
+		return;
+	    }
+	    lastDistance = point.distance;
+	    let ele = point.ele;
+	    if(isNaN(ele)) {
+		// avoid missing ele by simply copying the last one
+		ele = lastEle;
+	    } else if(isNaN(lastEle)) {
+		// special case: already first value was missing
+		// fixup all missing ele up to this
+		this.points.forEach((p) => p.ele = ele);
+	    }
+	    lastEle = ele;
+	    this.points.push({
+		origIndex: idx,
+		distance: point.distance,
+		ele: ele,
+	    });
+	});
+	this.calcPointInfo()
+    }
+
+    calcPointInfo()
+    {
+	const points = this.points;
+	this.points.deltaDistance = 0;
+	this.points.deltaEle = 0;
+	for(let idx = 1; idx < this.points.length; idx++) {
+	    const point = points[idx];
+	    const lastPoint = points[idx - 1];
+
+	    // Not sure if the distance here also includes the climbing
+	    // (triangle and so on) but it should really matte that much to
+	    // we just need to be close enough
+	    point.deltaDistance = point.distance - lastPoint.distance;
+	    point.deltaEle = point.ele - lastPoint.ele;
+	    point.grade = (point.deltaEle / point.deltaDistance) * 100;
+	}
+    }
+
+    smoothPoints()
+    {
+	let newPoints;
+	let points = this.points;
+
+	newPoints = [];
+	for(let idx = 1; idx < points.length; idx++) {
+	    const point = points[idx];
+	    const prevPoint = points[idx - 1];
+
+	    // combine a points with very short distance with it's predecessor
+	    // in a hope to smooth out gradients created by elevation over very
+	    // short distances
+	    if(
+		((prevPoint.deltaDistance + point.deltaDistance) < 15) ||
+		// sum is already above target but keep join in extremely short
+		// segments
+		(point.deltaDistance < 1) || (prevPoint.deltaDistance < 1)
+
+	    ) {
+		if(
+		    // only merge if prev point has elevation change in same direction
+		    (point.deltaEle > 0 && prevPoint.deltaEle > 0) ||
+		    (point.deltaEle == 0 && prevPoint.deltaEle == 0) ||
+		    (point.deltaEle < 0 && prevPoint.deltaEle < 0)
+		) {
+		    newPoints.pop();
+		    point.deltaDistance += prevPoint.deltaDistance;
+		    newPoints.push(point);
+		    continue;
+		}
+	    }
+	    newPoints.push(point);
+	}
+
+	console.log('joined', points.length, 'down to', newPoints.length);
+
+	this.points = points = newPoints;
+	// update Info
+	this.calcPointInfo();
+
+	// Smooth out oscillating elevation
+	// The Idea is to check all groups of points the idea is that
+	// an actually wavy road (in the mater of a few meters) is rather rare
+	// and more likely some rounding errors on height calculation.
+	//
+	// The effect for findClimbs() is that those small changes in climbing
+	// direction won't constantly interrupt the search for stretches.
+	let smoothed = 0;
+	for(let idx = 2; idx < points.length; idx++) {
+	    const point1 = points[idx - 2];
+	    const point2 = points[idx - 1];
+	    const point3 = points[idx];
+	    if(Math.abs(point1.ele - point3.ele) < 0.5 &&
+		(
+		    (point2.ele > point1.ele && point2.ele > point3.ele) ||
+		    (point2.ele < point1.ele && point2.ele < point3.ele)
+		) &&
+		point2.deltaDistance < 20 &&  point3.deltaDistance < 20
+	    ) {
+		point2.ele = (point1.ele + point3.ele) / 2.0;
+		smoothed++;
+	    }
+	}
+	console.log('flattend peaks/valleys', smoothed);
+
+	// update Info
+	this.calcPointInfo();
+
+
+	/*
+	// TODO howto flatten surreal grades?
+	for(let idx = 0; idx < points.length; idx++) {
+	    const point = points[idx];
+	    if(Math.abs(point.grade) > 30) {
+		console.log(points[idx-1], point, points[idx+1]);
+	    }
+	}*/
+
     }
 }
 
 
 /** Analyse Track and create "turn"-hints with info about
  *  upcoming climbs. A poor-mans-climb-pro feature. */
-// TODO: Vermutlich in eine Klasse umbauen für hübschere Strukturen
 export function findClimbs(points, config)
 {
-    const processor = new ClimbFinder(points, config);
+    const processor = new ClimbFinder(config);
+    processor.loadPointsBasic(points);
+    processor.smoothPoints();
     processor.findClimbs();
 }
