@@ -128,6 +128,24 @@ function onFitDownload() {
   }
 }
 
+async function onSearchClimbs() {
+    try {
+	const climbs = await import('../climbs.js');
+	const created = climbs.findClimbs(this.route.points);
+	if(!created) {
+	    alert('No Climbs found.');
+	    return;
+	}
+    } catch(e) {
+	console.error(e);
+	alert('Failed :/');
+	return;
+    }
+    // enable turn display to avoid confusion
+    this.show_turns = true;
+    this.$refs.map.drawTurns();
+}
+
 function onBeforeUnload(event) {
   // simple 'forgot to save' question
   if (this.unsaved) {
@@ -161,6 +179,7 @@ const FitRoute = {
     onClear,
     onFileUpload,
     onFitDownload,
+    onSearchClimbs,
     setName,
     setDuration,
     setShortNotes,

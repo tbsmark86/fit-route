@@ -200,6 +200,7 @@ class ClimbFinder
     constructor(points, config)
     {
 	this.config = config || ClimbFinder.defaultConfig;
+	this.created = 0;
     }
 
     hasLeveledOf(cur, curEnd, idx)
@@ -529,6 +530,8 @@ class ClimbFinder
 	//console.log(targetPoint.turn, targetPoint.name);
 	//console.log(startPointIndex);
 
+	this.created++;
+
 	if(segment.distance < 2000) {
 	    // no end marker for short climbs
 	    return;
@@ -685,4 +688,5 @@ export function findClimbs(points, config)
     processor.loadPointsBasic(points);
     processor.smoothPoints();
     processor.findClimbs();
+    return processor.created;
 }
