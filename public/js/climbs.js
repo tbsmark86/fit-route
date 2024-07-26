@@ -73,6 +73,36 @@ class Segment {
 	return trimed;
     }
 
+    trimAfterMax(points)
+    {
+	let val;
+	let trimPoint = 0;
+	if(this.isClimb) {
+	    val = Number.MIN_SAFE_INTEGER;
+	    for(let idx = this.startPoint + 1; idx <= this.endPoint; idx++) {
+		const point = points[idx];
+		if(point.ele > val) {
+		    val = point.ele;
+		    trimPoint = idx;
+		}
+	    }
+	} else {
+	    val = Number.MAX_SAFE_INTEGER;
+	    for(let idx = this.startPoint + 1; idx <= this.endPoint; idx++) {
+		const point = points[idx];
+		if(point.ele < val) {
+		    val = point.ele;
+		    trimPoint = idx;
+		}
+	    }
+	}
+	let oldEnd = this.endPoint;
+	this.endPoint = trimPoint;
+	for(let idx = oldEnd +1; idx < this.endPoint; idx++) {
+	    this.removePoint(points[idx].deltaDistance, points[idx].deltaEle);
+	}
+    }
+
     calcGrade(points, config)
     {
 	const isClimb = this.isClimb;
@@ -172,7 +202,7 @@ class ClimbFinder
 	ignoreAscentLessThen: 80,
 	/* average grade */
 	ignoreAscentGradesLessThen: 4,
-	/* max grade (at least 10m gain) */
+	/* max grade */
 	butKeepAscentMaxGrade: 10,
 	
 	/* Restore shallow climbs but with lots of climbing */
@@ -183,7 +213,7 @@ class ClimbFinder
 	ignoreDescentLessThen: 100,
 	/* average grade  */
 	ignoreDescentGradesLessThen: -5,
-	/* max grade (at least 10m loss) */
+	/* max grade */
 	butKeepDescentMaxGrade: -8,
     };
 
@@ -195,7 +225,13 @@ class ClimbFinder
     hasLeveledOf(cur, curEnd, idx)
     {
 	const config = this.config;
-	if(curEnd.distance < config.considerAsLeveledOfDistance) {
+	if(curEnd.distance > cur.distance * 0.5) {
+	    // if the flat distance after the climb is almost the
+	    // length of the climb itself it certainly has level of
+	    // This is primarily intended to cut of very short climbs
+	    // early
+	    return true;
+	} else if(curEnd.distance < config.considerAsLeveledOfDistance) {
 	    // No: below absolute minimum distance
 	    return false;
 	}
@@ -215,7 +251,12 @@ class ClimbFinder
     {
 	const config = this.config;
 	const eleDelta = cur.isClimb ? curEnd.descent : curEnd.ascent;
-	if(eleDelta < config.considerAsPeakAfterDescent) {
+	if(eleDelta > cur.relevantHeight * 0.5) {
+	    // already descended half of the ascent: thats clearly after the peak
+	    // This is important for very flat terrain we're all climbs stay 
+	    // below the considerAsPeakAfterDescent value.
+	    return true;
+	} else if(eleDelta < config.considerAsPeakAfterDescent) {
 	    // No: below absolute minimum drop/climb after climb/drop
 	    return false;
 	}
@@ -245,6 +286,7 @@ class ClimbFinder
 	// not to be the end we need to still keep track of stats to copy
 	// them over
 	let curEnd = null;
+	let stickToEnd;
 
 	// faster local 'copy'
 	const points = this.points;
@@ -298,25 +340,38 @@ class ClimbFinder
 		} else {
 		    curEnd.addPoint(distance, eleDelta);
 		}
+		// like the segment that does not end instantly also allow
+		// the end segment up to 2 points of slack.
+		stickToEnd = 2;
 
 		if(
 		    this.hasLeveledOf(cur, curEnd, idx)  ||
 		    this.hasPeaked(cur, curEnd, idx)
 		) {
-		    cur.endPoint = curEnd.startPoint;
-		    this.processClimb(cur);
-
-		    // Consider the ignored part again; could be something
-		    // on its own.
-		    // But be careful with edge case of climb consisting only of
-		    // two points - don't create endless loops!
-		    idx = Math.max(cur.endPoint - 1, cur.startPoint + 1);
-
+		    cur.endPoint = curEnd.startPoint - 1;
+		    if(!this.processClimb(cur)) {
+			// try everything again with one less point
+			// It could be that overall the selected segment was to
+			// shallow but contains more step sub-parts.
+			idx = cur.startPoint + 1;
+		    } else {
+			// Consider the ignored part again; could be something
+			// on its own.
+			// But be careful with edge case of climb consisting only of
+			// two points - don't create endless loops!
+			idx = Math.max(cur.endPoint - 1, cur.startPoint + 1);
+		    }
 		    // reset current climb
 		    cur = null;
 		}
 		continue;
 	    } else if(curEnd) {
+		if(stickToEnd) {
+		    stickToEnd--;
+		    curEnd.addPoint(distance, eleDelta);
+		    continue;
+		}
+
 		// continue climb after short shallow/descent stretch
 		cur.addSegment(curEnd);
 		curEnd = null;
@@ -343,6 +398,7 @@ class ClimbFinder
 		segment.descent < this.config.ignoreDescentLessThen;
 	}
 
+	let res = false;
 	let avgGrade, maxGrade;
 	if(!ignoreClimb) {
 	    // This is the opposite of the hasLeveldOf/hasPeaked test to end a climb: 
@@ -350,11 +406,15 @@ class ClimbFinder
 	    // split of this initial part as a separate Segment.
 	    const trimed = segment.trimOppositeStart(points);
 	    if(trimed) {
-		this.processClimb(trimed);
+		res = this.processClimb(trimed);
 	    }
+	    // Let the segment end at the highest/lowest point; this should
+	    // be the default of course but due to unclean data and findClimbs end-overshoot
+	    // sometimes there is extra stuff
+	    segment.trimAfterMax(points);
 
 	    [avgGrade, maxGrade] = segment.calcGrade(points, this.config);
-	    
+
 	    if(segment.isClimb) {
 		ignoreClimb =
 		    avgGrade < this.config.ignoreAscentGradesLessThen &&
@@ -376,11 +436,12 @@ class ClimbFinder
 
 	if(ignoreClimb) {
 	    //console.debug('ignoreClimb', segment, avgGrade, maxGrade);
-	    return;
+	    return res;
 	}
 
 	//console.debug('useClimb', segment, avgGrade, maxGrade);
 	this.insertClimb(segment, avgGrade, maxGrade);
+	return true;
     }
 
     findFreePoint(points, start, searchDistance, direction, skipMore)
@@ -479,7 +540,8 @@ class ClimbFinder
 	    targetPoint.turn = 'danger';
 	}
 	targetPoint.name = `${meterFormat.format(segment.relevantHeight)}/${kmFormat.format(segment.distance / 1000)} ⌀:${percentFormat.format(avgGrade/100)} Max:${percentFormat.format(maxGrade/100)}`;
-	console.warn(targetPoint.turn, targetPoint.name);
+	//console.log(targetPoint.turn, targetPoint.name);
+	//console.log(startPointIndex);
 
 	if(segment.distance < 2000) {
 	    // no end marker for short climbs
