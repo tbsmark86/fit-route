@@ -125,6 +125,9 @@ function* distanceMarkers(points, units, zoom) {
 
 function drawMarkers() {
   this.distanceLayer.clearLayers();
+  if (!this.show_marker) {
+    return;
+  }
   for (const distanceMarker of distanceMarkers(this.route.points, this.units, this.zoom)) {
     distanceMarker.addTo(this.distanceLayer);
   }
