@@ -1,5 +1,3 @@
-
-
 /** Helper to group stats about current stretch of points we're analysing.
  *  start/endPoint are index into the points array. */
 class Segment {
@@ -103,7 +101,7 @@ class Segment {
 	}
     }
 
-    calcGrade(points, config)
+    calcAvgGrade(points, config)
     {
 	const isClimb = this.isClimb;
 	const minGrade = config.minClimbGrade;
@@ -112,40 +110,23 @@ class Segment {
 	let filteredDistance = 0;
 	let filteredHeight = 0;
 
-	let rollingDistance = 0;
-	let rollingHeight = 0;
-
-	let maxGrade = 0;
-
-
-	for(let idx = this.startPoint + 1; idx < this.endPoint; idx++) {
+	for(let idx = this.startPoint + 1; idx <= this.endPoint; idx++) {
 	    const point = points[idx];
-	    const lastPoint = points[idx - 1];
 
 	    const eleDelta = point.deltaEle;
 	    const distance = point.deltaDistance;
-	    const grade = point.grade;
+	    let grade = point.grade;
 
 	    // Ignore opposite direction
 	    if(
 		(isClimb && grade < 0) ||
 		(!isClimb && grade > 0)
 	    ) {
-		rollingDistance = 0;
-		rollingHeight = 0;
 		continue;
-
 	    }
-
-	    // Calculate maxGrade only over stretches of at least 20 meters
-	    // to avoid Artifacts with very close points.
-	    rollingDistance += distance;
-	    rollingHeight += eleDelta;
-	    if(rollingDistance > 20) {
-		maxGrade = Math.max(maxGrade, Math.abs((rollingHeight / rollingDistance) * 100));
-		rollingDistance = 0;
-		rollingHeight = 0;
-	    }
+	    // limit effect of parts with absurd grade
+	    // e.g. this happens for tracks trough short tunnels
+	    grade = Math.max(25, Math.min(-25, grade))
 
 	    // Ignore flat sections for average calculation
 	    if(Math.abs(grade) > minGrade) {
@@ -153,11 +134,14 @@ class Segment {
 		filteredHeight += eleDelta;
 	    }
 	}
-	if(!isClimb) {
-	    maxGrade = -maxGrade;
+	let avgGrade;
+	if(filteredDistance) {
+	    avgGrade = (filteredHeight / filteredDistance) * 100;
+	} else {
+	    // can happen on short segments
+	    avgGrade = (this.relevantHeight / this.distance) * 100;
 	}
-	const avgGrade = (filteredHeight / filteredDistance) * 100;
-	return [avgGrade, maxGrade];
+	return avgGrade;
     }
 
 
@@ -179,7 +163,7 @@ class ClimbFinder
 	 * still part of the climb */
 	minClimbGrade: 1,
 	/* End Mode a) now level after this distance */
-	considerAsLeveledOfDistance: 1000,
+	considerAsLeveledOfDistance: 500,
 	/* Increase the minimum distance by this * totalAscent */
 	considerAsLeveledOfFactor: 1.5,
 	/* Up to this max value */
@@ -202,8 +186,6 @@ class ClimbFinder
 	ignoreAscentLessThen: 80,
 	/* average grade */
 	ignoreAscentGradesLessThen: 4,
-	/* max grade */
-	butKeepAscentMaxGrade: 10,
 	
 	/* Restore shallow climbs but with lots of climbing */
 	butKeepAvgGradeLongAscent: 3,
@@ -213,8 +195,6 @@ class ClimbFinder
 	ignoreDescentLessThen: 100,
 	/* average grade  */
 	ignoreDescentGradesLessThen: -5,
-	/* max grade */
-	butKeepDescentMaxGrade: -8,
     };
 
     constructor(points, config)
@@ -323,7 +303,6 @@ class ClimbFinder
 		    checkForClimbEnd = true;
 		}
 	    }
-
 	    if(checkForClimbEnd && !curEnd && cur.distance < 50) {
 		// require at least 2 consecutive points of climb/drop
 		// to do any detailed investigation unless this first
@@ -399,7 +378,7 @@ class ClimbFinder
 	}
 
 	let res = false;
-	let avgGrade, maxGrade;
+	let avgGrade;
 	if(!ignoreClimb) {
 	    // This is the opposite of the hasLeveldOf/hasPeaked test to end a climb: 
 	    // If a change started with short descent (or ascent) but has then switched
@@ -413,12 +392,17 @@ class ClimbFinder
 	    // sometimes there is extra stuff
 	    segment.trimAfterMax(points);
 
-	    [avgGrade, maxGrade] = segment.calcGrade(points, this.config);
+	    // Note: getting the MaxGrade would also be very interesting but the route
+	    // data is often very unclean on this due to problems with the used height map
+	    // for the earth surface (the resolution).
+	    // In tight valley there are often extrem jumps on some points due to this
+	    // which would result in absurd values for max grade.
+	    // For example the test track on the 'Klausen pass' has grades up to 150%
+	    // => Solution: Don't output values that can't be trusted.
+	    avgGrade = segment.calcAvgGrade(points, this.config);
 
 	    if(segment.isClimb) {
-		ignoreClimb =
-		    avgGrade < this.config.ignoreAscentGradesLessThen &&
-		    maxGrade < this.config.butKeepAscentMaxGrade;
+		ignoreClimb = avgGrade < this.config.ignoreAscentGradesLessThen;
 
 		if(ignoreClimb && 
 		    segment.ascent > this.config.longAscentMin &&
@@ -428,19 +412,17 @@ class ClimbFinder
 		}
 	    } else {
 		// less then in this context means shallower then
-		ignoreClimb =
-		    avgGrade > this.config.ignoreDescentGradesLessThen &&
-		    maxGrade > this.config.butKeepDescentMaxGrade;
+		ignoreClimb = avgGrade > this.config.ignoreDescentGradesLessThen;
 	    }
 	}
 
 	if(ignoreClimb) {
-	    //console.debug('ignoreClimb', segment, avgGrade, maxGrade);
+	    //console.debug('ignoreClimb', segment, avgGrade);
 	    return res;
 	}
 
-	//console.debug('useClimb', segment, avgGrade, maxGrade);
-	this.insertClimb(segment, avgGrade, maxGrade);
+	//console.debug('useClimb', segment, avgGrade);
+	this.insertClimb(segment, avgGrade);
 	return true;
     }
 
@@ -489,11 +471,13 @@ class ClimbFinder
 	return null;
     }
 
-    insertClimb(segment, avgGrade, maxGrade)
+    insertClimb(segment, avgGrade)
     {
 	const originalPoints = this.originalPoints;
 
 	const startPointIndex = this.points[segment.startPoint].origIndex;
+	const endPointIndex = this.points[segment.endPoint].origIndex;
+
 	let targetPoint = originalPoints[startPointIndex];
 	if(targetPoint.turn) {
 	    // There is already something here :/
@@ -524,7 +508,7 @@ class ClimbFinder
 	// Tdf should be more like 600/300/150/75
 	const eleDelta = segment.relevantHeight;
 	if(segment.isClimb) {
-	    const climbPoints = (segment.distance / 1000) * Math.pow(avgGrade);
+	    const climbPoints = (segment.distance / 1000) * Math.pow(avgGrade, 2);
 	    if(climbPoints > 800) {
 		targetPoint.turn = 'hors_category';
 	    } else if(climbPoints > 400) {
@@ -539,7 +523,9 @@ class ClimbFinder
 	} else {
 	    targetPoint.turn = 'danger';
 	}
-	targetPoint.name = `${meterFormat.format(segment.relevantHeight)}/${kmFormat.format(segment.distance / 1000)} ⌀:${percentFormat.format(avgGrade/100)} Max:${percentFormat.format(maxGrade/100)}`;
+	const endHeight = originalPoints[endPointIndex].ele;
+	const symbol = segment.isClimb ? '↑' : '↓';
+	targetPoint.name = `${meterFormat.format(endHeight)} - ${symbol} ${meterFormat.format(segment.relevantHeight)}/${kmFormat.format(segment.distance / 1000)} ⌀ ${percentFormat.format(avgGrade/100)}`;
 	//console.log(targetPoint.turn, targetPoint.name);
 	//console.log(startPointIndex);
 
@@ -548,7 +534,6 @@ class ClimbFinder
 	    return;
 	}
 
-	const endPointIndex = this.points[segment.endPoint].origIndex;
 	targetPoint = originalPoints[endPointIndex];
 	if(targetPoint.turn) {
 	    // There is already something here :/
@@ -604,8 +589,9 @@ class ClimbFinder
     calcPointInfo()
     {
 	const points = this.points;
-	this.points.deltaDistance = 0;
-	this.points.deltaEle = 0;
+	this.points[0].deltaDistance = 0;
+	this.points[0].deltaEle = 0;
+	this.points[0].grade = 0;
 	for(let idx = 1; idx < this.points.length; idx++) {
 	    const point = points[idx];
 	    const lastPoint = points[idx - 1];
@@ -687,17 +673,6 @@ class ClimbFinder
 
 	// update Info
 	this.calcPointInfo();
-
-
-	/*
-	// TODO howto flatten surreal grades?
-	for(let idx = 0; idx < points.length; idx++) {
-	    const point = points[idx];
-	    if(Math.abs(point.grade) > 30) {
-		console.log(points[idx-1], point, points[idx+1]);
-	    }
-	}*/
-
     }
 }
 
