@@ -44,14 +44,12 @@ async function onFileUpload(gpxFile) {
   }
 }
 
-function onFitDownload() {
+function fitDownloadPart(points, start, finish, postfix1, postfix2) {
+  console.log('Download Fit', postfix1);
   try {
-    const start = this.route.points[0];
-    const finish = this.route.points[this.route.points.length - 1];
-
     const encoder = new FITEncoder();
     encoder.writeFileId({ type: 'course', time_created: Date.now() });
-    encoder.writeCourse({ name: this.route.name });
+    encoder.writeCourse({ name: `${this.route.name}${postfix1}` });
     encoder.writeLap({
       timestamp: start.time,
       total_timer_time: (finish.time - start.time) / 1000,
@@ -61,6 +59,7 @@ function onFitDownload() {
       end_position_lat: start.lat,
       end_position_long: finish.lon,
       total_distance: finish.distance,
+      // TODO: These values are invalid on split
       total_ascent: this.route.eleGain,
       total_descent: this.route.eleLoss
     });
@@ -85,10 +84,16 @@ function onFitDownload() {
       sharp_right: 'RR'
     };
 
-    for (let { lat, lon, ele, time, distance, turn, name } of this.route.points) {
+    for (let { lat, lon, ele, time, distance, turn, name } of points) {
       encoder.writeRecord({ timestamp: time, position_lat: lat, position_long: lon, altitude: ele, distance });
 
       if (turn !== undefined) {
+	if (turn === 'split') {
+	    turn = 'generic';
+	    if (!name) {
+		name = 'Track Split';
+	    }
+	}
         if (name === undefined && shortNotes && shortMapping[turn]) {
           // Store an almost empty Description for the turn.
           // The Idea is to override any Default (long word) default Text of
@@ -117,7 +122,7 @@ function onFitDownload() {
 
     const url = URL.createObjectURL(encoder.blob);
     const anchorElement = this.$refs.downloadAnchor;
-    anchorElement.download = `${this.route.name}.fit`;
+    anchorElement.download = `${this.route.name}${postfix2}.fit`;
     anchorElement.href = url;
     anchorElement.click();
     setTimeout(() => URL.revokeObjectURL(url), 100);
@@ -126,6 +131,40 @@ function onFitDownload() {
     console.error(error);
     this.$emit('error', `Unable to create FIT`);
   }
+}
+
+function slicePoints(points, start, end)
+{
+    const substract = points[start].distance;
+    return points.slice(start, end).map((point) => {
+	let { lat, lon, ele, time, distance, turn, name } = point;
+	distance -= substract;
+	return { lat, lon, ele, time, distance, turn, name };
+    });
+}
+
+function onFitDownload() {
+    const points = this.route.points;
+
+    // check for splits
+    let splitCount = 0;
+    let curStart = 0;
+    for(let i = 0; i < points.length; i++) {
+	const point = points[i];
+	if(point.turn === 'split') {
+	    splitCount++;
+	    // always do split +/- 20 points to create minimal overlap.
+	    let realEnd = Math.min(i + 20, points.length);
+	    fitDownloadPart.call(this, slicePoints(points, curStart, realEnd), points[curStart], points[realEnd], ` (${splitCount})`, `-${splitCount}`);
+	    curStart = Math.max(i - 20, 0);
+	}
+    }
+    if(splitCount > 0) {
+	splitCount++;
+	fitDownloadPart.call(this, slicePoints(points, curStart, points.length), points[curStart], points[points.length -1], ` (${splitCount})`, `-${splitCount}`);
+    } else {
+        fitDownloadPart.call(this, points, points[0], points[points.length - 1], '', '');
+    }
 }
 
 async function onSearchClimbs() {

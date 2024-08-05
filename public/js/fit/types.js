@@ -11,7 +11,7 @@ const enum_maps = {
   event: { timer: 0 },
   event_type: { start: 0, stop_disable_all: 9 },
   course_point: {
-    generic: 0, // idea: offer those as custom markers!
+    generic: 0,
     summit: 1,
     valley: 2,
     water: 3,
@@ -20,7 +20,7 @@ const enum_maps = {
     left: 6,
     right: 7,
     straight: 8,
-    //first_aid: 9,
+    first_aid: 9,
     fourth_category: 10,
     third_category: 11,
     second_category: 12,
