@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" class="help-page">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>FIT Route Converter - Help</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="css/fit-route.css" />
+  </head>
+
+  <body class="d-flex flex-column">
+    <nav class="navbar navbar-expand navbar-dark bg-dark">
+      <div class="container-fluid">
+        <h1 class="navbar-brand">
+          <img class="rounded mr-1" src="images/logo-32.png" width="24" height="24" alt="" />
+          FIT Route Converter (Tobias Fork)
+        </h1>
+        <div class="navbar-expand">
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid p-3">
+      <main role="main" id="main" class="flex-grow-1 d-flex flex-column">
+	<h2>Help</h2>
+	<b>Content</b>
+	<ul>
+	  <li><a href="#intro">How to use</a></li>
+	  <li><a href="#shortcuts">Shortcuts</a></li>
+	  <li><a href="#split">Split</a></li>
+	  <li><a href="#climbs">Find Climbs</a></li>
+	  <li><a href="#pois">POIs</a></li>
+	  <li><a href="#tip1">Get route with turn instructions</a></li>
+	  <li><a href="#credits">Credits</a></li>
+	</ul>
+
+	<h3 id=intro>How to use</h3>
+	<ul>
+	  <li>Select the GPX file to be converted
+	      <ul><li>You can also select a previously created FIT to continue editing</li></ul>
+	  </li>
+	  <li>Verify that your route is correct. If not go back to your route-planer.<br>
+	      Otherwise you probably have to re-do some steps</li>
+	  <li>Click on point of the route where you like to insert a turn instruction
+	      <ul>
+		<li>Of course if You don't need those you can skip it</li>
+		<li>See shortcuts below to speed up for multiple points</li>
+	      </ul>
+	  </li>
+	  <li>Amend the average speed to your desired value<br>
+	      <ul>
+		<li>Optional</li>
+		<li>This helps with displaying the expected time for the route</li>
+	      </ul>
+	  </li>
+          <li>Download will save the course as a FIT file</li>
+	  <li>Open the FIT on your Phone to Import with the App of your Navigation Device</li>
+        </ul>
+	<p><a href="./">Back to App</a></p>
+
+	<h3 id=shortcuts>Shortcuts while adding turn instructions</h3>
+	<p>
+	    After click on a point you can use keys to quickly set the turn.<br>
+	    <dl class=form-list>
+		<dt>q</dt><dd>slight left</dd>
+		<dt>w</dt><dd>straight</dd>
+		<dt>e</dt><dd>slight right</dd>
+		<dt>a</dt><dd>left</dd>
+		<dt>s</dt><dd>u-turn</dd>
+		<dt>d</dt><dd>right</dd>
+		<dt>y/z</dt><dd>sharp left</dd>
+		<dt>x</dt><dd>generic/other</dd>
+		<dt>c</dt><dd>sharp right</dd>
+	    </dl>
+	</p>
+	
+	<p><a href="./">Back to App</a></p>
+
+	<h3 id=split>Split Route into multiple Files</h3>
+
+	<p>
+	  The app also enables you to generate multiple FIT files form a single input route. Meaning
+	  you can break large routes into smaller chunks to avoid overloading your navigation device
+	  - or just build daily targets.<br>
+	  This works just like adding a turn instruction: Click on the route and select "Split Track
+	  here". While saving your browser will now download multiple files.
+	</p>
+	<p><a href="./">Back to App</a></p>
+	
+	<h3 id=climbs>Find Climbs</h3>
+	
+	<p>
+	  This is intended to be a poor mans version of modern devices "climb pro" or a like.<br>
+	  But if (like me) you prefer just a simple one-time message for really important climbs it might be also for you.
+	  <br><br>
+	  It's currently still very much WIP.
+	</p>
+
+	<p><a href="./">Back to App</a></p>
+
+	<h3 id=pois>Get POIs for your route</h3>
+
+	<p>For (long-distance) bike riding you may find my <a href="https://www.tobis-page.de/pois/">POIs Tool</a> to get a list of usefull locations near your route.</p>
+	<p><a href="./">Back to App</a></p>
+
+
+	<h3 id=tip1>Tip: Get Route with turn instructions</h3>
+	<p>
+	  This App also supports a GPX file with already embedded turn instructions.<br>
+	  Sadly for GPX files turn instructions are multiple different proprietary extensions. The app supports the style used by <tt>osmand</tt>.
+	</p>
+	<p>
+	  One way (of likely many) to create such a GPX route is to use a <tt>brouter</tt> based application. I know of these web-frontends:
+	  <ul>
+	    <li><a href="https://bikerouter.de/">bikerouter.de</a> (active development)</li>
+	    <li><a href="https://brouter.de/brouter-web/">brouter.de/brouter-web</a> (a bit stale)</li>
+	  </ul>
+	  Just create your route there as normal but before you export:
+	  <ul>
+	    <li>select the profile settings (wrench on the left)</li>
+	    <li>Change this option:<br>
+		<img src="images/bikerouter.png">
+	    </li>
+	    <li>Save the profile</li>
+	    <li>Now you can export the GPX</li>
+	  </ul>
+
+	  <i>Also note:</i> If you don't want to manually edit the turn instructions you can simply export as FIT directly from those
+	  apps above (the export logic is virtually identical).
+	</p>
+	
+	<p><a href="./">Back to App</a></p>
+
+	<h2 id=credits>Credits</h2>
+	<ul>
+          <li>
+	    <a href="https://github.com/tbsmark86/fit-route">Code for this Version</a>
+          </li>
+	  <li>
+	      You may report Bugs/Spelling mistakes/Questions <a href="mailto:kontakt@tobis-page.de">via E-Mail</a> <b>IF</b> you can Include the problematic File.
+	      <br>
+	      Please note that this app was build primarily for my personal use.
+          </li>
+	  <li>
+	    <a href="https://gitlab.com/nwholloway/fit-route">Original Version</a>
+	  </li>
+          <li>
+	    Main Lib: <a href="https://leafletjs.com/">Leaflet</a>
+          </li>
+        </ul>
+
+	<p><a href="./">Back to App</a></p>
+      </main>
+    </div>
+  </body>
+</html>
+
+

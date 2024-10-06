@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta
       name="Description"
-      content="Browser based application to convert a GPX route into a FIT course for Garmin Edge"
+      content="Browser based application to convert a GPX route into a FIT course for Navigation Devices"
     />
     <title>FIT Route Converter (Tobias Fork)</title>
     <link rel="icon" href="images/logo-32.png" sizes="32x32" />
@@ -42,10 +42,10 @@
   <body class="d-flex flex-column">
     <nav class="navbar navbar-expand navbar-dark bg-dark">
       <div class="container-fluid">
-        <div class="navbar-brand">
+        <h1 class="navbar-brand">
           <img class="rounded mr-1" src="images/logo-32.png" width="24" height="24" alt="" />
           FIT Route Converter (Tobias Fork)
-        </div>
+        </h1>
         <div class="navbar-expand">
         </div>
       </div>
@@ -53,41 +53,8 @@
 
     <main role="main" id="main" class="flex-grow-1 d-flex flex-column">
       <div v-if="showInfo" class="container-fluid p-3">
-        <p>
-	  <span>A browser based application to convert a GPX file into a FIT file <i>and</i> insert Turn-by-Turn Instructions.</span>
-        </p>
-        <ul>
-          <li>Select the GPX file to be converted</li>
-	  <li>Check the route; click on Points to add Turn Instructions<br>
-	    <details><summary>Shortcuts</summary>
-		After click on a point you can use keys to quickly set the turn.<br>
-		
-		<dl class=form-list>
-		    <dt>q</dt><dd>slight left</dd>
-		    <dt>w</dt><dd>straight</dd>
-		    <dt>e</dt><dd>slight right</dd>
-		    <dt>a</dt><dd>left</dd>
-		    <dt>s</dt><dd>u-turn</dd>
-		    <dt>d</dt><dd>right</dd>
-		    <dt>y/z</dt><dd>sharp left</dd>
-		    <dt>x</dt><dd>generic/other</dd>
-		    <dt>c</dt><dd>sharp right</dd>
-		</dl>
-	    </details>
-	    <details><summary>GPX with Turns</summary>
-		You can also use a GPX which already includes Turn-by-Turn Instructions and edit them. The Instructions need to be in the <tt>osmand</tt> format.<br>
-		You can use e.g. <a href="https://bikerouter.de/">bikerouter.de</a> or <a href="http://brouter.de/brouter-web/">Brouter-Web</a> for this.
-	    </details>
-	  </li>
-          <li>Amend the average speed to your desired value</li>
-          <li>Download will save the course as a FIT file</li>
-	  <li>Open the FIT on your Phone to Import with the App of your Navigation Device</li>
-        </ul>
-        <p>
-          <span>Your data never leaves your computer as all processing is performed within your browser.</span>
-          <span>You do not need to register to use this application.</span>
-          <span>There are no adverts, no cookies, almost no use of local storage, or service workers.</span>
-        </p>
+        <p>A browser based application to convert a GPX file into a FIT file <i>and</i> insert Turn-by-Turn Instructions.</p>
+
         <noscript>
           <div class="alert alert-danger">
             This application requires a browser with JavaScript enabled, supporting ES modules and object spread
@@ -98,33 +65,17 @@
       <div v-if="error" class="container">
         <error-message :message="error"></error-message>
       </div>
-      <fit-route @show-info="onShowInfo" @error="onError" class="flex-grow-1"></fit-route>
+      <fit-route @show-info="onShowInfo" @error="onError"></fit-route>
       <div v-if="showInfo" class="container-fluid p-3">
+	<p class="d-flex justify-content-center" style="gap:1em">
+	  <a href="help.html#" class="btn btn-info btn-lg">Help</a>
+	  <a href="help.html#credits" class="btn btn-secondary btn-lg">Credits</a>
+	</p>
         <p>
-          <span>More Info</span>
+	  <i>Privacy:</i> Your data never leaves your computer as all processing is performed within your browser.
+          You do not need to register to use this application.
+          There are no adverts, no cookies, almost no use of local storage, or service workers.
         </p>
-	<ul>
-          <li>Also can be used to edit FIT routes or convert FIT activity</li>
-	  <li>POIs: If you want to download POIs checkout my <a href="https://www.tobis-page.de/pois/">POIs Tool</a></li>
-	</ul>
-        <p>
-          <span>Credits</span>
-        </p>
-        <ul>
-          <li>
-	    <a href="https://github.com/tbsmark86/fit-route">Code for this Version</a>
-          </li>
-	  <li>
-	      You may report Bugs <a href="mailto:kontakt@tobis-page.de">via E-Mail</a> <b>IF</b> you can Include the problematic File.
-          </li>
-
-	  <li>
-	    <a href="https://gitlab.com/nwholloway/fit-route">Original Version</a>
-	  </li>
-          <li>
-	    Main Lib: <a href="https://leafletjs.com/">Leaflet</a>
-          </li>
-        </ul>
       </div>
     </main>
 
@@ -174,7 +125,7 @@
       <form enctype="multipart/form-data" novalidate>
         <div class="file-upload d-flex justify-content-center align-items-center border bg-light w-75 mx-auto">
           <input v-if="!file" type="file" title=" " aria-label="Select GPX" accept=".gpx,application/gpx+xml,application/octet-stream,.fit,application/vnd.ant.fit" @change="onFilesChange($event.target.files)">
-          <div v-if="!file" class="h4 font-weight-normal">
+          <div v-if="!file" class="h4 font-weight-normal m-2">
             Drop GPX/FIT here or click to browse
           </div>
           <div v-else d-flex justify-content-center align-items-center>
@@ -186,18 +137,19 @@
           </div>
         </div>
 	<div class="text-center">
-	  <input class="form-check-input" type="checkbox" value="" id="auto_submit" v-model="auto_submit">
+	  <input class="form-check-input" type="checkbox" value="" id="auto_submit" v-model="auto_submit">&thinsp;
 	  <label class="form-check-label" for="auto_submit">automatic submit</label>
 	</div>
       </form>
     </script>
 
     <script type="text/x-template" id="fit-route-template">
-      <div class="container-fluid d-flex flex-column">
-        <template v-if="!gpxFile">
-          <file-upload @submit="onFileUpload"></file-upload>
-        </template>
-        <template v-if="route">
+      <template v-if="!gpxFile">
+	<div class="container-fluid">
+	  <file-upload @submit="onFileUpload"></file-upload>
+	</div>
+      </template>
+      <template v-if="route"><div class="container-fluid d-flex flex-column flex-grow-1">
         <div class="row flex-grow-1">
           <div class="col-auto bg-light">
             <form novalidate>
@@ -275,8 +227,7 @@
           </div>
 	  <course-point-dialog ref="dialog"></course-point-dialog>
         </div>
-      </template>
-      </div>
+      </div></template>
     </script>
     
     <script type="text/x-template" id="route-info-template">

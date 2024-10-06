@@ -2,6 +2,10 @@ body {
   min-height: 100vh;
 }
 
+h1.navbar-brand {
+    margin: 0;
+}
+
 .file-upload {
   position: relative;
   min-height: 150px;
@@ -181,4 +185,7 @@ body {
 }
 .form-list > dd {
   grid-column: field;
+}
+.help-page .form-list > dd {
+    margin-bottom: 0;
 }
