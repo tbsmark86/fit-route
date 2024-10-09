@@ -233,13 +233,13 @@
     <script type="text/x-template" id="route-info-template">
       <form novalidate>
         <div class="d-flex flex-column">
-          <div class="mb-3">
+          <div class="mb-2">
             <label class="form-label" for="routeName">Name</label>
             <input id="routeName" type="text" v-model="routeName" @keydown.enter.prevent class="form-control text-primary" data-lpignore="true">
             <i v-if="routeNameTooLong" class="fas fa-exclamation-triangle text-warning input-feedback" title="Name will be truncated on Garmin device" aria-hidden="true"></i>
           </div>
 
-          <div class="mb-3">
+          <div class="mb-2">
             <label class="form-label" for="distance">Distance</label>
             <div class="input-group">
               <input id="distance" type="text" v-model="distance" readonly class="form-control text-primary bg-light">
@@ -247,7 +247,15 @@
             </div>
           </div>
 
-          <div class="mb-3">
+          <div class="mb-2">
+            <label class="form-label" for="distance">Climbing</label>
+            <div class="input-group">
+              <input id="climbing" type="text" v-model="climbing" readonly class="form-control text-primary bg-light">
+              <div class="input-group-text">{{ heightUnits }}</div>
+            </div>
+          </div>
+
+          <div class="mb-2">
             <label class="form-label" for="speed">Average Speed</label>
             <div class="input-group">
               <input id="speed" type="text" v-model="avgSpeedField" class="form-control text-primary" data-lpignore="true">
@@ -255,7 +263,7 @@
             </div>
           </div>
 
-          <div class="mb-3">
+          <div class="mb-2">
             <label class="form-label" for="time">Goal Time</label>
             <div class="input-group">
               <input id="time" type="text" v-model="goalTime" readonly class="form-control text-primary bg-light">

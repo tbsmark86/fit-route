@@ -15,6 +15,11 @@ function distance() {
   return this.units === 'miles' ? round(km / 1.609344) : round(km);
 }
 
+function climbing() {
+  const eleGain = this.route.eleGain;
+  return Math.round(this.units === 'miles' ? eleGain * 3.28084 : eleGain);
+}
+
 function duration() {
   const points = this.route.points;
   const [{ time: startTime }, { time: finishTime }] = [points[0], points[points.length - 1]];
@@ -64,6 +69,11 @@ function speedUnits() {
   return this.units === 'miles' ? 'mph' : `${this.units}/h`;
 }
 
+function heightUnits() {
+  return this.units === 'miles' ? 'ft' : `m`;
+}
+
+
 const RouteInfo = {
   template: '#route-info-template',
   mounted,
@@ -79,7 +89,9 @@ const RouteInfo = {
     routeNameTooLong,
     avgSpeed,
     speedUnits,
+    heightUnits,
     distance,
+    climbing,
     duration,
     goalTime,
     shortNotes
