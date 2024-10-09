@@ -87,7 +87,7 @@ h1.navbar-brand {
   border-width: 0 3px 10px 3px;
 }
 
-.map-turn-content:after {
+.map-turn-content::after {
   content: attr(data-turn);
   display: block;
   font-weight: bold;
@@ -96,59 +96,63 @@ h1.navbar-brand {
   line-height: 1;
 }
 
-.map-turn-right:after {
+.map-turn-right::after {
   content: '➡';
 }
-.map-turn-sharp_right:after {
+.map-turn-sharp_right::after {
   content: '⬊';
 }
-.map-turn-slight_right:after {
+.map-turn-slight_right::after {
   content: '⬈';
 }
-.map-turn-right_fork:after {
+.map-turn-right_fork::after {
   content: '⬈';
 }
-.map-turn-left:after {
+.map-turn-left::after {
   content: '⬅';
 }
-.map-turn-sharp_left:after {
+.map-turn-sharp_left::after {
   content: '⬋';
 }
-.map-turn-slight_left:after {
+.map-turn-slight_left::after {
   content: '⬉';
 }
-.map-turn-left_fork:after {
+.map-turn-left_fork::after {
   content: '⬉';
 }
-.map-turn-straight:after {
+.map-turn-straight::after {
   content: '⬆';
 }
-.map-turn-u_turn:after {
+.map-turn-u_turn::after {
   content: '↶';
 }
-.map-turn-danger:after {
+.map-turn-danger::after {
   content: '⚠';
 }
-.map-turn-generic:after {
+.map-turn-generic::after {
   content: '⬤';
 }
-.map-turn-summit:after {
+.map-turn-summit::after {
   content: '⚑';
 }
-.map-turn-fourth_category:after {
+.map-turn-fourth_category::after {
   content: '⛰';
 }
-.map-turn-third_category:after {
+.map-turn-third_category::after {
   content: '⛰⛰';
 }
-.map-turn-second_category:after {
+.map-turn-second_category::after {
   content: '⛰⛰⛰';
 }
-.map-turn-first_category:after {
+.map-turn-first_category::after {
   content: '⛰⛰⛰⛰';
 }
-.map-turn-hors_category:after {
+.map-turn-hors_category::after {
   content: '🏔🏔🏔🏔🏔';
+}
+
+.map-turn-split::after {
+  content: '✂ Track';
 }
 
 .input-feedback {

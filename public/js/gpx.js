@@ -218,7 +218,7 @@ function insertInstructions(points, instructions) {
   return points;
 }
 
-function elevationChange(points) {
+export function elevationChange(points) {
   let eleGain = 0;
   let eleLoss = 0;
   let lastEle;

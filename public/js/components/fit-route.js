@@ -1,6 +1,6 @@
 /* jshint esversion: 6 */
 /* global URL */
-import { parseGpx } from '../gpx.js';
+import { parseGpx, elevationChange } from '../gpx.js';
 import FileUpload from './file-upload.js';
 import RouteInfo from './route-info.js';
 import RouteMap from './route-map.js';
@@ -44,8 +44,11 @@ async function onFileUpload(gpxFile) {
   }
 }
 
-function fitDownloadPart(points, start, finish, postfix1, postfix2) {
+function fitDownloadPart(points, postfix1 = '', postfix2 = '') {
   console.log('Download Fit', postfix1);
+  const start = points[0];
+  const finish = points[points.length - 1];
+  const {eleGain, eleLoss} = elevationChange(points);
   try {
     const encoder = new FITEncoder();
     encoder.writeFileId({ type: 'course', time_created: Date.now() });
@@ -59,9 +62,8 @@ function fitDownloadPart(points, start, finish, postfix1, postfix2) {
       end_position_lat: start.lat,
       end_position_long: finish.lon,
       total_distance: finish.distance,
-      // TODO: These values are invalid on split
-      total_ascent: this.route.eleGain,
-      total_descent: this.route.eleLoss
+      total_ascent: eleGain,
+      total_descent: eleLoss
     });
 
     encoder.writeEvent({
@@ -155,15 +157,15 @@ function onFitDownload() {
 	    splitCount++;
 	    // always do split +/- 20 points to create minimal overlap.
 	    let realEnd = Math.min(i + 20, points.length);
-	    fitDownloadPart.call(this, slicePoints(points, curStart, realEnd), points[curStart], points[realEnd], ` (${splitCount})`, `-${splitCount}`);
+	    fitDownloadPart.call(this, slicePoints(points, curStart, realEnd), ` (${splitCount})`, `-${splitCount}`);
 	    curStart = Math.max(i - 20, 0);
 	}
     }
     if(splitCount > 0) {
 	splitCount++;
-	fitDownloadPart.call(this, slicePoints(points, curStart, points.length), points[curStart], points[points.length -1], ` (${splitCount})`, `-${splitCount}`);
+	fitDownloadPart.call(this, slicePoints(points, curStart, points.length), ` (${splitCount})`, `-${splitCount}`);
     } else {
-        fitDownloadPart.call(this, points, points[0], points[points.length - 1], '', '');
+        fitDownloadPart.call(this, points);
     }
 }
 
