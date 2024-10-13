@@ -163,13 +163,31 @@
               </div>
             </form>
 
-           <route-info :route="route" :units="units" @name="setName" @duration="setDuration" @shortNotes="setShortNotes"></route-info>
+           <route-info :route="route" :units="units" @name="setName" @duration="setDuration"></route-info>
+	   <div class="form-check d-flex" style="gap:2em">
+	     <div>
+		<input class="form-check-input" type="checkbox" value="" id="shortNotes" v-model="shortNotes">
+		<label class="form-check-label" for="shortNotes" title="Store simple letter note for each turn">
+		  Add short turn notes
+		</label>
+	     </div>
+	     <div>
+		<input class="form-check-input" type="checkbox" value="" id="improveTurns" v-model="improveTurns">
+		<label class="form-check-label" for="improveTurns" title="Some minor heuristic to create better turns notes">
+		  Try improve turn notes
+		</label>
+	     </div>
+	   </div>
            <div class="mt-4 d-flex flex-column">
               <div class="d-flex justify-content-around">
                 <button class="btn btn-secondary m-2" @click="onClear">Clear</button>
                 <button class="btn btn-primary m-2" @click="onFitDownload">Download as FIT</button>
               </div>
               <a ref="downloadAnchor" class="d-none" download="COURSE.fit" href="#"></a>
+            </div>
+	    <div style="text-align:center">
+	      <button class="btn btn-secondary" type=button @click="onSearchClimbs" title="Search for Climbs in Track based on provided Elevation data">Add Climb Hints</button><br>
+	      <small>(Beta, options yet to come)</small>
             </div>
 	    <form novalidate style="font-size:0.8em">
 	      <i>View Settings</i>
@@ -201,13 +219,10 @@
 		<input class="form-check-input" type="checkbox" value="" id="show_gas" v-model="show_gas">
 		<label class="form-check-label" for="show_gas">
 		  Show nearby 24h Gas Stations*
-		</label>
+		</label><br>
 		<small>*According to OSM Data, always validate if critical</small>
 	      </div>
-	      <div class="form-check">
-                <button class="btn btn-secondary" type=button @click="onSearchClimbs" title="Search for Climbs in Track based on provided Elevation data">Add Climb Hints</button>
-		<small>(Beta, options yet to come)</small>
-              </div>
+	     
 
 	      <div class="form-group">
 		<label for="map_url">Custom map</label>
@@ -270,12 +285,6 @@
               <span class="input-group-text">h:mm:ss</span>
             </div>
           </div>
-	  <div class="form-check">
-	    <input class="form-check-input" type="checkbox" value="" id="shortNotes" v-model="shortNotes">
-	    <label class="form-check-label" for="shortNotes" title="Store simple letter note for each turn">
-	      Add short turn notes
-	    </label>
-	  </div>
         </div>
       </form>
     </script>

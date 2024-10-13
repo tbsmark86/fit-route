@@ -48,15 +48,6 @@ const routeName = {
   }
 };
 
-const shortNotes = {
-  get: function shortNotes() {
-    return this.route.shortNotes;
-  },
-  set: function shortNotes(value) {
-    this.$emit('shortNotes', value);
-  }
-};
-
 function routeNameTooLong() {
   return encodedStrlen(this.routeName) > 16;
 }
@@ -93,8 +84,7 @@ const RouteInfo = {
     distance,
     climbing,
     duration,
-    goalTime,
-    shortNotes
+    goalTime
   },
   watch: {
     avgSpeed: {

@@ -7,14 +7,12 @@ import RouteMap from './route-map.js';
 import CoursePointDialog from './course-point-dialog.js';
 import { FITEncoder } from '../fit/encoder.js';
 import { getBool, setBoolWatchFunc, setBool, getString, setString } from '../localStorage.js';
+import { improveInstructions } from '../improve-instructions.js';
 
 function setName(name) {
   this.route.name = name;
 }
 
-function setShortNotes(shortNotes) {
-  this.route.shortNotes = shortNotes;
-}
 
 function setDuration(duration) {
   const points = this.route.points;
@@ -34,8 +32,9 @@ async function onFileUpload(gpxFile) {
   try {
     this.gpxFile = gpxFile;
     this.route = await parseGpx(gpxFile);
-    // default save option
-    this.route.shortNotes = true;
+    if(this.improveTurns) {
+	this.route = improveInstructions(this.route);
+    }
     this.$emit('show-info', false);
     this.unsaved = true;
   } catch (error) {
@@ -72,7 +71,6 @@ function fitDownloadPart(points, postfix1 = '', postfix2 = '') {
       event_type: 'start',
       event_group: 0
     });
-    const shortNotes = this.route.shortNotes;
     const shortMapping = {
       u_turn: 'U',
       sharp_left: 'LL',
@@ -96,7 +94,7 @@ function fitDownloadPart(points, postfix1 = '', postfix2 = '') {
 		name = 'Track Split';
 	    }
 	}
-        if (name === undefined && shortNotes && shortMapping[turn]) {
+        if (name === undefined && this.shortNotes && shortMapping[turn]) {
           // Store an almost empty Description for the turn.
           // The Idea is to override any Default (long word) default Text of
           // the device e.g. 'l' instead 'turn slight left' this way manual
@@ -196,6 +194,9 @@ function onBeforeUnload(event) {
 
 async function onSelectPoint(point) {
   await this.$refs.dialog.edit(point);
+  if(this.improve_turns) {
+    this.route = improveInstructions(this.route, true);
+  }
   this.$refs.map.drawTurns();
   this.unsaved = true;
 }
@@ -205,6 +206,8 @@ const FitRoute = {
   data: () => ({
     gpxFile: null,
     route: null,
+    shortNotes: getBool('shortNotes', true),
+    improveTurns: getBool('improveTurns', false),
     units: 'km',
     show_marker: getBool('show-marker', true),
     show_turns: getBool('show-turns', true),
@@ -223,7 +226,6 @@ const FitRoute = {
     onSearchClimbs,
     setName,
     setDuration,
-    setShortNotes,
     onSelectPoint,
     onBeforeUnload
   },
@@ -234,6 +236,16 @@ const FitRoute = {
     CoursePointDialog
   },
   watch: {
+    shortNotes: setBoolWatchFunc('shortNotes'),
+    improveTurns: function(val) {
+	setBool('improveTurns', val);
+	console.log('hey!!!');
+	if(val) {
+	    console.log('do improve!!!');
+	    this.route = improveInstructions(this.route);
+	    this.$refs.map.drawTurns();
+	}
+    },
     show_marker: setBoolWatchFunc('show-marker'),
     show_turns: setBoolWatchFunc('show-turns'),
     map_url: function (val) {
@@ -245,7 +257,7 @@ const FitRoute = {
     map_url_active: function (val) {
       setBool('map-url-active', val);
       this.layer = val ? this.map_url : '';
-    }
+    },
   },
   created: function () {
     window.addEventListener('beforeunload', this.onBeforeUnload);
