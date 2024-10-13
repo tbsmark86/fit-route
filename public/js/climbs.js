@@ -501,9 +501,9 @@ class ClimbFinder
 	    }
 	}
 
-	let meterFormat = new Intl.NumberFormat(undefined, { style: 'unit', unit: 'meter', maximumFractionDigits: 0, unitDisplay: 'narrow' });
-	let kmFormat = new Intl.NumberFormat(undefined, { style: 'unit', unit: 'kilometer', maximumFractionDigits: 1, unitDisplay: 'narrow' });
-	let percentFormat = new Intl.NumberFormat(undefined, { style: 'percent', maximumFractionDigits: 1 });
+	let meterFormat = new Intl.NumberFormat(undefined, { style: 'unit', unit: 'meter', maximumFractionDigits: 0, unitDisplay: 'narrow', useGrouping: false });
+	let kmFormat = new Intl.NumberFormat(undefined, { style: 'unit', unit: 'kilometer', maximumFractionDigits: 1, unitDisplay: 'narrow', useGrouping: false });
+	let percentFormat = new Intl.NumberFormat(undefined, { style: 'percent', useGrouping: false });
 
 	// Climb Point similar to tdf but increase the scale a bit
 	// Tdf should be more like 600/300/150/75
@@ -526,7 +526,13 @@ class ClimbFinder
 	}
 	const endHeight = originalPoints[endPointIndex].ele;
 	const symbol = segment.isClimb ? '↑' : '↓';
-	targetPoint.name = `${meterFormat.format(endHeight)} - ${symbol} ${meterFormat.format(segment.relevantHeight)}/${kmFormat.format(segment.distance / 1000)} ⌀ ${percentFormat.format(avgGrade/100)}`;
+	// not all locals 'narrow' are without space but we are heavily limited 
+	// on space here so cut everything out.
+	const endHeightStr = meterFormat.format(endHeight).replace(/\s/, '');
+	const relevantHeightStr = meterFormat.format(segment.relevantHeight).replace(/\s/g, '');
+	const distanceStr = kmFormat.format(segment.distance / 1000).replace(/\s/g, '');
+	const avgGradeStr = percentFormat.format(avgGrade / 100).replace(/\s/g, '');
+	targetPoint.name = `${endHeightStr}:${symbol}${relevantHeightStr} ${distanceStr} ${avgGradeStr}`;
 	//console.log(targetPoint.turn, targetPoint.name);
 	//console.log(startPointIndex);
 
@@ -550,7 +556,7 @@ class ClimbFinder
 		return;
 	    }
 	}
-	targetPoint.turn = 'summit';
+	targetPoint.turn = segment.isClimb ? 'summit' : 'valley';
 	targetPoint.name = 'Done!';
     }
 
