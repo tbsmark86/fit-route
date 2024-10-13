@@ -151,12 +151,12 @@ class Segment {
 class ClimbFinder
 {
     static defaultConfig = {
-	/* While not already into a conjected climb consider
+	/* While not already into a suspected climb consider
 	 * every gradient below that as flat */
 	considerAsFlatTill: 1.5,
 
 	/* Where to End a Climb ?
-	 * - All condition for climbs are applyed anlog for descents 
+	 * - All condition for climbs are applied analog for descents 
 	 */
 
 	/* Once inside a climb required at least this grade to be
@@ -177,7 +177,7 @@ class ClimbFinder
 	considerAsPeakAfterDescentFactorMax: 150,
 
 	/* Which climbs to Mark ?
-	 * - All condition for climbs are applyed anlog for descents 
+	 * - All condition for climbs are applied analog for descents 
 	 */
 	useClimbs: true,
 	useDescents: true,
@@ -292,7 +292,7 @@ class ClimbFinder
 		continue;
 	    }
 
-	    // Check if the climb is ended
+	    // Check if the climb has ended
 	    let checkForClimbEnd = false;
 	    if(cur.isClimb) {
 		// this also includes descent
@@ -656,9 +656,9 @@ class ClimbFinder
 	this.calcPointInfo();
 
 	// Smooth out oscillating elevation
-	// The Idea is to check all groups of points the idea is that
-	// an actually wavy road (in the mater of a few meters) is rather rare
-	// and more likely some rounding errors on height calculation.
+	// The Idea is to check for 'waves' in the points and to flatten
+	// those out. Because likely those are just rounding errors in the
+	// height calculation of the track.
 	//
 	// The effect for findClimbs() is that those small changes in climbing
 	// direction won't constantly interrupt the search for stretches.
