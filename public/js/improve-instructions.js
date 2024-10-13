@@ -63,7 +63,7 @@ function azimuth({ lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }) {
 
 
 function turnMapping(angle) {
-  const [slight, regular, sharp, reverse] = [30, 60, 120, 150];
+  const [slight, regular, sharp, reverse] = [30, 45, 160, 175];
 
   if (angle >= slight && angle <= 360 - slight) {
     if (angle < regular) {
