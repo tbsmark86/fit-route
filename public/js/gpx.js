@@ -42,7 +42,6 @@ async function parseXml(buffer) {
   });
 }
 
-const toDegrees = (radians) => ((radians * 180) / Math.PI + 360) % 360;
 const toRadians = (degrees) => (degrees * Math.PI) / 180;
 
 function haversine({ lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }) {
@@ -59,16 +58,6 @@ function haversine({ lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }) {
   return d;
 }
 
-function azimuth({ lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }) {
-  const φ1 = (lat1 * Math.PI) / 180;
-  const φ2 = (lat2 * Math.PI) / 180;
-  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
-  const y = Math.sin(Δλ) * Math.cos(φ2);
-  const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
-  const θ = Math.atan2(y, x);
-
-  return toDegrees(θ);
-}
 
 const childNamed = (node, nodeName) => Array.from(node.children).find((node) => node.nodeName === nodeName);
 const childsNamed = (node, nodeName) => Array.from(node.children).filter((node) => node.nodeName === nodeName);
