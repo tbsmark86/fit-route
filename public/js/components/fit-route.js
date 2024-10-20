@@ -170,7 +170,9 @@ function onFitDownload() {
 async function onSearchClimbs() {
     try {
 	const climbs = await import('../climbs.js');
-	const created = climbs.findClimbs(this.route.points);
+	const created = climbs.findClimbs(this.route.points,
+	    /*{debug: () => this.$refs.map.drawTurns()}*/
+	);
 	if(!created) {
 	    alert('No Climbs found.');
 	    return;

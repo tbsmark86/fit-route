@@ -1,3 +1,4 @@
+/* jshint esversion: 9*/
 /** Helper to group stats about current stretch of points we're analysing.
  *  start/endPoint are index into the points array. */
 class Segment {
@@ -197,9 +198,9 @@ class ClimbFinder
 	ignoreDescentGradesLessThen: -5,
     };
 
-    constructor(points, config)
+    constructor(config)
     {
-	this.config = config || ClimbFinder.defaultConfig;
+	this.config = {...ClimbFinder.defaultConfig, ...config};
 	this.created = 0;
     }
 
@@ -275,6 +276,8 @@ class ClimbFinder
 	for(let idx = 1; idx < points.length; idx++) {
 	    const point = points[idx];
 
+	    this.debug.mapNote(idx);
+
 	    const eleDelta = point.deltaEle;
 	    if(eleDelta === 0 && cur === null) {
 		continue;
@@ -288,6 +291,7 @@ class ClimbFinder
 		    continue;
 		}
 		cur = new Segment(idx - 1, distance, eleDelta);
+		this.debug.point(idx, 'start');
 		curEnd = null;
 		continue;
 	    }
@@ -305,11 +309,12 @@ class ClimbFinder
 		}
 	    }
 	    if(checkForClimbEnd && !curEnd && cur.distance < 50) {
+		this.debug.point(cur.startPoint, 'bump');
 		// require at least 2 consecutive points of climb/drop
 		// to do any detailed investigation unless this first
 		// point is unusually long
 		//
-		// This should filter out many small bumbs from the cacluation
+		// This should filter out many small bumps from the calculation
 		cur = null;
 		continue;
 	    }
@@ -317,6 +322,7 @@ class ClimbFinder
 	    if(checkForClimbEnd) {
 		if(!curEnd) {
 		    curEnd = new Segment(idx - 1, distance, eleDelta);
+		    this.debug.point(idx, 'check-end');
 		} else {
 		    curEnd.addPoint(distance, eleDelta);
 		}
@@ -330,11 +336,14 @@ class ClimbFinder
 		) {
 		    cur.endPoint = curEnd.startPoint - 1;
 		    if(!this.processClimb(cur)) {
+			this.debug.point(cur.endPoint, 'ignore');
 			// try everything again with one less point
 			// It could be that overall the selected segment was to
 			// shallow but contains more step sub-parts.
 			idx = cur.startPoint + 1;
 		    } else {
+			this.debug.point(cur.startPoint, 'used-start');
+			this.debug.point(cur.endPoint, 'used-end');
 			// Consider the ignored part again; could be something
 			// on its own.
 			// But be careful with edge case of climb consisting only of
@@ -355,6 +364,7 @@ class ClimbFinder
 		// continue climb after short shallow/descent stretch
 		cur.addSegment(curEnd);
 		curEnd = null;
+		this.debug.point(idx, 'no-end');
 	    }
 	    cur.addPoint(distance, eleDelta);
 	}
@@ -564,6 +574,7 @@ class ClimbFinder
     {
 	this.originalPoints = inputPoints;
 
+	this.points = inputPoints;
 	this.points = [];
 
 	// Just pass input points through ensuring every point can be used
@@ -619,7 +630,7 @@ class ClimbFinder
 	let newPoints;
 	let points = this.points;
 
-	newPoints = [];
+	this.points = newPoints = [];
 	for(let idx = 1; idx < points.length; idx++) {
 	    const point = points[idx];
 	    const prevPoint = points[idx - 1];
@@ -643,6 +654,7 @@ class ClimbFinder
 		    newPoints.pop();
 		    point.deltaDistance += prevPoint.deltaDistance;
 		    newPoints.push(point);
+		    this.debug.point(newPoints.length - 1, 'joined');
 		    continue;
 		}
 	    }
@@ -676,6 +688,7 @@ class ClimbFinder
 	    ) {
 		point2.ele = (point1.ele + point3.ele) / 2.0;
 		smoothed++;
+		this.debug.point(idx - 1, 'smoothed');
 	    }
 	}
 	console.log('flattend peaks/valleys', smoothed);
@@ -685,6 +698,100 @@ class ClimbFinder
     }
 }
 
+class DebugNone {
+    point() {}
+    mapNote() {}
+}
+
+/* Helper for Debug: Show Profile in extra window with Detail info */
+class DebugActive {
+    constructor(processor) {
+	this.processor = processor;
+    }
+
+    point(idx, info) {
+	const point = this.processor.points[idx];
+	if(!point.debugInfo) {
+	    point.debugInfo = new Set();
+	}
+	point.debugInfo.add(info);
+    }
+
+    mapNote(idx) {
+	if((idx % 10) == 0) {
+	    let point = this.processor.points[idx];
+	    let origPoint = this.processor.originalPoints[point.origIndex];
+	    origPoint.turn = 'danger';
+	    origPoint.name = idx;
+	}
+    }
+
+    async display(name) {
+	let title = 'Debug';
+	if(name === 'initial') {
+	    title = 'Raw Data';
+	} else if(name === 'smooth') {
+	    title = 'Smootehd Data';
+	} else if(name === 'climbs') {
+	    title = 'Find Info';
+	}
+
+	const points = this.processor.points;
+
+	const minEle = points.reduce((minCur, point) => Math.min(minCur, point.ele || minCur), 100000);
+	const maxEle = points.reduce((maxCur, point) => Math.max(maxCur, point.ele || maxCur), -100000);
+	const deltaEle = maxEle - minEle;
+	console.log(minEle, maxEle);
+
+	const win = window.open('about:blank', name || 'points');
+	await (new Promise((done) => {
+	    win.onload = done;
+	}));
+	DebugActive.registerCleanup(win)
+
+	win.document.documentElement.innerHTML = `
+	    <head>
+		<title>${title}</title>
+		<style>
+		    body { font: 12px/1.0 monospace; }
+		    .bar { border: 1px solid black; text-wrap: nowrap; }
+		</style>
+	    </head>
+	    <body></body>`;
+	const cont = win.document.body;
+
+	const pxPerEle = (document.body.offsetWidth - 50) / deltaEle;
+	let format = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2, useGrouping: true });
+
+	let i = 0;
+	for(const point of points) {
+	    i++;
+	    const div = win.document.createElement('div');
+	    div.classList.add('bar');
+	    div.style.width = `${(point.ele - minEle) * pxPerEle}px`;
+	    div.style.minHeight = `${point.deltaDistance * 0.1}px`;
+	    let text = `${point.origIndex || i}: ${format.format(point.ele)} | ${format.format(point.deltaDistance)} | ${format.format(point.grade)}`;
+	    if(point.debugInfo) {
+		text += ' | ' + Array.from(point.debugInfo.values()).join(', ');
+		// don't display this debug data again
+		delete point.debugInfo;
+	    }
+	    div.innerText = text;
+	    cont.appendChild(div);
+	}
+    }
+
+    static activeWindows = [];
+    static registerCleanup(win) {
+	if(DebugActive.activeWindows.length === 0) {
+	    window.addEventListener('pagehide', () => {
+		DebugActive.activeWindows.forEach((w) => w.close());
+		DebugActive.activeWindows = [];
+	    });
+	}
+	DebugActive.activeWindows.push(win);
+    }
+}
 
 /** Analyse Track and create "turn"-hints with info about
  *  upcoming climbs. A poor-mans-climb-pro feature. */
@@ -692,6 +799,21 @@ export function findClimbs(points, config)
 {
     const processor = new ClimbFinder(config);
     processor.loadPointsBasic(points);
+    config = config || {};
+    if(config.debug) {
+	processor.debug = new DebugActive(processor);
+	new Promise(async (done) => {
+	    await processor.debug.display('initial');
+	    processor.smoothPoints();
+	    await processor.debug.display('smooth');
+	    processor.findClimbs();
+	    await processor.debug.display('climbs');
+	    done();
+	    config.debug();
+	});
+	return 1; /* fake result */
+    }
+    processor.debug = new DebugNone();
     processor.smoothPoints();
     processor.findClimbs();
     return processor.created;
