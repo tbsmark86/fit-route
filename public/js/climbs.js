@@ -338,23 +338,20 @@ class ClimbFinder
 		    this.hasPeaked(cur, curEnd, idx)
 		) {
 		    cur.endPoint = curEnd.startPoint - 1;
-		    if(!this.processClimb(cur)) {
+		    if(!this.tryInsertClimb(cur)) {
 			this.debug.point(idx, 'do-end');
-			// try everything again with one less point
-			// It could be that overall the selected segment was to
-			// shallow but contains more step sub-parts.
-			idx = cur.startPoint + 1;
 		    } else {
 			this.debug.point(cur.startPoint, 'used-start');
 			this.debug.point(cur.endPoint, 'used-end');
-			// Consider the ignored part again; could be something
-			// on its own.
-			// But be careful with edge case of climb consisting only of
-			// two points - don't create endless loops!
-			idx = Math.max(cur.endPoint - 1, cur.startPoint + 1);
 		    }
+		    // Consider everything after the final tested Segment again
+		    // for a new Segment.
+		    // But be careful with edge case of climb consisting only of
+		    // two points - don't create endless loops!
+		    idx = Math.max(cur.endPoint - 1, cur.startPoint + 1);
+
 		    // reset current climb
-		    cur = null;
+		    cur = curEnd = null;
 		}
 		continue;
 	    } else if(curEnd) {
@@ -378,7 +375,22 @@ class ClimbFinder
 	}
     }
 
-    processClimb(segment)
+    tryInsertClimb(segment)
+    {
+	while(segment.endPoint - segment.startPoint > 1) {
+	    if(this._tryInsertClimb(segment)) {
+		return true;
+	    }
+	    // Trim of first point and try again if the Segment matches
+	    // required conditions (because the avgGrade may now be higher)
+	    const toRemove = this.points[segment.startPoint + 1];
+	    segment.removePoint(toRemove.deltaDistance, toRemove.deltaEle);
+	    segment.startPoint++;
+	}
+	return false;
+    }
+
+    _tryInsertClimb(segment)
     {
 	const points = this.points;
 
@@ -391,7 +403,6 @@ class ClimbFinder
 		segment.descent < this.config.ignoreDescentLessThen;
 	}
 
-	let res = false;
 	let avgGrade;
 	if(!ignoreClimb) {
 	    // This is the opposite of the hasLeveldOf/hasPeaked test to end a climb: 
@@ -399,7 +410,7 @@ class ClimbFinder
 	    // split of this initial part as a separate Segment.
 	    const trimed = segment.trimOppositeStart(points);
 	    if(trimed) {
-		res = this.processClimb(trimed);
+		this._tryInsertClimb(trimed);
 	    }
 	    // Let the segment end at the highest/lowest point; this should
 	    // be the default of course but due to unclean data and findClimbs end-overshoot
@@ -432,7 +443,8 @@ class ClimbFinder
 
 	if(ignoreClimb) {
 	    //console.debug('ignoreClimb', segment, avgGrade);
-	    return res;
+	    return false;
+
 	}
 
 	//console.debug('useClimb', segment, avgGrade);
