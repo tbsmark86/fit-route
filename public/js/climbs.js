@@ -325,7 +325,7 @@ class ClimbFinder
 	    if(checkForClimbEnd) {
 		if(!curEnd) {
 		    curEnd = new Segment(idx - 1, distance, eleDelta);
-		    this.debug.point(idx, 'check-end');
+		    this.debug.point(idx - 1, 'check-end');
 		} else {
 		    curEnd.addPoint(distance, eleDelta);
 		}
@@ -339,7 +339,7 @@ class ClimbFinder
 		) {
 		    cur.endPoint = curEnd.startPoint - 1;
 		    if(!this.processClimb(cur)) {
-			this.debug.point(cur.endPoint, 'ignore');
+			this.debug.point(idx, 'do-end');
 			// try everything again with one less point
 			// It could be that overall the selected segment was to
 			// shallow but contains more step sub-parts.
