@@ -196,6 +196,9 @@ class ClimbFinder
 	ignoreDescentLessThen: 100,
 	/* average grade  */
 	ignoreDescentGradesLessThen: -5,
+
+	/* Smooth? */
+	smoothing: true,
     };
 
     constructor(config)
@@ -627,6 +630,9 @@ class ClimbFinder
 
     smoothPoints()
     {
+	if(!this.config.smoothing) {
+	    return;
+	}
 	let newPoints;
 	let points = this.points;
 
@@ -639,17 +645,17 @@ class ClimbFinder
 	    // in a hope to smooth out gradients created by elevation over very
 	    // short distances
 	    if(
-		((prevPoint.deltaDistance + point.deltaDistance) < 15) ||
-		// sum is already above target but keep join in extremely short
+		((prevPoint.deltaDistance + point.deltaDistance) < 25) ||
+		// sum is already above target but keep joining extremely short
 		// segments
-		(point.deltaDistance < 1) || (prevPoint.deltaDistance < 1)
+		(point.deltaDistance < 2) || (prevPoint.deltaDistance < 2)
 
 	    ) {
 		if(
 		    // only merge if prev point has elevation change in same direction
-		    (point.deltaEle > 0 && prevPoint.deltaEle > 0) ||
+		    (point.deltaEle >= 0 && prevPoint.deltaEle > 0) ||
 		    (point.deltaEle == 0 && prevPoint.deltaEle == 0) ||
-		    (point.deltaEle < 0 && prevPoint.deltaEle < 0)
+		    (point.deltaEle <= 0 && prevPoint.deltaEle < 0)
 		) {
 		    newPoints.pop();
 		    point.deltaDistance += prevPoint.deltaDistance;
@@ -674,17 +680,22 @@ class ClimbFinder
 	//
 	// The effect for findClimbs() is that those small changes in climbing
 	// direction won't constantly interrupt the search for stretches.
+	function allow_smooth(point1, point2, point3, deltaEle, deltaDistance) {
+	    return Math.abs(point1.ele - point3.ele) < deltaEle &&
+		(
+		    (point2.ele > point1.ele && point2.ele > point3.ele) ||
+		    (point2.ele < point1.ele && point2.ele < point3.ele)
+		) &&
+		point2.deltaDistance < deltaDistance &&  point3.deltaDistance < deltaDistance;
+	}
+	//
 	let smoothed = 0;
 	for(let idx = 2; idx < points.length; idx++) {
 	    const point1 = points[idx - 2];
 	    const point2 = points[idx - 1];
 	    const point3 = points[idx];
-	    if(Math.abs(point1.ele - point3.ele) < 0.5 &&
-		(
-		    (point2.ele > point1.ele && point2.ele > point3.ele) ||
-		    (point2.ele < point1.ele && point2.ele < point3.ele)
-		) &&
-		point2.deltaDistance < 20 &&  point3.deltaDistance < 20
+	    if(allow_smooth(point1, point2, point3, 0.5, 20) ||
+	      allow_smooth(point1, point2, point3, 3, 10)
 	    ) {
 		point2.ele = (point1.ele + point3.ele) / 2.0;
 		smoothed++;
@@ -732,6 +743,9 @@ class DebugActive {
 	    title = 'Raw Data';
 	} else if(name === 'smooth') {
 	    title = 'Smootehd Data';
+	    if(!this.processor.config.smoothing) {
+		return;
+	    }
 	} else if(name === 'climbs') {
 	    title = 'Find Info';
 	}
