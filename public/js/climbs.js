@@ -127,7 +127,7 @@ class Segment {
 	    }
 	    // limit effect of parts with absurd grade
 	    // e.g. this happens for tracks trough short tunnels
-	    grade = Math.max(25, Math.min(-25, grade))
+	    grade = Math.max(25, Math.min(-25, grade));
 
 	    // Ignore flat sections for average calculation
 	    if(Math.abs(grade) > minGrade) {
@@ -228,7 +228,7 @@ class ClimbFinder
 	    // (aka the higher the climb the more short drop/stop is allowed)
 	    return false;
 	}
-	//console.debug('endClimbLeveldOf', idx, curEnd, scaledLimit);
+	this.debug.log('endClimbLeveldOf', idx, curEnd, scaledLimit);
 	return true;
     }
 
@@ -254,7 +254,7 @@ class ClimbFinder
 	    // (aka the higher the climb the more short drop/stop is allowed)
 	    return false;
 	}
-	//console.debug('endClimbPeak', idx, curEnd, scaledLimit);
+	this.debug.log('endClimbPeak', idx, curEnd, scaledLimit);
 	return true;
     }
 
@@ -286,7 +286,7 @@ class ClimbFinder
 		continue;
 	    }
 	    const distance = point.deltaDistance;
-	    const grade = point.grade
+	    const grade = point.grade;
 
 	    if(cur === null) {
 		if(Math.abs(grade) < config.considerAsFlatTill) {
@@ -371,7 +371,7 @@ class ClimbFinder
 
 	if(cur !== null) {
 	    cur.endPoint = points.length - 1;
-	    this.processClimb(cur);
+	    this.tryInsertClimb(cur);
 	}
     }
 
@@ -442,12 +442,12 @@ class ClimbFinder
 	}
 
 	if(ignoreClimb) {
-	    //console.debug('ignoreClimb', segment, avgGrade);
+	    this.debug.log('ignoreClimb', segment, avgGrade);
 	    return false;
 
 	}
 
-	//console.debug('useClimb', segment, avgGrade);
+	this.debug.log('useClimb', segment, avgGrade);
 	this.insertClimb(segment, avgGrade);
 	return true;
     }
@@ -558,8 +558,8 @@ class ClimbFinder
 	const distanceStr = kmFormat.format(segment.distance / 1000).replace(/\s/g, '');
 	const avgGradeStr = percentFormat.format(avgGrade / 100).replace(/\s/g, '');
 	targetPoint.name = `${endHeightStr}:${symbol}${relevantHeightStr} ${distanceStr} ${avgGradeStr}`;
-	//console.log(targetPoint.turn, targetPoint.name);
-	//console.log(startPointIndex);
+	this.debug.log(targetPoint.turn, targetPoint.name);
+	this.debug.log(startPointIndex);
 
 	this.created++;
 
@@ -618,7 +618,7 @@ class ClimbFinder
 		ele: ele,
 	    });
 	});
-	this.calcPointInfo()
+	this.calcPointInfo();
     }
 
     calcPointInfo()
@@ -679,7 +679,7 @@ class ClimbFinder
 	    newPoints.push(point);
 	}
 
-	console.log('joined', points.length, 'down to', newPoints.length);
+	this.debug.log('joined', points.length, 'down to', newPoints.length);
 
 	this.points = points = newPoints;
 	// update Info
@@ -714,7 +714,7 @@ class ClimbFinder
 		this.debug.point(idx - 1, 'smoothed');
 	    }
 	}
-	console.log('flattend peaks/valleys', smoothed);
+	this.debug.log('flattend peaks/valleys', smoothed);
 
 	// update Info
 	this.calcPointInfo();
@@ -724,6 +724,7 @@ class ClimbFinder
 class DebugNone {
     point() {}
     mapNote() {}
+    log() {}
 }
 
 /* Helper for Debug: Show Profile in extra window with Detail info */
@@ -749,6 +750,10 @@ class DebugActive {
 	}
     }
 
+    log(...args) {
+	console.debug('[Climbs]', ...args);
+    }
+
     async display(name) {
 	let title = 'Debug';
 	if(name === 'initial') {
@@ -767,13 +772,13 @@ class DebugActive {
 	const minEle = points.reduce((minCur, point) => Math.min(minCur, point.ele || minCur), 100000);
 	const maxEle = points.reduce((maxCur, point) => Math.max(maxCur, point.ele || maxCur), -100000);
 	const deltaEle = maxEle - minEle;
-	console.log(minEle, maxEle);
+	this.log(`Display ${name} Min/Max`, minEle, maxEle);
 
 	const win = window.open('about:blank', name || 'points');
 	await (new Promise((done) => {
 	    win.onload = done;
 	}));
-	DebugActive.registerCleanup(win)
+	DebugActive.registerCleanup(win);
 
 	win.document.documentElement.innerHTML = `
 	    <head>
@@ -826,7 +831,7 @@ export function findClimbs(points, config)
     const processor = new ClimbFinder(config);
     processor.loadPointsBasic(points);
     config = config || {};
-    if(config.debug) {
+    if(window.location.hash.indexOf('debug_climbs') !== -1) {
 	processor.debug = new DebugActive(processor);
 	new Promise(async (done) => {
 	    await processor.debug.display('initial');
@@ -835,7 +840,7 @@ export function findClimbs(points, config)
 	    processor.findClimbs();
 	    await processor.debug.display('climbs');
 	    done();
-	    config.debug();
+	    config._lateRedrawDebug();
 	});
 	return 1; /* fake result */
     }

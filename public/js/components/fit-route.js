@@ -1,4 +1,4 @@
-/* jshint esversion: 6 */
+/* jshint esversion: 11 */
 /* global URL */
 import { parseGpx, elevationChange } from '../gpx.js';
 import FileUpload from './file-upload.js';
@@ -171,7 +171,7 @@ async function onSearchClimbs() {
     try {
 	const climbs = await import('../climbs.js');
 	const created = climbs.findClimbs(this.route.points,
-	    /*{debug: () => this.$refs.map.drawTurns()}*/
+	    {_lateRedrawDebug: () => this.$refs.map.drawTurns()}
 	);
 	if(!created) {
 	    alert('No Climbs found.');
@@ -262,7 +262,9 @@ const FitRoute = {
     },
   },
   created: function () {
-    window.addEventListener('beforeunload', this.onBeforeUnload);
+    if(window.location.hash.indexOf('debug') === -1) {
+	window.addEventListener('beforeunload', this.onBeforeUnload);
+    }
   },
   destroyed: function () {
     window.removeEventListener('beforeunload', this.onBeforeUnload);
