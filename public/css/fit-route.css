@@ -165,17 +165,17 @@ h1.navbar-brand {
   width: 6rem;
 }
 
-.course-point-dialog {
+.default-dialog {
   width: max-content;
   max-width: 90vw;
   margin: auto auto;
   padding: 0;
   border: none;
 }
-.course-point-dialog::backdrop {
+.default-dialog::backdrop {
   background-color: rgba(1, 1, 1, 0.5);
 }
-.course-point-dialog > .modal-dialog {
+.default-dialog > .modal-dialog {
   margin: 0;
 }
 

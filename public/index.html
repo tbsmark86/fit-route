@@ -179,15 +179,14 @@
 	     </div>
 	   </div>
            <div class="mt-4 d-flex flex-column">
-              <div class="d-flex justify-content-around">
-                <button class="btn btn-secondary m-2" @click="onClear">Clear</button>
-                <button class="btn btn-primary m-2" @click="onFitDownload">Download as FIT</button>
+              <div class="d-flex justify-content-between">
+                <button class="btn btn-secondary m-2" type=button @click="onClear">Clear</button>
+                <button class="btn btn-primary m-2" type=button @click="onFitDownload">Download as FIT</button>
               </div>
               <a ref="downloadAnchor" class="d-none" download="COURSE.fit" href="#"></a>
             </div>
-	    <div style="text-align:center">
-	      <button class="btn btn-secondary" type=button @click="onSearchClimbs" title="Search for Climbs in Track based on provided Elevation data">Add Climb Hints</button><br>
-	      <small>(Beta, options yet to come)</small>
+	    <div class="d-flex justify-content-between">
+	      <button class="btn btn-secondary m-2" type=button @click="onSearchClimbs">Find Climbs</button>
             </div>
 	    <form novalidate style="font-size:0.8em">
 	      <i>View Settings</i>
@@ -240,7 +239,8 @@
 		@select_point="onSelectPoint"
 	    ></route-map>
           </div>
-	  <course-point-dialog ref="dialog"></course-point-dialog>
+	  <course-point-dialog ref="dialog_point"></course-point-dialog>
+	  <climb-dialog ref="dialog_climbs"></climb-dialog>
         </div>
       </div></template>
     </script>
@@ -295,7 +295,7 @@
 
     <script type="text/x-template" id="course-point-dialog-template">
       <template v-if="open">
-	<dialog ref="dialog" class="modal-content course-point-dialog"><!-- custom bootstrap modal -->
+	<dialog ref="dialog" class="modal-content default-dialog"><!-- custom bootstrap modal -->
 	  <form ref="form" method="dialog" role="document">
 	  <div class="modal-header">
 	    <h5 class="modal-title">Edit Turn Info</h5>
@@ -355,5 +355,71 @@
 	</dialog>
       </template>
     </script>
+
+    <script type="text/x-template" id="climb-dialog-template">
+      <template v-if="open">
+	<dialog ref="dialog" class="modal-content default-dialog"><!-- custom bootstrap modal -->
+	  <form ref="form" method="dialog" role="document">
+	  <div class="modal-header">
+	    <h5 class="modal-title">Find Climbs</h5>
+	    <button type="submit" class="btn-close" value="close" aria-label="Close"></button>
+	  </div>
+	  <div class="modal-body">
+	    This depends on the qualitiy of elevation data in your GPX data.
+	    <fieldset>
+		<legend class=col-form-label>Climbs</legend>
+		<div class="form-check form-check-inline">
+		    <input name=climb v-model=climb class=form-check-input type=radio value=all id=cb_c1><label class=form-check-label for=cb_c1> All</label>
+		</div>
+		<div class="form-check form-check-inline">
+		    <input name=climb v-model=climb class=form-check-input type=radio value=medium id=cb_c2><label class=form-check-label for=cb_c2> Medium+Major</label>
+		</div>
+		<div class="form-check form-check-inline">
+		    <input name=climb v-model=climb class=form-check-input type=radio value=major id=cb_c3><label class=form-check-label for=cb_c3> Major</label>
+		</div>
+		<div class="form-check form-check-inline">
+		    <input name=climb v-model=climb class=form-check-input type=radio value=none id=cb_c4><label class=form-check-label for=cb_c4> None</label>
+		</div>
+	    </fieldset>
+	    <fieldset>
+		<legend class=col-form-label>Descents</legend>
+		<div class="form-check form-check-inline">
+		    <input name=descent v-model=descent class=form-check-input type=radio value=all id=cb_d1><label class=form-check-label for=cb_d1> All</label>
+		</div>
+		<div class="form-check form-check-inline">
+		    <input name=descent v-model=descent class=form-check-input type=radio value=medium id=cb_d2><label class=form-check-label for=cb_d2> Medium+Major</label>
+		</div>
+		<div class="form-check form-check-inline">
+		    <input name=descent v-model=descent class=form-check-input type=radio value=major id=cb_d3><label class=form-check-label for=cb_d3> Major</label>
+		</div>
+		<div class="form-check form-check-inline">
+		    <input name=descent v-model=descent class=form-check-input type=radio value=none id=cb_d4><label class=form-check-label for=cb_d4> None</label>
+		</div>
+	    </fieldset>
+	    <fieldset>
+		<legend class=col-form-label>Details</legend>
+		<small>How much level road before a climb is split into two segments?</small><br>
+		<div class="form-check form-check-inline">
+		    <input name=end v-model=end class=form-check-input type=radio value=short id=cb_l1><label class=form-check-label for=cb_l1> Short</label>
+		</div>
+		<div class="form-check form-check-inline">
+		    <input name=end v-model=end class=form-check-input type=radio value=normal id=cb_l2><label class=form-check-label for=cb_l2> Medium</label>
+		</div>
+		<div class="form-check form-check-inline">
+		    <input name=end v-model=end class=form-check-input type=radio value=long id=cb_l3><label class=form-check-label for=cb_l3> Long</label>
+		</div>
+	    </fieldset>
+	    <small><i>Custom:</i><br>
+	    If you want custom adjustment you can fork the project or <a href="mailto:kontakt@tobis-page.de">write me</a></small>
+	  </div>
+	  <div class="modal-footer">
+	    <button type="submit" class="btn btn-primary" value="go" autofocus>Go</button>
+	    <button type="submit" class="btn btn-secondary" value="close">Abort</button>
+	  </div>
+	  </form>
+	</dialog>
+      </template>
+    </script>
+
   </body>
 </html>

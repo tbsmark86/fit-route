@@ -200,12 +200,80 @@ class ClimbFinder
 	/* Smooth? */
 	smoothing: true,
     };
+    /* Config changes */
+    static presets = {
+	climbs_all: {
+	    considerAsFlatTill: 0.8,
+	    ignoreAscentLessThen: 20,
+	    ignoreAscentGradesLessThen: 2,
+	},
+	climbs_medium: {
+	    considerAsFlatTill: 1,
+	    ignoreAscentLessThen: 50,
+	    ignoreAscentGradesLessThen: 3,
+	},
+	climbs_none: {
+	    useClimbs: false
+	},
+	descents_all: {
+	   considerAsFlatTill: 1,
+	   ignoreAscentLessThen: 30,
+	   ignoreAscentGradesLessThen: 2,
+	},
+	descents_medium: {
+	   ignoreAscentLessThen: 50,
+	   ignoreAscentGradesLessThen: 3,
+	},
+	descents_none: {
+	    useDescents: false
+	},
+	end_short: {
+	    considerAsLeveledOfDistance: 250,
+	    considerAsLeveledOfFactor: 1,
+	    considerAsLeveledOfFactorMax: 1000,
 
-    constructor(config)
+	    considerAsPeakAfterDescent: 10,
+	    //considerAsPeakAfterDescentFactor: 0.1,
+	    considerAsPeakAfterDescentFactorMax: 75,
+	},
+	end_long: {
+	    considerAsLeveledOfDistance: 750,
+	    considerAsLeveledOfFactor: 2,
+	    considerAsLeveledOfFactorMax: 3000,
+
+	    considerAsPeakAfterDescent: 30,
+	    considerAsPeakAfterDescentFactor: 0.2,
+	    considerAsPeakAfterDescentFactorMax: 200,
+	}
+    };
+
+    constructor()
     {
-	this.config = {...ClimbFinder.defaultConfig, ...config};
+	this.config = {...ClimbFinder.defaultConfig};
 	this.created = 0;
     }
+ 
+    applyPreset(preset) 
+    {
+	const presetData = ClimbFinder.presets[preset];
+	if(presetData) {
+	    this.config = {...this.config, ...presetData};
+	}
+    }
+
+    applyPresets(presets)
+    {
+	if(presets.climbs) {
+	    this.applyPreset(`climbs_${presets.climbs}`);
+	}
+	if(presets.descents) {
+	    this.applyPreset(`descents_${presets.descents}`);
+	}
+	if(presets.end) {
+	    this.applyPreset(`end_${presets.end}`);
+	}
+    }
+
 
     hasLeveledOf(cur, curEnd, idx)
     {
@@ -549,6 +617,7 @@ class ClimbFinder
 	} else {
 	    targetPoint.turn = 'danger';
 	}
+	targetPoint._climb = true;
 	const endHeight = originalPoints[endPointIndex].ele;
 	const symbol = segment.isClimb ? '↑' : '↓';
 	// not all locals 'narrow' are without space but we are heavily limited 
@@ -583,6 +652,7 @@ class ClimbFinder
 	}
 	targetPoint.turn = segment.isClimb ? 'summit' : 'valley';
 	targetPoint.name = 'Done!';
+	targetPoint._climb = true;
     }
 
     loadPointsBasic(inputPoints)
@@ -597,6 +667,11 @@ class ClimbFinder
 	let lastEle = NaN;
 	let lastDistance = 0;
 	inputPoints.forEach((point, idx) => {
+	    if(point._climb) {
+		// Clear previous run
+		delete point.turn;
+		delete point._climb;
+	    }
 	    if(lastDistance == point.distance) {
 		// ignore duplicate points
 		return;
@@ -826,11 +901,11 @@ class DebugActive {
 
 /** Analyse Track and create "turn"-hints with info about
  *  upcoming climbs. A poor-mans-climb-pro feature. */
-export function findClimbs(points, config)
+export function findClimbs(points, presets, debugRedraw)
 {
-    const processor = new ClimbFinder(config);
+    const processor = new ClimbFinder(points);
+    processor.applyPresets(presets);
     processor.loadPointsBasic(points);
-    config = config || {};
     if(window.location.hash.indexOf('debug_climbs') !== -1) {
 	processor.debug = new DebugActive(processor);
 	new Promise(async (done) => {
@@ -840,7 +915,7 @@ export function findClimbs(points, config)
 	    processor.findClimbs();
 	    await processor.debug.display('climbs');
 	    done();
-	    config._lateRedrawDebug();
+	    debugRedraw();
 	});
 	return 1; /* fake result */
     }

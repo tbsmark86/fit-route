@@ -1,0 +1,21 @@
+
+[ ] Bei brouter: Neues issue projiziere POIs auf den FIT-Track
+    damit die nicht verlochen gehen
+    [ ] update der lib
+[ ] Bei brouter:
+    diese 'navi pfeil' beim export durch expliziten text ersetzen
+    ob turn instructions exporitert werden oder nicht. 
+
+-----
+
+Tool:
+
++ Eigener track von Wahoo kennt Kreisverkehr :/
+    * hrm es gibt 'roundabout_45_idx' unter turn_type?
+     aber der ist in keiner mesg verwendet also nur für developer-data?
+
+Teste
+------
+* L/R Logik
+* Kreisverkehr logik
+* Climb Texte jetzt kurz genug?

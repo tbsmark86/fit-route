@@ -5,6 +5,7 @@ import FileUpload from './file-upload.js';
 import RouteInfo from './route-info.js';
 import RouteMap from './route-map.js';
 import CoursePointDialog from './course-point-dialog.js';
+import ClimbDialog from './climb-dialog.js';
 import { FITEncoder } from '../fit/encoder.js';
 import { getBool, setBoolWatchFunc, setBool, getString, setString } from '../localStorage.js';
 import { improveInstructions } from '../improve-instructions.js';
@@ -169,18 +170,22 @@ function onFitDownload() {
 
 async function onSearchClimbs() {
     try {
+	const choice = await this.$refs.dialog_climbs.show();
+	if(choice.climbs === 'none' && choice.descents === 'none') {
+	    return;
+	}
 	const climbs = await import('../climbs.js');
 	const created = climbs.findClimbs(this.route.points,
-	    {_lateRedrawDebug: () => this.$refs.map.drawTurns()}
+	    choice,
+	    () => this.$refs.map.drawTurns()
 	);
 	if(!created) {
 	    alert('No Climbs found.');
 	    return;
 	}
     } catch(e) {
-	console.error(e);
-	alert('Failed :/');
-	return;
+	alert('Unexpected Problem :/');
+	throw e;
     }
     // enable turn display to avoid confusion
     this.show_turns = true;
@@ -195,7 +200,7 @@ function onBeforeUnload(event) {
 }
 
 async function onSelectPoint(point) {
-  await this.$refs.dialog.edit(point);
+  await this.$refs.dialog_point.edit(point);
   if(this.improve_turns) {
     this.route = improveInstructions(this.route, true);
   }
@@ -235,7 +240,8 @@ const FitRoute = {
     FileUpload,
     RouteInfo,
     RouteMap,
-    CoursePointDialog
+    CoursePointDialog,
+    ClimbDialog
   },
   watch: {
     shortNotes: setBoolWatchFunc('shortNotes'),
